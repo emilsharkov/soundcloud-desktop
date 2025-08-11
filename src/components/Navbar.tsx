@@ -1,30 +1,40 @@
-import { SearchResult } from "@/models/response";
-import { PopoverAnchor, PopoverContent } from "@radix-ui/react-popover";
+import { PagingCollection, SearchResult, Track } from "@/models/response";
+import { PopoverAnchor, PopoverContent } from "./ui/popover";
 import { Search } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useDebounceValue } from "usehooks-ts";
 import Soundcloud from "../assets/soundcloud.svg?react";
 import { Input } from "./ui/input";
 import { NavigationMenu, NavigationMenuItem, NavigationMenuList } from "./ui/navigation-menu";
 import { Popover } from "./ui/popover";
+import { useTauriInvoke } from "@/hooks/useTauriInvoke";
+
+interface SearchArgs {
+    q: string;
+}
 
 const Navbar = () => {
     const [search, setSearch] = useState<string>("");
     const [debouncedSearch] = useDebounceValue(search, 500);
-    const [searchResults,setSearchResults] = useState<SearchResult[] | null>(null)
+    const [selectedOutput, setSelectedOutput] = useState<string | undefined>(undefined);
 
-    useEffect(() => {
-        setSearchResults(debouncedSearch !== "" ? [
-            {
-                output: "fluxxwave",
-                query: "fluxxwave"
-            },
-            {
-                output: "fluxxwave",
-                query: "fluxxwave"
-            }
-        ]: null)
-    }, [debouncedSearch])
+    const { data: searchResults } = useTauriInvoke<SearchArgs,PagingCollection<SearchResult>>(
+        "search_results", { 
+            q: debouncedSearch 
+        }, {
+            enabled: debouncedSearch.trim() !== "",
+        }
+    );
+
+    const { data: tracks } = useTauriInvoke<SearchArgs,PagingCollection<Track>>(
+        "search_tracks", { 
+            q: selectedOutput ?? ""
+        }, {
+            enabled: selectedOutput !== undefined,
+        }
+    );    
+
+    console.log(tracks);
 
     return (
         <NavigationMenu className="w-full max-w-none border-white border">
@@ -34,7 +44,7 @@ const Navbar = () => {
                 <NavigationMenuItem>Search</NavigationMenuItem>
                 <NavigationMenuItem>Library</NavigationMenuItem>
             </NavigationMenuList>
-            <Popover open={searchResults !== null}>
+            <Popover open={search.trim() !== "" && searchResults !== null}>
                 <PopoverAnchor>
                     <div className="relative w-full mx-4">
                         <Input
@@ -48,13 +58,13 @@ const Navbar = () => {
                 </PopoverAnchor>
                 <PopoverContent>
                     <div className="w-full bg-white rounded-lg flex flex-col">
-                        {searchResults?.map((searchResult: SearchResult) => {
-                            const { output } = searchResult
+                        {searchResults?.collection.map((searchResult: SearchResult, idx: number) => {
+                            const { output } = searchResult;
                             return (
-                                <div className="px-3 py-1 text-black">
+                                <div key={idx} className="px-3 py-1 text-black" onClick={() => setSelectedOutput(output)}>
                                     {output}
                                 </div>
-                            )
+                            );
                         })}
                     </div>
                 </PopoverContent>
