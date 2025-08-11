@@ -4,12 +4,15 @@
 mod db;
 mod utils;
 mod commands;
+mod models;
+
+use std::sync::Arc;
 
 use db::setup::setup_database;
 use commands::greet::greet;
 use utils::init_app_data_dir::init_app_data_dir;
 use tauri::Manager;
-
+use models::app_state::AppState;
 
 fn main() {
     tauri::Builder::default()
@@ -17,12 +20,17 @@ fn main() {
         .setup(|app| {
             let app_handle = app.handle().clone();
             let app_data_dir = app_handle.path().app_data_dir().expect("Failed to get app data dir");
-            println!("app_data_dir: {}", app_data_dir.display());
             init_app_data_dir(&app_data_dir).expect("Failed to init app data dir");
-            let db_pool = tauri::async_runtime::block_on(async {
-                setup_database(&app_data_dir).await.expect("Failed to setup database")
+
+            let app_state = tauri::async_runtime::block_on(async {
+                let db_pool = setup_database(&app_data_dir).await.expect("Failed to setup database");
+                // let soundcloud_client = soundcloud_rs::Client::new().await.expect("Failed to create soundcloud client");
+                AppState {
+                    db_pool: Arc::new(db_pool),
+                    // soundcloud_client: Arc::new(soundcloud_client),
+                }
             });
-            app.manage(db_pool);
+            app.manage(app_state);
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![greet])
