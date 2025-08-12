@@ -1,4 +1,4 @@
-\import { Waveform } from "@/models/response";
+import { Waveform } from "@/models/response";
 
 export interface SongProps {
     title: string;
