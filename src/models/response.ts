@@ -220,3 +220,9 @@ export interface UserSummary {
 }
 
 export type Users = PagingCollection<User>; 
+
+export interface Waveform {
+  width: number;
+  height: number;
+  samples: number[];
+}

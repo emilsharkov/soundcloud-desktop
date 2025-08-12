@@ -1,6 +1,4 @@
-import { Waveform } from "@/App";
-import AdaptiveAudio from "./AdaptiveAudio";
-import { useRef } from "react";
+\import { Waveform } from "@/models/response";
 
 export interface SongProps {
     title: string;
@@ -10,10 +8,12 @@ export interface SongProps {
 
 const Song = (props: SongProps) => {
     const { title, imageSrc, waveform } = props
-    const audioRef = useRef<HTMLAudioElement | null>(null);    
 
     return (
-        <AdaptiveAudio ref={audioRef} controls src={""} />
+        <div className="flex flex-col gap-2">
+            <img src={imageSrc} alt={title} className="w-full h-full object-cover" />
+            <p className="text-sm text-gray-500">{title}</p>
+        </div>
     )
 }
 
