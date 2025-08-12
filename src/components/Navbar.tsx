@@ -1,13 +1,14 @@
 import { PagingCollection, SearchResult, Track } from "@/models/response";
 import { PopoverAnchor, PopoverContent } from "./ui/popover";
 import { Search } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDebounceValue } from "usehooks-ts";
 import Soundcloud from "../assets/soundcloud.svg?react";
 import { Input } from "./ui/input";
 import { NavigationMenu, NavigationMenuItem, NavigationMenuList } from "./ui/navigation-menu";
 import { Popover } from "./ui/popover";
 import { useTauriInvoke } from "@/hooks/useTauriInvoke";
+import { invoke } from "@tauri-apps/api/core";
 
 interface SearchArgs {
     q: string;
@@ -34,7 +35,16 @@ const Navbar = () => {
         }
     );    
 
-    console.log(tracks);
+    useEffect(() => {
+        const fetchStreamUrl = async () => {
+            console.log(tracks?.collection[0]);
+            const streamUrl = await invoke("get_stream_url", {
+                track: tracks?.collection[0],
+            });
+            console.log(streamUrl);
+        };
+        fetchStreamUrl();
+    }, [tracks]);
 
     return (
         <NavigationMenu className="w-full max-w-none border-white border">
@@ -44,7 +54,7 @@ const Navbar = () => {
                 <NavigationMenuItem>Search</NavigationMenuItem>
                 <NavigationMenuItem>Library</NavigationMenuItem>
             </NavigationMenuList>
-            <Popover open={search.trim() !== "" && searchResults !== null}>
+            <Popover open={searchResults !== undefined}>
                 <PopoverAnchor>
                     <div className="relative w-full mx-4">
                         <Input

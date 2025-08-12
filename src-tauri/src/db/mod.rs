@@ -1,3 +1,3 @@
 pub mod playlist;
-pub mod track;
 pub mod setup;
+pub mod track;
