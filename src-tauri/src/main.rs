@@ -44,10 +44,10 @@ fn main() {
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
-            search_results,
-            search_tracks,
-            get_stream_url,
-            download_track
+            // search_results,
+            // search_tracks,
+            // get_stream_url,
+            // download_track
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

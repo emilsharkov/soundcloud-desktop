@@ -1,18 +1,31 @@
-import { Waveform } from "@/models/response";
+import { Waveform } from "./Waveform";
 
 export interface SongProps {
     title: string;
+    artist: string;
     imageSrc: string;
     waveform: Waveform;
 }
 
 const Song = (props: SongProps) => {
-    const { title, imageSrc, waveform } = props
+    const { title, artist, imageSrc, waveform } = props
 
     return (
-        <div className="flex flex-col gap-2">
-            <img src={imageSrc} alt={title} className="w-full h-full object-cover" />
-            <p className="text-sm text-gray-500">{title}</p>
+        <div className="flex flex-row w-full">
+            <img className="w-[200] h-[200]" src={imageSrc} />
+            <div className="flex flex-col flex-1">
+               <div className="w-full">
+                    <p className="text-tertiary">
+                        {title}
+                    </p>
+                    <p className="text-secondary">
+                        {artist}
+                    </p>
+               </div>
+               <div className="w-full">
+                    <Waveform waveform={waveform} />
+               </div>
+            </div>
         </div>
     )
 }
