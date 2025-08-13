@@ -25,13 +25,16 @@ fn main() {
                 .expect("Failed to get app data dir");
             init_app_data_dir(&app_data_dir).expect("Failed to init app data dir");
 
-            let app_state = tauri::async_runtime::block_on(async {
+            let app_state: AppState = tauri::async_runtime::block_on(async {
                 let db_pool = setup_database(&app_data_dir)
                     .await
                     .expect("Failed to setup database");
-                let soundcloud_client = soundcloud_rs::Client::new()
-                    .await
-                    .expect("Failed to create soundcloud client");
+                // let soundcloud_client = soundcloud_rs::Client::new()
+                //     .await
+                //     .expect("Failed to create soundcloud client");
+                let soundcloud_client = soundcloud_rs::Client {
+                    client_id: "".to_string(),
+                };
                 AppState {
                     db_pool: Arc::new(db_pool),
                     soundcloud_client: Arc::new(soundcloud_client),
