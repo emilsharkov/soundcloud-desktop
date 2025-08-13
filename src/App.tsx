@@ -5,7 +5,6 @@ import { Song } from "./components/Song";
 import { useAudioContext } from "./context/AudioContext";
 import data from "./assets/data.json";
 import fluxxwaveImage from "./assets/fluxxwave.jpg";
-import fluxxwaveMp3 from "./assets/Fluxxwave.mp3"
 
 function App() {
   const { audioRef } = useAudioContext()
@@ -21,7 +20,9 @@ function App() {
             )
           })}
         </div>
-        <AdaptiveAudio controls ref={audioRef} src={fluxxwaveMp3} />
+        <div className="mb-10">
+          <AdaptiveAudio controls ref={audioRef} />
+        </div>
       </div>
     </main>
   );

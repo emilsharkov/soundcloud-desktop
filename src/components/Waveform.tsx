@@ -1,5 +1,8 @@
+import { useWaveform } from "@/hooks/useWaveform";
+import { getSampleColor } from "@/lib/getSampleColor";
 import { type Waveform } from "@/models/response"
-import { useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
+import { useAudioContext } from "@/context/AudioContext";
 
 export interface WaveformProps {
     waveform: Waveform;
@@ -7,11 +10,48 @@ export interface WaveformProps {
 
 const Waveform = (props: WaveformProps) => {
     const { waveform } = props
-    
+    const { ref, samples } = useWaveform(waveform)
+    const [hoveredSample, setHoveredSample] = useState<number | null>(null)
+    const [isHovered, setIsHovered] = useState<boolean>(false)
+    const { playbackTime, duration } = useAudioContext()
+    const currentSample = (playbackTime / duration) * samples.length
+
+    const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+        const rect = ref.current?.getBoundingClientRect()
+        if (!rect) return
+        const x = e.clientX - rect.left
+        const index = Math.floor(x / 3)
+        setHoveredSample(index)
+    }
+
+    useEffect(() => {
+        if (!isHovered) {
+            setHoveredSample(null)
+        }
+    }, [isHovered])
 
     return (
-        <div ref={ref} className="border border-white">
+        <div 
+            ref={ref} 
+            className="gap-[1px] flex-1 flex flex-row items-center"
+            onMouseMove={handleMouseMove} 
+            onMouseEnter={() => setIsHovered(true)} 
+            onMouseLeave={() => setIsHovered(false)}
+        >
+            {samples.map((sample, index) => {
+                const color = getSampleColor(index,currentSample,hoveredSample)
 
+                return (
+                    <div 
+                        key={index} 
+                        className="w-[2px]" 
+                        style={{ 
+                            height: `${sample}px`,
+                            backgroundColor: color,
+                        }} 
+                    />
+                )
+            })}
         </div>
     )
 }

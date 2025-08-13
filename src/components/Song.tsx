@@ -11,10 +11,10 @@ const Song = (props: SongProps) => {
     const { title, artist, imageSrc, waveform } = props
 
     return (
-        <div className="flex flex-row w-full">
-            <img className="w-[200] h-[200]" src={imageSrc} />
+        <div className="flex flex-row w-full items-center gap-4">
+            <img className="w-[125px] h-[125px]" src={imageSrc} />
             <div className="flex flex-col flex-1">
-               <div className="w-full">
+               <div className="flex-1">
                     <p className="text-tertiary">
                         {title}
                     </p>
@@ -22,7 +22,7 @@ const Song = (props: SongProps) => {
                         {artist}
                     </p>
                </div>
-               <div className="w-full">
+               <div className="flex flex-1">
                     <Waveform waveform={waveform} />
                </div>
             </div>
