@@ -1,18 +1,27 @@
 import { createContext, useContext, useEffect, useReducer, useRef } from "react";
 import fluxxwaveMp3 from "../assets/Fluxxwave.mp3";
 
+export type Repeat = "none" | "song" | "songs"
+
 export interface AudioContextType {
     audioRef: React.RefObject<HTMLAudioElement | null>;
-    selectedTrackId: string | null;
     playbackTime: number;
     duration: number;
+
+    selectedTrackId: string | null;
     src: string;
     paused: boolean;
+    shuffled: boolean;
+    repeat: Repeat;
+
     setSelectedTrackId: (trackId: string | null) => void;
-    setTime: (time: number) => void;
-    resetSong: () => void;
     setSrc: (src: string) => void;
     setPaused: (paused: boolean) => void;
+    setShuffled: (shuffled: boolean) => void;
+    setRepeat: (repeat: Repeat) => void;
+
+    setTime: (time: number) => void;
+    resetSong: () => void;
 }
 
 interface AudioState {
@@ -21,6 +30,8 @@ interface AudioState {
     duration: number;
     src: string;
     paused: boolean;
+    shuffled: boolean;
+    repeat: Repeat;
 }
 
 type AudioAction =
@@ -29,6 +40,8 @@ type AudioAction =
     | { type: "SET_DURATION"; payload: number }
     | { type: "SET_SRC"; payload: string }
     | { type: "SET_PAUSED"; payload: boolean }
+    | { type: "SET_SHUFFLED"; payload: boolean }
+    | { type: "SET_REPEAT", payload: Repeat }
     | { type: "RESET_SONG" };
 
 const initialState: AudioState = {
@@ -37,6 +50,8 @@ const initialState: AudioState = {
     duration: 0,
     src: fluxxwaveMp3,
     paused: true,
+    shuffled: false,
+    repeat: 'none',
 };
 
 const audioReducer = (state: AudioState, action: AudioAction): AudioState => {
@@ -60,16 +75,14 @@ const audioReducer = (state: AudioState, action: AudioAction): AudioState => {
 
 const AudioContext = createContext<AudioContextType>({
     audioRef: { current: null },
-    selectedTrackId: null,
-    playbackTime: 0,
-    duration: 0,
-    src: "",
-    paused: true,
+    ...initialState,
     setTime: () => {},
     resetSong: () => {},
     setSrc: () => {},
     setSelectedTrackId: () => {},
     setPaused: () => {},
+    setShuffled: () => {},
+    setRepeat: () => {}
 });
 
 export const useAudioContext = () => {
@@ -149,6 +162,14 @@ const AudioProvider = ({ children }: { children: React.ReactNode }) => {
         dispatch({ type: "SET_PAUSED", payload: paused });
     };
 
+    const setRepeat = (repeat: Repeat) => {
+        dispatch({ type: "SET_REPEAT", payload: repeat })
+    }
+
+    const setShuffled = (shuffled: boolean) => {
+        dispatch({ type: "SET_SHUFFLED", payload: shuffled })
+    }
+
     return (
         <AudioContext.Provider value={{
             audioRef,
@@ -157,11 +178,15 @@ const AudioProvider = ({ children }: { children: React.ReactNode }) => {
             duration: state.duration,
             src: state.src,
             paused: state.paused,
+            shuffled: state.shuffled,
+            repeat: state.repeat,
             setSelectedTrackId,
             setTime,
             resetSong,
             setSrc,
             setPaused,
+            setShuffled,
+            setRepeat,
         }}>
             {children}
         </AudioContext.Provider>
