@@ -29,12 +29,11 @@ fn main() {
                 let db_pool = setup_database(&app_data_dir)
                     .await
                     .expect("Failed to setup database");
-                // let soundcloud_client = soundcloud_rs::Client::new()
-                //     .await
-                //     .expect("Failed to create soundcloud client");
-                let soundcloud_client = soundcloud_rs::Client {
-                    client_id: "".to_string(),
-                };
+
+                let soundcloud_client = soundcloud_rs::Client::new()
+                    .await
+                    .expect("Failed to create soundcloud client");
+                
                 AppState {
                     db_pool: Arc::new(db_pool),
                     soundcloud_client: Arc::new(soundcloud_client),
@@ -44,10 +43,13 @@ fn main() {
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
-            // search_results,
-            // search_tracks,
-            // get_stream_url,
-            // download_track
+            search_results,
+            search_tracks,
+            search_playlists,
+            get_stream_url,
+            get_track_waveform,
+            download_track,
+            download_playlist,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

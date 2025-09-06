@@ -1,23 +1,26 @@
-import { PagingCollection, SearchResult, Track } from "@/models/response";
-import { PopoverAnchor, PopoverContent } from "./ui/popover";
+import { useTauriInvoke } from "@/hooks/useTauriInvoke";
+import { PagingCollection, SearchResult } from "@/models/response";
 import { Search } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useDebounceValue } from "usehooks-ts";
 import Soundcloud from "../assets/soundcloud.svg?react";
 import { Input } from "./ui/input";
 import { NavigationMenu, NavigationMenuItem, NavigationMenuList } from "./ui/navigation-menu";
-import { Popover } from "./ui/popover";
-import { useTauriInvoke } from "@/hooks/useTauriInvoke";
-import { invoke } from "@tauri-apps/api/core";
+import { Popover, PopoverAnchor, PopoverContent } from "./ui/popover";
 
 interface SearchArgs {
     q: string;
 }
 
-const Navbar = () => {
+export interface NavbarProps {
+    setSelectedOutput: (output: string | undefined) => void;
+}
+
+const Navbar = (props: NavbarProps) => {
+    const { setSelectedOutput } = props;
     const [search, setSearch] = useState<string>("");
     const [debouncedSearch] = useDebounceValue(search, 500);
-    const [selectedOutput, setSelectedOutput] = useState<string | undefined>(undefined);
+    const [popoverOpen, setPopoverOpen] = useState<boolean>(false);
 
     const { data: searchResults } = useTauriInvoke<SearchArgs,PagingCollection<SearchResult>>(
         "search_results", { 
@@ -27,24 +30,12 @@ const Navbar = () => {
         }
     );
 
-    const { data: tracks } = useTauriInvoke<SearchArgs,PagingCollection<Track>>(
-        "search_tracks", { 
-            q: selectedOutput ?? ""
-        }, {
-            enabled: selectedOutput !== undefined,
-        }
-    );    
-
-    useEffect(() => {
-        const fetchStreamUrl = async () => {
-            console.log(tracks?.collection[0]);
-            const streamUrl = await invoke("get_stream_url", {
-                track: tracks?.collection[0],
-            });
-            console.log(streamUrl);
-        };
-        fetchStreamUrl();
-    }, [tracks]);
+    const selectSearchResult = (searchResult: SearchResult) => {
+        const { output } = searchResult;
+        setSelectedOutput(output)
+        setSearch(output ?? '')
+        setPopoverOpen(false)
+    }
 
     return (
         <NavigationMenu className="w-full max-w-none border-white border">
@@ -54,7 +45,7 @@ const Navbar = () => {
                 <NavigationMenuItem>Search</NavigationMenuItem>
                 <NavigationMenuItem>Library</NavigationMenuItem>
             </NavigationMenuList>
-            <Popover open={searchResults !== undefined}>
+            <Popover open={searchResults !== undefined && popoverOpen}>
                 <PopoverAnchor>
                     <div className="relative w-full mx-4">
                         <Input
@@ -62,16 +53,21 @@ const Navbar = () => {
                             placeholder="Search"
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
+                            onFocus={() => setPopoverOpen(true)}
+                            onBlur={() => setPopoverOpen(false)}
                         />
                         <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-tertiary pointer-events-none" />
                     </div>
                 </PopoverAnchor>
-                <PopoverContent>
+                <PopoverContent
+                    onOpenAutoFocus={(e) => e.preventDefault()}
+                    onCloseAutoFocus={(e) => e.preventDefault()}
+                >
                     <div className="w-full bg-white rounded-lg flex flex-col">
                         {searchResults?.collection.map((searchResult: SearchResult, idx: number) => {
                             const { output } = searchResult;
                             return (
-                                <div key={idx} className="px-3 py-1 text-black" onClick={() => setSelectedOutput(output)}>
+                                <div key={idx} className="px-3 py-1 text-black" onClick={() => selectSearchResult(searchResult)}>
                                     {output}
                                 </div>
                             );

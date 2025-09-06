@@ -1,5 +1,7 @@
 // Query models translated from soundcloud-rs (Rust) to TypeScript
 
+import { Track } from "./response";
+
 export interface AlbumQuery {
   q?: string;
   limit?: number;
@@ -43,6 +45,10 @@ export interface TracksQuery {
   limit?: number;
   offset?: number;
   linked_partitioning?: boolean;
+}
+
+export interface TrackWaveformQuery {
+  track: Track;
 }
 
 export interface Paging {

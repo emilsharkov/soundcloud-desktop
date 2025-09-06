@@ -7,7 +7,7 @@ const MusicPlayer = (): JSX.Element => {
 
     return (
         <div className="w-full">
-            <AdaptiveAudio ref={audioRef} />
+            <AdaptiveAudio loop controls ref={audioRef} />
         </div>
     )
 }

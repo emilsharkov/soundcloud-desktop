@@ -1,5 +1,4 @@
 import { createContext, useContext, useEffect, useReducer, useRef } from "react";
-import fluxxwaveMp3 from "../assets/Fluxxwave.mp3";
 
 export type Repeat = "none" | "song" | "songs"
 
@@ -48,7 +47,7 @@ const initialState: AudioState = {
     selectedTrackId: null,
     playbackTime: 0,
     duration: 0,
-    src: fluxxwaveMp3,
+    src: "",
     paused: true,
     shuffled: false,
     repeat: 'none',
