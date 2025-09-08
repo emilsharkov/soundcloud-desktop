@@ -36,6 +36,13 @@ const Navbar = (props: NavbarProps) => {
         setSearch(output ?? '')
         setPopoverOpen(false)
     }
+    
+    const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter') {
+            selectSearchResult({ output: search })
+            e.currentTarget.blur()
+        }
+    }
 
     return (
         <NavigationMenu className="w-full max-w-none border-white border">
@@ -52,6 +59,7 @@ const Navbar = (props: NavbarProps) => {
                             className="border-none bg-search focus-visible:ring-0 rounded-sm placeholder:font-medium"
                             placeholder="Search"
                             value={search}
+                            onKeyDown={onKeyDown}
                             onChange={(e) => setSearch(e.target.value)}
                             onFocus={() => setPopoverOpen(true)}
                             onBlur={() => setPopoverOpen(false)}

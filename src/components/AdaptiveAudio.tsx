@@ -1,5 +1,5 @@
 // AdaptiveAudio.tsx
-import { useAudioContext } from "@/context/AudioContext";
+import { useAudioContext } from "@/models/audio/AudioContext";
 import useAdaptiveAudio from "@/hooks/useAdaptiveAudio";
 import React from "react";
 
@@ -15,15 +15,14 @@ interface AdaptiveAudioProps extends React.DetailedHTMLProps<React.AudioHTMLAttr
     */
 export const AdaptiveAudio = (props: AdaptiveAudioProps) => {
   const { ref, ...rest } = props;
-  const { src } = useAudioContext();
+  // const { src } = useAudioContext();
 
-  useAdaptiveAudio(src, ref);
+  // useAdaptiveAudio(src, ref);
 
   return (
     <audio
       {...rest}
       ref={ref}
-      src={src}
     />
   );
 };

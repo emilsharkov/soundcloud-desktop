@@ -2,7 +2,7 @@ import { Track } from "@/models/response";
 import { Waveform } from "./Waveform";
 import { useTauriInvoke } from "@/hooks/useTauriInvoke";
 import { TrackWaveformQuery } from "@/models/query";
-import { useAudioContext } from "@/context/AudioContext";
+import { useAudioContext } from "@/models/audio/AudioContext";
 import { Play, Pause } from "lucide-react";
 
 export interface SongProps {
@@ -11,7 +11,7 @@ export interface SongProps {
 
 const Song = (props: SongProps) => {
     const { track } = props;
-    const { paused, setPaused, setSelectedTrackId, selectedTrackId } = useAudioContext();
+    const { paused, setPaused, setQueue } = useAudioContext();
 
     const { data: waveform } = useTauriInvoke<TrackWaveformQuery,Waveform>(
         "get_track_waveform", { 
@@ -19,17 +19,16 @@ const Song = (props: SongProps) => {
         }
     );
 
-    const trackIdString = track.id?.toString() ?? null;
-    const isCurrentTrack = selectedTrackId === trackIdString;
-    const isPlaying = isCurrentTrack && !paused;
+    // const isCurrentTrack = selectedTrackId === trackIdString;
+    const isPlaying = !paused;
 
     const handlePlayPause = () => {
-        if (isCurrentTrack) {
-            setPaused(!paused);
-        } else {
-            setSelectedTrackId(trackIdString);
+        // if (isCurrentTrack) {
+        //     setPaused(!paused);
+        // } else {
+            setQueue([track]);
             setPaused(false);
-        }
+        // }
     };
 
     return (

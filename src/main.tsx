@@ -3,7 +3,7 @@ import ReactDOM from "react-dom/client";
 import App from "./App";
 import "@fontsource-variable/inter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { AudioProvider } from "./context/AudioContext";
+import { AudioProvider } from "./models/audio/AudioProvider";
 
 const queryClient = new QueryClient();
 
