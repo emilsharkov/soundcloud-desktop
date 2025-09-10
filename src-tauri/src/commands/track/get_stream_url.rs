@@ -10,7 +10,6 @@ pub async fn get_stream_url(
     stream_type: Option<StreamType>,
 ) -> Result<String, String> {
     let soundcloud_client = state.lock().unwrap().soundcloud_client.clone();
-    println!("stream_type: {:?}", stream_type);
     let stream_url = soundcloud_client
         .get_stream_url(&track, stream_type.as_ref())
         .await

@@ -3,7 +3,11 @@ import { Waveform } from "./Waveform";
 import { useTauriInvoke } from "@/hooks/useTauriInvoke";
 import { TrackWaveformQuery } from "@/models/query";
 import { useAudioContext } from "@/models/audio/AudioContext";
-import { Play, Pause } from "lucide-react";
+import { Play, Pause, LucideDownload, LoaderCircle } from "lucide-react";
+import { Button } from "./ui/button";
+import { toast } from "sonner";
+import { invoke } from "@tauri-apps/api/core";
+import { useState } from "react";
 
 export interface SongProps {
     track: Track;
@@ -12,6 +16,7 @@ export interface SongProps {
 const Song = (props: SongProps) => {
     const { track } = props;
     const { paused, setPaused, setQueue } = useAudioContext();
+    const [downloading, setDownloading] = useState<boolean>(false);
 
     const { data: waveform } = useTauriInvoke<TrackWaveformQuery,Waveform>(
         "get_track_waveform", { 
@@ -31,6 +36,19 @@ const Song = (props: SongProps) => {
         // }
     };
 
+    const handleDownload = async () => {
+        setDownloading(true);
+        invoke(
+            "download_track", { track }
+        ).then(() => {
+            toast.success("Downloaded successfully");
+        }).catch(() => {
+            toast.error("Failed to download");
+        }).finally(() => {
+            setDownloading(false);
+        });
+    };
+
     return (
         <>
             {waveform && (
@@ -46,17 +64,26 @@ const Song = (props: SongProps) => {
                             onClick={handlePlayPause}
                         >
                             {isPlaying ? (
-                                <Pause className="w-6 h-6 text-black ml-0.5" />
+                                <Pause className="w-6 h-6 text-black" />
                             ) : (
-                                <Play className="w-6 h-6 text-black ml-1" />
+                                <Play className="w-6 h-6 text-black" />
                             )}
                         </button>
                     </div>
                     <div className="flex flex-col flex-1">
                         <div className="flex-1">
-                            <p className="text-tertiary">
-                                {track.title}
-                            </p>
+                            <div className="flex flex-row items-center gap-2">
+                                <p className="text-tertiary">
+                                    {track.title}
+                                </p>
+                                <Button disabled={downloading} className="hover:bg-transparent cursor-pointer" variant="ghost" size="icon" onClick={handleDownload}>
+                                    {downloading ? (
+                                        <LoaderCircle className="w-4 h-4 text-secondary animate-spin" />
+                                    ) : (
+                                        <LucideDownload className="w-4 h-4 text-secondary" />
+                                    )}
+                                </Button>
+                            </div>
                             <p className="text-secondary">
                                 {track.user?.username}
                             </p>

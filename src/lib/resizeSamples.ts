@@ -78,6 +78,8 @@ export function resizeSamples(
   const maxSample = Math.max(...result, 0);
   if (maxSample === 0) return Array(numSamples).fill(0);
 
-  const resizedSamples = result.map((s) => Math.floor((s / maxSample) * height));
+  const resizedSamples = result.map((s) => (
+    Math.max(1, Math.floor((s / maxSample) * height))
+  ));
   return resizedSamples;
 }

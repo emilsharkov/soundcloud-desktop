@@ -1,4 +1,3 @@
-
 use crate::models::app_state::AppState;
 use soundcloud_rs::response::{Track, Waveform};
 use std::sync::Mutex;

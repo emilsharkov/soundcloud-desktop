@@ -7,15 +7,15 @@ use tauri::State;
 pub async fn download_playlist(
     state: State<'_, Mutex<AppState>>,
     playlist: Playlist,
-    destination: Option<String>,
-    playlist_name: Option<String>,
 ) -> Result<(), String> {
     let soundcloud_client = state.lock().unwrap().soundcloud_client.clone();
+    let app_data_dir = state.lock().unwrap().app_data_dir.clone();
+    let music_dir = app_data_dir.join("music");
     soundcloud_client
         .download_playlist(
             &playlist,
-            destination.as_deref(),
-            playlist_name.as_deref(),
+            Some(music_dir.to_str().expect("Failed to get music dir")),
+            Some("/"),
         )
         .await
         .expect("Failed to download playlist");

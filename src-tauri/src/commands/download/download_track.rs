@@ -8,16 +8,22 @@ pub async fn download_track(
     state: State<'_, Mutex<AppState>>,
     track: Track,
     stream_type: Option<StreamType>,
-    destination: Option<String>,
-    filename: Option<String>,
 ) -> Result<(), String> {
     let soundcloud_client = state.lock().unwrap().soundcloud_client.clone();
+    let app_data_dir = state.lock().unwrap().app_data_dir.clone();
+    let music_dir = app_data_dir.join("music");
     soundcloud_client
         .download_track(
             &track,
             stream_type.as_ref(),
-            destination.as_deref(),
-            filename.as_deref(),
+            Some(music_dir.to_str().expect("Failed to get music dir")),
+            Some(
+                track
+                    .id
+                    .expect("Failed to get track id")
+                    .to_string()
+                    .as_str(),
+            ),
         )
         .await
         .expect("Failed to download track");

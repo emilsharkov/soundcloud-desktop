@@ -13,9 +13,11 @@ use db::setup::setup_database;
 use models::app_state::AppState;
 use tauri::Manager;
 use utils::init_app_data_dir::init_app_data_dir;
+use utils::init_music_dir::init_music_dir;
 
 fn main() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_opener::init())
         .setup(|app| {
             let app_handle = app.handle().clone();
@@ -23,7 +25,10 @@ fn main() {
                 .path()
                 .app_data_dir()
                 .expect("Failed to get app data dir");
+
             init_app_data_dir(&app_data_dir).expect("Failed to init app data dir");
+            init_music_dir(&app_data_dir).expect("Failed to init music dir");
+            println!("Music dir: {:?}", app_data_dir.join("music"));
 
             let app_state: AppState = tauri::async_runtime::block_on(async {
                 let db_pool = setup_database(&app_data_dir)
@@ -33,10 +38,11 @@ fn main() {
                 let soundcloud_client = soundcloud_rs::Client::new()
                     .await
                     .expect("Failed to create soundcloud client");
-                
+
                 AppState {
                     db_pool: Arc::new(db_pool),
                     soundcloud_client: Arc::new(soundcloud_client),
+                    app_data_dir: Arc::new(app_data_dir),
                 }
             });
             app.manage(Mutex::new(app_state));

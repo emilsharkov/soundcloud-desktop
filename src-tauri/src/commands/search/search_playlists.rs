@@ -1,9 +1,5 @@
 use crate::models::app_state::AppState;
-use soundcloud_rs::{
-    query::PlaylistsQuery,
-    response::{PagingCollection},
-    response::Playlist,
-};
+use soundcloud_rs::{query::PlaylistsQuery, response::PagingCollection, response::Playlist};
 use std::sync::Mutex;
 use tauri::State;
 

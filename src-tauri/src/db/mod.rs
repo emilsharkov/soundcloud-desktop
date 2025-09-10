@@ -1,3 +1,2 @@
-pub mod playlist;
+pub mod queries;
 pub mod setup;
-pub mod track;
