@@ -5,8 +5,7 @@ pub struct TrackRow {
     pub id: String,
     pub title: Option<String>,
     pub artist: Option<String>,
-    pub artwork_url: Option<String>,
-    pub data: Option<Vec<u8>>,
+    pub data: Option<String>,
 }
 
 pub mod create_track;

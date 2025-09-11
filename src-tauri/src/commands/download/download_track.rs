@@ -1,4 +1,4 @@
-use crate::models::app_state::AppState;
+use crate::{db::queries::create_track, models::app_state::AppState};
 use soundcloud_rs::response::{StreamType, Track};
 use std::sync::Mutex;
 use tauri::State;
@@ -27,5 +27,19 @@ pub async fn download_track(
         )
         .await
         .expect("Failed to download track");
+
+    let pool = state.lock().unwrap().db_pool.clone();
+    let track_id = track.id.as_ref().expect("Failed to get track id").to_string();
+    let track_title = track.title.as_ref().expect("Failed to get title");
+    let track_username = track.user.as_ref().expect("Failed to get user").username.as_ref().expect("Failed to get username");
+    create_track(
+        &pool,
+        &track_id,
+        track_title,
+        track_username,
+        &track,
+    )
+    .await
+    .expect("Failed to create track");
     Ok(())
 }
