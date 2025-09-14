@@ -2,10 +2,7 @@ use std::fs::remove_file;
 use std::sync::Mutex;
 use tauri::State;
 
-use crate::{
-    db::queries::delete_track,
-    models::app_state::AppState,
-};
+use crate::{db::queries::delete_track, models::app_state::AppState};
 
 #[tauri::command]
 pub async fn delete_local_track(

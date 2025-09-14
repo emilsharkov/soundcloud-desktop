@@ -1,4 +1,6 @@
-use crate::{db::queries::create_track, models::app_state::AppState};
+use crate::{
+    commands::update_local_track_metadata, db::queries::create_track, models::app_state::AppState,
+};
 use soundcloud_rs::response::{StreamType, Track};
 use std::sync::Mutex;
 use tauri::State;
@@ -28,18 +30,41 @@ pub async fn download_track(
         .await
         .expect("Failed to download track");
 
-    let pool = state.lock().unwrap().db_pool.clone();
-    let track_id = track.id.as_ref().expect("Failed to get track id").to_string();
+    let track_id = track
+        .id
+        .as_ref()
+        .expect("Failed to get track id")
+        .to_string();
     let track_title = track.title.as_ref().expect("Failed to get title");
-    let track_username = track.user.as_ref().expect("Failed to get user").username.as_ref().expect("Failed to get username");
-    create_track(
-        &pool,
-        &track_id,
-        track_title,
-        track_username,
-        &track,
+    let track_username = track
+        .user
+        .as_ref()
+        .expect("Failed to get user")
+        .username
+        .as_ref()
+        .expect("Failed to get username");
+
+    // Add track metadata to mp3 file
+    update_local_track_metadata(
+        state,
+        track_id,
+        Some(track_title.to_string()),
+        Some(track_username.to_string()),
+        Some(
+            track
+                .artwork_url
+                .as_ref()
+                .expect("Failed to get artwork url")
+                .to_string(),
+        ),
     )
     .await
-    .expect("Failed to create track");
+    .expect("Failed to update local track metadata");
+
+    // Add track to database
+    let pool = state.lock().unwrap().db_pool.clone();
+    create_track(&pool, &track_id, track_title, track_username, &track)
+        .await
+        .expect("Failed to create track");
     Ok(())
 }
