@@ -1,5 +1,5 @@
-import { useAudioContext } from "@/models/audio/AudioContext"
-import AdaptiveAudio from "../AdaptiveAudio"
+import { useAudioContext } from "@/context/AudioContext"
+import AdaptiveAudio from "./AdaptiveAudio"
 import { JSX } from "react"
 
 const MusicPlayer = (): JSX.Element => {

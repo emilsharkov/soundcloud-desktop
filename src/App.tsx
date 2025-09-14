@@ -1,6 +1,6 @@
 import "./App.css";
 import { Navbar } from "./components/Navbar";
-import { Song } from "./components/Song";
+import { Song } from "./components/Song/Song";
 import { MusicPlayer } from "./components/MusicPlayer/MusicPlayer";
 import { PagingCollection, Track } from "./models/response";
 import { useRef, useState } from "react";

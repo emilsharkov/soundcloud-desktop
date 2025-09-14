@@ -2,12 +2,13 @@ import { Track } from "@/models/response";
 import { Waveform } from "./Waveform";
 import { useTauriInvoke } from "@/hooks/useTauriInvoke";
 import { TrackWaveformQuery } from "@/models/query";
-import { useAudioContext } from "@/models/audio/AudioContext";
-import { Play, Pause, LucideDownload, LoaderCircle } from "lucide-react";
-import { Button } from "./ui/button";
+import { useAudioContext } from "@/context/AudioContext";
+import { Play, Pause, LucideDownload, LoaderCircle, MoreVertical } from "lucide-react";
+import { Button } from "../ui/button";
 import { toast } from "sonner";
 import { invoke } from "@tauri-apps/api/core";
 import { useState } from "react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu";
 
 export interface SongProps {
     track: Track;
@@ -83,6 +84,7 @@ const Song = (props: SongProps) => {
                                         <LucideDownload className="w-4 h-4 text-secondary" />
                                     )}
                                 </Button>
+                                <Settings />
                             </div>
                             <p className="text-secondary">
                                 {track.user?.username}

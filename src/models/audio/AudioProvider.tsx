@@ -1,5 +1,5 @@
 import React, { JSX, useEffect, useRef, useSyncExternalStore, useCallback } from "react";
-import { AudioContext, type AudioContextType } from "./AudioContext";
+import { AudioContext, type AudioContextType } from "@/context/AudioContext";
 import { AudioEngine } from "./AudioEngine";
 import { Track } from "../response";
 import { Repeat } from "./repeat";

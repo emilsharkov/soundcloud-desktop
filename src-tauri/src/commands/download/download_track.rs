@@ -14,6 +14,8 @@ pub async fn download_track(
     let soundcloud_client = state.lock().unwrap().soundcloud_client.clone();
     let app_data_dir = state.lock().unwrap().app_data_dir.clone();
     let music_dir = app_data_dir.join("music");
+
+    // Download track
     soundcloud_client
         .download_track(
             &track,
@@ -30,6 +32,7 @@ pub async fn download_track(
         .await
         .expect("Failed to download track");
 
+    // Get track metadata
     let track_id = track
         .id
         .as_ref()
@@ -46,8 +49,8 @@ pub async fn download_track(
 
     // Add track metadata to mp3 file
     update_local_track_metadata(
-        state,
-        track_id,
+        state.clone(),
+        track_id.clone(),
         Some(track_title.to_string()),
         Some(track_username.to_string()),
         Some(
@@ -63,8 +66,15 @@ pub async fn download_track(
 
     // Add track to database
     let pool = state.lock().unwrap().db_pool.clone();
-    create_track(&pool, &track_id, track_title, track_username, &track)
-        .await
-        .expect("Failed to create track");
+    create_track(
+        &pool,
+        &track_id.clone(),
+        track_title,
+        track_username,
+        &track,
+    )
+    .await
+    .expect("Failed to create track");
+
     Ok(())
 }

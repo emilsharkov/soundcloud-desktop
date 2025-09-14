@@ -2,7 +2,7 @@ import { useWaveform } from "@/hooks/useWaveform";
 import { getSampleColor } from "@/lib/getSampleColor";
 import { type Waveform } from "@/models/response"
 import { useEffect, useState } from "react";
-import { useAudioContext } from "@/models/audio/AudioContext";
+import { useAudioContext } from "@/context/AudioContext";
 
 export interface WaveformProps {
     waveform: Waveform;
