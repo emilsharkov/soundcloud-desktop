@@ -3,13 +3,21 @@ import { getSampleColor } from "@/lib/getSampleColor";
 import { type Waveform } from "@/models/response"
 import { useEffect, useState } from "react";
 import { useAudioContext } from "@/context/AudioContext";
+import { useTauriInvoke } from "@/hooks/useTauriInvoke";
+import { Track } from "@/models/response";
+import { TrackWaveformQuery } from "@/models/query";
 
 export interface WaveformProps {
-    waveform: Waveform;
+    track: Track;
 }
 
 const Waveform = (props: WaveformProps) => {
-    const { waveform } = props
+    const { track } = props
+    const { data: waveform } = useTauriInvoke<TrackWaveformQuery,Waveform>(
+        "get_track_waveform", { 
+            track: track
+        }
+    );
     const { ref, samples } = useWaveform(waveform)
     const [hoveredSample, setHoveredSample] = useState<number | null>(null)
     const [isHovered, setIsHovered] = useState<boolean>(false)

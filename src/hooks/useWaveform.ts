@@ -7,8 +7,8 @@ export interface UseWaveformReturn {
     samples: number[];
 }
 
-const useWaveform = (waveform: Waveform): UseWaveformReturn => {
-    const { samples, height } = waveform
+const useWaveform = (waveform: Waveform | undefined): UseWaveformReturn => {
+    const { samples, height } = waveform ?? { samples: [], height: 0 }
     const ref = useRef<HTMLDivElement | null>(null)
     const [containerWidth,setContainerWidth] = useState<number>(0)
 
