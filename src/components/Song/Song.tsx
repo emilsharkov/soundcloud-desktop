@@ -3,12 +3,9 @@ import { Waveform } from "./Waveform";
 import { useTauriInvoke } from "@/hooks/useTauriInvoke";
 import { TrackWaveformQuery } from "@/models/query";
 import { useAudioContext } from "@/context/AudioContext";
-import { Play, Pause, LucideDownload, LoaderCircle, MoreVertical } from "lucide-react";
-import { Button } from "../ui/button";
-import { toast } from "sonner";
-import { invoke } from "@tauri-apps/api/core";
-import { useState } from "react";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu";
+import { Play, Pause } from "lucide-react";
+import { Download } from "./Download";
+import { Settings } from "./Settings/Settings";
 
 export interface SongProps {
     track: Track;
@@ -17,7 +14,6 @@ export interface SongProps {
 const Song = (props: SongProps) => {
     const { track } = props;
     const { paused, setPaused, setQueue } = useAudioContext();
-    const [downloading, setDownloading] = useState<boolean>(false);
 
     const { data: waveform } = useTauriInvoke<TrackWaveformQuery,Waveform>(
         "get_track_waveform", { 
@@ -35,19 +31,6 @@ const Song = (props: SongProps) => {
             setQueue([track]);
             setPaused(false);
         // }
-    };
-
-    const handleDownload = async () => {
-        setDownloading(true);
-        invoke(
-            "download_track", { track }
-        ).then(() => {
-            toast.success("Downloaded successfully");
-        }).catch(() => {
-            toast.error("Failed to download");
-        }).finally(() => {
-            setDownloading(false);
-        });
     };
 
     return (
@@ -77,13 +60,7 @@ const Song = (props: SongProps) => {
                                 <p className="text-tertiary">
                                     {track.title}
                                 </p>
-                                <Button disabled={downloading} className="hover:bg-transparent cursor-pointer" variant="ghost" size="icon" onClick={handleDownload}>
-                                    {downloading ? (
-                                        <LoaderCircle className="w-4 h-4 text-secondary animate-spin" />
-                                    ) : (
-                                        <LucideDownload className="w-4 h-4 text-secondary" />
-                                    )}
-                                </Button>
+                                <Download track={track} />
                                 <Settings />
                             </div>
                             <p className="text-secondary">

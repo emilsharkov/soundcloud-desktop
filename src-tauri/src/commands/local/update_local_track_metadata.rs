@@ -25,7 +25,7 @@ pub async fn update_local_track_metadata(
 ) -> Result<(), String> {
     let music_dir = state.lock().unwrap().app_data_dir.clone().join("music");
     let path = music_dir.join(&id).with_extension("mp3");
-    let mut tag = Tag::read_from_path(&path).expect("Failed to read tag");
+    let mut tag = Tag::read_from_path(&path).map_err(|e| format!("Failed to read tag: {e}"))?;
 
     if let Some(title) = title {
         tag.set_title(title);
@@ -68,6 +68,6 @@ pub async fn update_local_track_metadata(
     }
 
     tag.write_to_path(&path, Version::Id3v24)
-        .expect("Failed to write tag");
+        .map_err(|e| format!("Failed to write tag: {e}"))?;
     Ok(())
 }

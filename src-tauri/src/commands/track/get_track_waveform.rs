@@ -12,6 +12,6 @@ pub async fn get_track_waveform(
     let waveform = soundcloud_client
         .get_track_waveform(&track)
         .await
-        .expect("Failed to get track waveform");
+        .map_err(|e| format!("Failed to get track waveform: {e}"))?;
     Ok(waveform)
 }

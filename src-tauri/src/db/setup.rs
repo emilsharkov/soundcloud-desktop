@@ -12,10 +12,10 @@ pub async fn setup_database(app_data_dir: &Path) -> Result<SqlitePool, String> {
         .create_if_missing(true);
     let db_pool = sqlx::SqlitePool::connect_with(opts)
         .await
-        .expect("Failed to connect to db");
+        .map_err(|e| format!("Failed to connect to db: {e}"))?;
     MIGRATOR
         .run(&db_pool)
         .await
-        .expect("Failed to run migrations");
+        .map_err(|e| format!("Failed to run migrations: {e}"))?;
     Ok(db_pool)
 }

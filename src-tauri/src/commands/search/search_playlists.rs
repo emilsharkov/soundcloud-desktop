@@ -16,6 +16,6 @@ pub async fn search_playlists(
     let playlists = soundcloud_client
         .search_playlists(Some(&query))
         .await
-        .expect("Failed to get search playlists");
+        .map_err(|e| format!("Failed to get search playlists: {e}"))?;
     Ok(playlists)
 }

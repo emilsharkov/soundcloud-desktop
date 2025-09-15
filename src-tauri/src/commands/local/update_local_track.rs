@@ -23,7 +23,7 @@ pub async fn update_local_track(
         artwork.clone(),
     )
     .await
-    .expect("Failed to update track metadata");
+    .map_err(|e| format!("Failed to update track metadata: {e}"))?;
 
     let pool = state.lock().unwrap().db_pool.clone();
     update_track(
@@ -34,6 +34,6 @@ pub async fn update_local_track(
         artwork.as_deref(),
     )
     .await
-    .expect("Failed to update track");
+    .map_err(|e| format!("Failed to update track: {e}"))?;
     Ok(())
 }

@@ -19,6 +19,6 @@ pub async fn search_tracks(
     let tracks = soundcloud_client
         .search_tracks(Some(&query))
         .await
-        .expect("Failed to get search results");
+        .map_err(|e| format!("Failed to get search results: {e}"))?;
     Ok(tracks)
 }

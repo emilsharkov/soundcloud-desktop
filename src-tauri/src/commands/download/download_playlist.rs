@@ -14,10 +14,10 @@ pub async fn download_playlist(
     soundcloud_client
         .download_playlist(
             &playlist,
-            Some(music_dir.to_str().expect("Failed to get music dir")),
+            Some(music_dir.to_str().ok_or("Failed to get music dir")?),
             Some("/"),
         )
         .await
-        .expect("Failed to download playlist");
+        .map_err(|e| format!("Failed to download playlist: {e}"))?;
     Ok(())
 }

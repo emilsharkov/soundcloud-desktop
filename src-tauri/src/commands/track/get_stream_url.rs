@@ -13,6 +13,6 @@ pub async fn get_stream_url(
     let stream_url = soundcloud_client
         .get_stream_url(&track, stream_type.as_ref())
         .await
-        .expect("Failed to get stream url");
+        .map_err(|e| format!("Failed to get stream url: {e}"))?;
     Ok(stream_url)
 }

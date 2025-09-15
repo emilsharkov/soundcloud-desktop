@@ -20,32 +20,32 @@ pub async fn download_track(
         .download_track(
             &track,
             stream_type.as_ref(),
-            Some(music_dir.to_str().expect("Failed to get music dir")),
+            Some(music_dir.to_str().ok_or("Failed to get music dir")?),
             Some(
                 track
                     .id
-                    .expect("Failed to get track id")
+                    .ok_or("Failed to get track id")?
                     .to_string()
                     .as_str(),
             ),
         )
         .await
-        .expect("Failed to download track");
+        .map_err(|e| format!("Failed to download track: {e}"))?;
 
     // Get track metadata
     let track_id = track
         .id
         .as_ref()
-        .expect("Failed to get track id")
+        .ok_or("Failed to get track id")?
         .to_string();
-    let track_title = track.title.as_ref().expect("Failed to get title");
+    let track_title = track.title.as_ref().ok_or("Failed to get title")?;
     let track_username = track
         .user
         .as_ref()
-        .expect("Failed to get user")
+        .ok_or("Failed to get user")?
         .username
         .as_ref()
-        .expect("Failed to get username");
+        .ok_or("Failed to get username")?;
 
     // Add track metadata to mp3 file
     update_local_track_metadata(
@@ -57,12 +57,12 @@ pub async fn download_track(
             track
                 .artwork_url
                 .as_ref()
-                .expect("Failed to get artwork url")
+                .ok_or("Failed to get artwork url")?
                 .to_string(),
         ),
     )
     .await
-    .expect("Failed to update local track metadata");
+    .map_err(|e| format!("Failed to update local track metadata: {e}"))?;
 
     // Add track to database
     let pool = state.lock().unwrap().db_pool.clone();
@@ -74,7 +74,7 @@ pub async fn download_track(
         &track,
     )
     .await
-    .expect("Failed to create track");
+    .map_err(|e| format!("Failed to create track: {e}"))?;
 
     Ok(())
 }

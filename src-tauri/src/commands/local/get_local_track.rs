@@ -12,6 +12,6 @@ pub async fn get_local_track(
     id: String,
 ) -> Result<TrackRow, String> {
     let pool = state.lock().unwrap().db_pool.clone();
-    let track = get_track(&pool, &id).await.expect("Failed to get track");
-    Ok(track.expect("Track not found"))
+    let track = get_track(&pool, &id).await.map_err(|e| format!("Failed to get track: {e}"))?;
+    Ok(track.ok_or("Track not found")?)
 }

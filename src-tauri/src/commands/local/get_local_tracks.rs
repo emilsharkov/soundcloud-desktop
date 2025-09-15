@@ -11,6 +11,6 @@ pub async fn get_local_tracks(state: State<'_, Mutex<AppState>>) -> Result<Vec<T
     let pool = state.lock().unwrap().db_pool.clone();
     let tracks = get_tracks(&pool, None, None)
         .await
-        .expect("Failed to get tracks");
+        .map_err(|e| format!("Failed to get tracks: {e}"))?;
     Ok(tracks)
 }
