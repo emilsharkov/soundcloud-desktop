@@ -1,15 +1,15 @@
-import { useAudioContext } from "@/context/AudioContext"
-import AdaptiveAudio from "./AdaptiveAudio"
-import { JSX } from "react"
+import { useAudioContext } from '@/context/AudioContext';
+import AdaptiveAudio from './AdaptiveAudio';
+import { JSX } from 'react';
 
 const MusicPlayer = (): JSX.Element => {
-    const { audioRef } = useAudioContext()
+    const { audioRef } = useAudioContext();
 
     return (
-        <div className="w-full">
+        <div className='w-full'>
             <AdaptiveAudio loop controls ref={audioRef} />
         </div>
-    )
-}
+    );
+};
 
-export { MusicPlayer }
+export { MusicPlayer };

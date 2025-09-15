@@ -1,10 +1,14 @@
 // AdaptiveAudio.tsx
-import { useAudioContext } from "@/models/audio/AudioContext";
-import useAdaptiveAudio from "@/hooks/useAdaptiveAudio";
-import React from "react";
+import { useAudioContext } from '@/models/audio/AudioContext';
+import useAdaptiveAudio from '@/hooks/useAdaptiveAudio';
+import React from 'react';
 
-interface AdaptiveAudioProps extends React.DetailedHTMLProps<React.AudioHTMLAttributes<HTMLAudioElement>, HTMLAudioElement> {
-  ref: React.RefObject<HTMLAudioElement | null>;
+interface AdaptiveAudioProps
+    extends React.DetailedHTMLProps<
+        React.AudioHTMLAttributes<HTMLAudioElement>,
+        HTMLAudioElement
+    > {
+    ref: React.RefObject<HTMLAudioElement | null>;
 }
 
 /**
@@ -12,19 +16,14 @@ interface AdaptiveAudioProps extends React.DetailedHTMLProps<React.AudioHTMLAttr
  * - Plays HLS (.m3u8) via native support (Safari/iOS) or hls.js where needed
  * - Plays MP3 (and other browser-supported formats) natively
  * - Can try fallback sources on fatal errors
-    */
+ */
 export const AdaptiveAudio = (props: AdaptiveAudioProps) => {
-  const { ref, ...rest } = props;
-  // const { src } = useAudioContext();
+    const { ref, ...rest } = props;
+    // const { src } = useAudioContext();
 
-  // useAdaptiveAudio(src, ref);
+    // useAdaptiveAudio(src, ref);
 
-  return (
-    <audio
-      {...rest}
-      ref={ref}
-    />
-  );
+    return <audio {...rest} ref={ref} />;
 };
 
 export default AdaptiveAudio;

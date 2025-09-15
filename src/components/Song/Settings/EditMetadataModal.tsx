@@ -1,11 +1,17 @@
-import { useState } from "react";
-import { invoke } from "@tauri-apps/api/core";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { toast } from "sonner";
-import { Track } from "@/models/response";
+import { useState } from 'react';
+import { invoke } from '@tauri-apps/api/core';
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogFooter,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { toast } from 'sonner';
+import { Track } from '@/models/response';
 
 interface EditMetadataModalProps {
     track: Track;
@@ -15,25 +21,30 @@ interface EditMetadataModalProps {
 
 const EditMetadataModal = (props: EditMetadataModalProps) => {
     const { open, onOpenChange, track } = props;
-    const { id, title: initialTitle, user, artwork_url: initialArtworkUrl } = track;
+    const {
+        id,
+        title: initialTitle,
+        user,
+        artwork_url: initialArtworkUrl,
+    } = track;
     const initialArtist = user?.username;
     const [title, setTitle] = useState(initialTitle);
     const [artist, setArtist] = useState(initialArtist);
-    const [artworkUrl, setArtworkUrl] = useState("");
+    const [artworkUrl, setArtworkUrl] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        
+
         if (!id) {
-            console.error("No track ID provided");
-            throw new Error("No track ID provided");
+            console.error('No track ID provided');
+            throw new Error('No track ID provided');
         }
 
         setIsSubmitting(true);
-        
+
         try {
-            await invoke("update_local_track", {
+            await invoke('update_local_track', {
                 id: id,
                 title: title || null,
                 artist: artist || null,
@@ -41,76 +52,72 @@ const EditMetadataModal = (props: EditMetadataModalProps) => {
             });
 
             onOpenChange(false);
-            
+
             setTitle(initialTitle);
             setArtist(initialArtist);
-            setArtworkUrl("");
+            setArtworkUrl('');
 
-            toast.success("Metadata updated successfully");
+            toast.success('Metadata updated successfully');
         } catch (error) {
-            toast.error("Failed to update metadata");
-            console.error("Failed to update metadata:", error);
+            toast.error('Failed to update metadata');
+            console.error('Failed to update metadata:', error);
         } finally {
             setIsSubmitting(false);
         }
     };
 
-
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-md">
+            <DialogContent className='sm:max-w-md'>
                 <DialogHeader>
                     <DialogTitle>Edit Metadata</DialogTitle>
                 </DialogHeader>
-                
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="title">Title</Label>
+
+                <form onSubmit={handleSubmit} className='space-y-4'>
+                    <div className='space-y-2'>
+                        <Label htmlFor='title'>Title</Label>
                         <Input
-                            id="title"
-                            type="text"
+                            id='title'
+                            type='text'
                             value={title}
-                            onChange={(e) => setTitle(e.target.value)}
-                            placeholder="Enter track title"
+                            onChange={e => setTitle(e.target.value)}
+                            placeholder='Enter track title'
                         />
                     </div>
-                    
-                    <div className="space-y-2">
-                        <Label htmlFor="artist">Artist</Label>
+
+                    <div className='space-y-2'>
+                        <Label htmlFor='artist'>Artist</Label>
                         <Input
-                            id="artist"
-                            type="text"
+                            id='artist'
+                            type='text'
                             value={artist}
-                            onChange={(e) => setArtist(e.target.value)}
-                            placeholder="Enter artist name"
+                            onChange={e => setArtist(e.target.value)}
+                            placeholder='Enter artist name'
                         />
                     </div>
-                    
-                    <div className="space-y-2">
-                        <Label htmlFor="artwork">Artwork URL</Label>
+
+                    <div className='space-y-2'>
+                        <Label htmlFor='artwork'>Artwork URL</Label>
                         <Input
-                            id="artwork"
-                            type="file"
+                            id='artwork'
+                            type='file'
                             value={artworkUrl}
-                            onChange={(e) => setArtworkUrl(e.target.value)}
-                            placeholder="Enter artwork URL"
+                            onChange={e => setArtworkUrl(e.target.value)}
+                            placeholder='Enter artwork URL'
                         />
                     </div>
-                    
+
                     <DialogFooter>
                         <Button
-                            type="button"
-                            variant="outline"
+                            type='button'
+                            variant='outline'
                             onClick={() => onOpenChange(false)}
                             disabled={isSubmitting}
                         >
                             Cancel
                         </Button>
-                        <Button
-                            type="submit"
-                            disabled={isSubmitting}
-                        >
-                            {isSubmitting ? "Saving..." : "Save Changes"}
+                        <Button type='submit' disabled={isSubmitting}>
+                            {isSubmitting ? 'Saving...' : 'Save Changes'}
                         </Button>
                     </DialogFooter>
                 </form>

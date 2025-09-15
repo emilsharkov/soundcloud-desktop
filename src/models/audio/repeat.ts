@@ -1,1 +1,1 @@
-export type Repeat = "none" | "song" | "songs";
+export type Repeat = 'none' | 'song' | 'songs';
