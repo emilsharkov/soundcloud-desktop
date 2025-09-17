@@ -1,7 +1,8 @@
 use sqlx::FromRow;
 use serde_json::Value;
+use serde::Serialize;
 
-#[derive(Debug, FromRow, Clone)]
+#[derive(Debug, FromRow, Clone, Serialize)]
 pub struct TrackRow {
     pub id: String,
     pub title: Option<String>,

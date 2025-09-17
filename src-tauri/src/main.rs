@@ -49,13 +49,23 @@ fn main() {
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
+            // Search
             search_results,
             search_tracks,
             search_playlists,
+            // Track
             get_stream_url,
             get_track_waveform,
             download_track,
+            // Download
             download_playlist,
+            download_track,
+            // Local
+            update_local_track,
+            update_local_track_metadata,
+            delete_local_track,
+            get_local_track,
+            get_local_tracks,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

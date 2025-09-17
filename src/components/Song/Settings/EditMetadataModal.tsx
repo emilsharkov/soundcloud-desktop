@@ -21,12 +21,7 @@ interface EditMetadataModalProps {
 
 const EditMetadataModal = (props: EditMetadataModalProps) => {
     const { open, onOpenChange, track } = props;
-    const {
-        id,
-        title: initialTitle,
-        user,
-        artwork_url: initialArtworkUrl,
-    } = track;
+    const { id, title: initialTitle, user } = track;
     const initialArtist = user?.username;
     const [title, setTitle] = useState(initialTitle);
     const [artist, setArtist] = useState(initialArtist);
