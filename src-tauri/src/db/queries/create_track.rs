@@ -10,7 +10,7 @@ pub async fn create_track(
 ) -> sqlx::Result<(), String> {
     let json = serde_json::to_string(track).map_err(|e| format!("Failed to serialize track: {e}"))?;
     sqlx::query(
-        "INSERT INTO tracks (id, title, artist, data) VALUES (?1, ?2, ?3, jsonb(?4)) returning *",
+        "INSERT INTO tracks (id, title, artist, data) VALUES (?1, ?2, ?3, ?4)",
     )
     .bind(id)
     .bind(title)

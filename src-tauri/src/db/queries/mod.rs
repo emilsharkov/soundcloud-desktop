@@ -1,13 +1,13 @@
-use sqlx::FromRow;
+use sqlx::{types::Json, FromRow};
 use serde_json::Value;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, FromRow, Clone, Serialize)]
+#[derive(Debug, FromRow, Clone, Serialize, Deserialize)]
 pub struct TrackRow {
     pub id: String,
-    pub title: Option<String>,
-    pub artist: Option<String>,
-    pub data: Option<Value>,
+    pub title: String,
+    pub artist: String,
+    pub data: Json<Value>,
 }
 
 pub mod create_track;

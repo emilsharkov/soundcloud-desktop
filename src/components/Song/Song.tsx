@@ -1,12 +1,17 @@
 import { Track } from '@/models/response';
 import { Waveform } from './Waveform';
 import { useAudioContext } from '@/context/AudioContext';
-import { Play, Pause } from 'lucide-react';
+import { Play, Pause, LoaderCircle, X, Check } from 'lucide-react';
 import { Download } from './Download';
 import { Settings } from './Settings/Settings';
+import { useTauriInvoke } from '@/hooks/useTauriInvoke';
 
 export interface SongProps {
     track: Track;
+}
+
+export interface TrackQuery {
+    id: string;
 }
 
 const Song = (props: SongProps) => {
@@ -14,6 +19,15 @@ const Song = (props: SongProps) => {
     const { title, user, artwork_url } = track;
     const { tracks, currentIndex, paused, setPaused, setQueue } =
         useAudioContext();
+    const { isLoading, isError } = useTauriInvoke<TrackQuery, Track>(
+        'get_local_track',
+        {
+            id: track.id?.toString() ?? '',
+        },
+        {
+            retry: false,
+        }
+    );
 
     const isCurrentTrack = tracks[currentIndex]?.id === track.id;
     const isPlaying = !paused && isCurrentTrack;
@@ -23,7 +37,6 @@ const Song = (props: SongProps) => {
             setPaused(!paused);
         } else {
             setQueue([track]);
-            setPaused(false);
         }
     };
 
@@ -50,7 +63,13 @@ const Song = (props: SongProps) => {
                 <div className='flex-1'>
                     <div className='flex flex-row items-center gap-2'>
                         <p className='text-tertiary'>{title}</p>
-                        <Download track={track} />
+                        {isLoading ? (
+                            <LoaderCircle className='w-4 h-4 text-secondary animate-spin' />
+                        ) : isError ? (
+                            <Download track={track} />
+                        ) : (
+                            <Check className='w-4 h-4 text-secondary' />
+                        )}
                         <Settings track={track} />
                     </div>
                     <p className='text-secondary'>{user?.username}</p>

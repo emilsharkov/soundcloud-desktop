@@ -13,6 +13,10 @@ export interface WaveformProps {
 
 const Waveform = (props: WaveformProps) => {
     const { track } = props;
+    const { currentIndex, tracks, playbackTime, duration, setTime } =
+        useAudioContext();
+    const [hoveredSample, setHoveredSample] = useState<number | null>(null);
+    const [isHovered, setIsHovered] = useState<boolean>(false);
     const { data: waveform } = useTauriInvoke<TrackWaveformQuery, Waveform>(
         'get_track_waveform',
         {
@@ -20,12 +24,12 @@ const Waveform = (props: WaveformProps) => {
         }
     );
     const { ref, samples } = useWaveform(waveform);
-    const [hoveredSample, setHoveredSample] = useState<number | null>(null);
-    const [isHovered, setIsHovered] = useState<boolean>(false);
-    const { playbackTime, duration, setTime } = useAudioContext();
+
     const currentSample = (playbackTime / duration) * samples.length;
+    const isCurrentTrack = tracks[currentIndex]?.id === track.id;
 
     const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
+        if (!isCurrentTrack) return;
         const rect = ref.current?.getBoundingClientRect();
         if (!rect) return;
         const x = e.clientX - rect.left;
@@ -36,11 +40,16 @@ const Waveform = (props: WaveformProps) => {
     };
 
     const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+        if (!isCurrentTrack) return;
         const rect = ref.current?.getBoundingClientRect();
         if (!rect) return;
         const x = e.clientX - rect.left;
         const index = Math.floor(x / 3);
         setHoveredSample(index);
+    };
+
+    const handleHoverChange = (isHovered: boolean) => {
+        setIsHovered(isHovered);
     };
 
     useEffect(() => {
@@ -52,17 +61,18 @@ const Waveform = (props: WaveformProps) => {
     return (
         <div
             ref={ref}
-            className='gap-[1px] flex-1 flex flex-row items-center'
+            className='gap-[1px] flex-1 flex flex-row items-center cursor-pointer'
             onClick={handleClick}
             onMouseMove={handleMouseMove}
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
+            onMouseEnter={() => handleHoverChange(true)}
+            onMouseLeave={() => handleHoverChange(false)}
         >
             {samples.map((sample, index) => {
                 const color = getSampleColor(
                     index,
                     currentSample,
-                    hoveredSample
+                    hoveredSample,
+                    isCurrentTrack
                 );
 
                 return (

@@ -3,7 +3,7 @@ use sqlx::SqlitePool;
 
 pub async fn get_track(pool: &SqlitePool, id: &str) -> sqlx::Result<Option<TrackRow>, String> {
     let result = sqlx::query_as::<_, TrackRow>(
-        "SELECT id, title, artist, json(data) FROM tracks WHERE id = ?1",
+        "SELECT id, title, artist, data FROM tracks WHERE id = ?1",
     )
     .bind(id)
     .fetch_optional(pool)

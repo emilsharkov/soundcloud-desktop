@@ -54,7 +54,7 @@ const Navbar = (props: NavbarProps) => {
     };
 
     return (
-        <NavigationMenu className='w-full max-w-none border-white border'>
+        <NavigationMenu className='w-full max-w-none max-h-fit border-white border'>
             <Soundcloud className='w-14 h-14 mx-6' />
             <NavigationMenuList className='text-tertiary font-semibold text-sm gap-4'>
                 <NavigationMenuItem>Home</NavigationMenuItem>

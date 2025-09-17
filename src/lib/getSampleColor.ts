@@ -4,8 +4,13 @@ const lightOrange = '#ffa571';
 const getSampleColor = (
     index: number,
     currentSample: number,
-    hoveredSample: number | null
+    hoveredSample: number | null,
+    isCurrentTrack: boolean
 ): string => {
+    if (!isCurrentTrack) {
+        return 'white';
+    }
+
     if (hoveredSample === null) {
         return index < currentSample ? orange : 'white';
     }

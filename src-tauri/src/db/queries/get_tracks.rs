@@ -9,7 +9,7 @@ pub async fn get_tracks(
     let limit = limit.unwrap_or(100);
     let offset = offset.unwrap_or(0);
     let rows = sqlx::query_as::<_, TrackRow>(
-        "SELECT id, title, artist, json(data) FROM tracks LIMIT ?1 OFFSET ?2",
+        "SELECT id, title, artist, data FROM tracks LIMIT ?1 OFFSET ?2",
     )
     .bind(limit)
     .bind(offset)

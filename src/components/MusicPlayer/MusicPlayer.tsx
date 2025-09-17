@@ -1,5 +1,4 @@
 import { useAudioContext } from '@/context/AudioContext';
-import AdaptiveAudio from './AdaptiveAudio';
 import { JSX } from 'react';
 
 const MusicPlayer = (): JSX.Element => {
@@ -7,7 +6,7 @@ const MusicPlayer = (): JSX.Element => {
 
     return (
         <div className='w-full'>
-            <AdaptiveAudio loop controls ref={audioRef} />
+            <audio loop ref={audioRef} />
         </div>
     );
 };

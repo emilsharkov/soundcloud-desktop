@@ -6,6 +6,8 @@ import { Track } from '../response';
 import { PlayerQueue, type QueueSnapshot } from './PlayerQueue';
 import { AudioTransport, type TransportSnapshot } from './AudioTransport';
 import { invoke } from '@tauri-apps/api/core';
+import { BaseDirectory, readFile } from '@tauri-apps/plugin-fs';
+import { toast } from 'sonner';
 
 export type EngineSnapshot = QueueSnapshot & TransportSnapshot;
 
@@ -35,24 +37,47 @@ export class AudioEngine {
         });
 
         // 2) When queue selection changes → load src & continue playing if not paused
-        const handleQueueChange = () => {
+        const handleQueueChange = async () => {
             const q = this.queue.getSnapshot();
-            const current =
+            const currentTrack =
                 q.currentIndex >= 0 ? q.tracks[q.currentIndex] : null;
+            this.transport.setPaused(true);
 
-            if (!current) {
+            if (!currentTrack) {
                 this.transport.setSrc('');
-                void this.transport.setPaused(true);
             } else {
-                // Switch to streamType: "hls" when your backend supports it
-                invoke<string>('get_stream_url', {
-                    track: current,
-                }).then((streamUrl: string) => {
-                    this.transport.setSrc(streamUrl);
+                const trackId = currentTrack.id;
+                try {
+                    const track = await invoke<Track>('get_local_track', {
+                        id: trackId?.toString() || '',
+                    }).catch(() => {
+                        return undefined;
+                    });
+
+                    if (track) {
+                        const file = await readFile(`music/${trackId}.mp3`, {
+                            baseDir: BaseDirectory.AppLocalData,
+                        });
+                        const blob = new Blob([file], { type: 'audio/mpeg' });
+                        const url = URL.createObjectURL(blob);
+                        this.transport.setSrc(url);
+                    } else {
+                        const streamUrl = await invoke<string>(
+                            'get_stream_url',
+                            {
+                                track: currentTrack,
+                            }
+                        );
+                        this.transport.setSrc(streamUrl);
+                    }
+
+                    console.log('paused');
                     this.transport.setPaused(false);
-                });
+                } catch {
+                    console.log('below');
+                    toast.error('Failed to load track');
+                }
             }
-            // Don't emit here - let the transport changes handle the emission
         };
 
         const handleTransportChange = () => {
