@@ -1,11 +1,10 @@
-import { useWaveform } from '@/hooks/useWaveform';
-import { getSampleColor } from '@/lib/getSampleColor';
-import { type Waveform } from '@/models/response';
-import { useEffect, useState } from 'react';
 import { useAudioContext } from '@/context/AudioContext';
 import { useTauriInvoke } from '@/hooks/useTauriInvoke';
-import { Track } from '@/models/response';
+import { useWaveform } from '@/hooks/useWaveform';
+import { getSampleColor } from '@/lib/getSampleColor';
 import { TrackWaveformQuery } from '@/models/query';
+import { Track, type Waveform } from '@/models/response';
+import { useEffect, useState } from 'react';
 
 export interface WaveformProps {
     track: Track;

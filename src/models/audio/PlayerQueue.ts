@@ -1,5 +1,5 @@
-import { Repeat } from './repeat';
 import { Track } from '../response';
+import { Repeat } from './repeat';
 
 export type QueueSnapshot = {
     tracks: Track[];

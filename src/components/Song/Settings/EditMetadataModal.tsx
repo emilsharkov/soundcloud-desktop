@@ -1,17 +1,17 @@
-import { useState } from 'react';
-import { invoke } from '@tauri-apps/api/core';
+import { Button } from '@/components/ui/button';
 import {
     Dialog,
     DialogContent,
+    DialogFooter,
     DialogHeader,
     DialogTitle,
-    DialogFooter,
 } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { toast } from 'sonner';
 import { Track } from '@/models/response';
+import { invoke } from '@tauri-apps/api/core';
+import { useState } from 'react';
+import { toast } from 'sonner';
 
 interface EditMetadataModalProps {
     track: Track;

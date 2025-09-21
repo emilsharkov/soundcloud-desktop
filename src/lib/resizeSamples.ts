@@ -23,7 +23,7 @@ export function resizeSamples(
         const EPS = 1e-12;
 
         for (let i = 0; i < numSamples; i++) {
-            let start = Math.floor(i * chunkSize);
+            const start = Math.floor(i * chunkSize);
             let end = Math.floor((i + 1) * chunkSize);
 
             // Ensure at least one element per chunk

@@ -1,6 +1,6 @@
-import { Waveform } from '@/models/response';
-import { useLayoutEffect, useRef, useState, RefObject, useEffect } from 'react';
 import { resizeSamples } from '@/lib/resizeSamples';
+import { Waveform } from '@/models/response';
+import { RefObject, useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 export interface UseWaveformReturn {
     ref: RefObject<HTMLDivElement | null>;
@@ -8,7 +8,7 @@ export interface UseWaveformReturn {
 }
 
 const useWaveform = (waveform: Waveform | undefined): UseWaveformReturn => {
-    const { samples, height } = waveform ?? { samples: [], height: 0 };
+    const { samples } = waveform ?? { samples: [], height: 0 };
     const ref = useRef<HTMLDivElement | null>(null);
     const [containerWidth, setContainerWidth] = useState<number>(0);
 

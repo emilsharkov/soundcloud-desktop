@@ -1,9 +1,9 @@
-import { LoaderCircle, LucideDownload } from 'lucide-react';
-import { Button } from '../ui/button';
-import { useState } from 'react';
-import { invoke } from '@tauri-apps/api/core';
-import { toast } from 'sonner';
 import { Track } from '@/models/response';
+import { invoke } from '@tauri-apps/api/core';
+import { LoaderCircle, LucideDownload } from 'lucide-react';
+import { useState } from 'react';
+import { toast } from 'sonner';
+import { Button } from '../ui/button';
 
 interface DownloadProps {
     track: Track;

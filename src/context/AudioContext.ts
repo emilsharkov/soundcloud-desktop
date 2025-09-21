@@ -1,6 +1,6 @@
+import { Repeat } from '@/models/audio/repeat';
+import { Track } from '@/models/response';
 import React, { createContext, useContext } from 'react';
-import { Repeat } from './repeat';
-import { Track } from '../response';
 
 export interface AudioContextType {
     /** DOM ref exposed for custom controls if desired */

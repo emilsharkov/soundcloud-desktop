@@ -1,11 +1,11 @@
+import { useState } from 'react';
 import './App.css';
+import { MusicPlayer } from './components/MusicPlayer/MusicPlayer';
 import { Navbar } from './components/Navbar';
 import { Song } from './components/Song/Song';
-import { MusicPlayer } from './components/MusicPlayer/MusicPlayer';
-import { PagingCollection, Track } from './models/response';
-import { useState } from 'react';
 import { useTauriInvoke } from './hooks/useTauriInvoke';
 import { TracksQuery } from './models/query';
+import { PagingCollection, Track } from './models/response';
 
 function App() {
     const [selectedOutput, setSelectedOutput] = useState<string | undefined>(

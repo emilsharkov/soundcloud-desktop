@@ -1,10 +1,10 @@
-import { Track } from '@/models/response';
-import { Waveform } from './Waveform';
 import { useAudioContext } from '@/context/AudioContext';
-import { Play, Pause, LoaderCircle, X, Check } from 'lucide-react';
+import { useTauriInvoke } from '@/hooks/useTauriInvoke';
+import { Track } from '@/models/response';
+import { Check, LoaderCircle, Pause, Play } from 'lucide-react';
 import { Download } from './Download';
 import { Settings } from './Settings/Settings';
-import { useTauriInvoke } from '@/hooks/useTauriInvoke';
+import { Waveform } from './Waveform';
 
 export interface SongProps {
     track: Track;

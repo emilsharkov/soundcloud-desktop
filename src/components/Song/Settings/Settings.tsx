@@ -1,15 +1,15 @@
+import { Button } from '@/components/ui/button';
 import {
+    DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { toast } from 'sonner';
-import { Button } from '@/components/ui/button';
-import { DropdownMenu } from '@/components/ui/dropdown-menu';
+import { Track } from '@/models/response';
 import { MoreVertical } from 'lucide-react';
 import { useState } from 'react';
+import { toast } from 'sonner';
 import { EditMetadataModal } from './EditMetadataModal';
-import { Track } from '@/models/response';
 
 interface SettingsProps {
     track: Track;
@@ -23,8 +23,6 @@ const Settings = (props: SettingsProps) => {
     const handleEditMetadata = () => {
         setEditMetadataModalOpen(true);
     };
-
-    const handleAddToPlaylist = () => {};
 
     return (
         <>

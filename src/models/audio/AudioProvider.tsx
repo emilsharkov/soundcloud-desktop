@@ -1,13 +1,14 @@
+import { AudioContext, type AudioContextType } from '@/context/AudioContext';
+import { isEqual } from 'lodash';
 import React, {
     JSX,
+    useCallback,
     useEffect,
     useRef,
     useSyncExternalStore,
-    useCallback,
 } from 'react';
-import { AudioContext, type AudioContextType } from '@/context/AudioContext';
-import { AudioEngine } from './AudioEngine';
 import { Track } from '../response';
+import { AudioEngine, EngineSnapshot } from './AudioEngine';
 import { Repeat } from './repeat';
 
 export interface AudioProviderProps {
@@ -18,7 +19,7 @@ export const AudioProvider = (props: AudioProviderProps): JSX.Element => {
     const { children } = props;
     const audioRef = useRef<HTMLAudioElement | null>(null);
     const engineRef = useRef<AudioEngine>(new AudioEngine());
-    const lastSnapshotRef = useRef<any>(null);
+    const lastSnapshotRef = useRef<EngineSnapshot | null>(null);
 
     // Create stable references to avoid infinite loops
     const subscribe = useCallback((fn: () => void) => {
@@ -28,46 +29,19 @@ export const AudioProvider = (props: AudioProviderProps): JSX.Element => {
     const getSnapshot = useCallback(() => {
         const newSnapshot = engineRef.current.getSnapshot();
 
-        // Check if the snapshot has actually changed by comparing key values
-        if (lastSnapshotRef.current) {
-            const last = lastSnapshotRef.current;
-            const hasChanged =
-                last.playbackTime !== newSnapshot.playbackTime ||
-                last.duration !== newSnapshot.duration ||
-                last.src !== newSnapshot.src ||
-                last.paused !== newSnapshot.paused ||
-                last.tracks !== newSnapshot.tracks ||
-                last.currentIndex !== newSnapshot.currentIndex ||
-                last.shuffled !== newSnapshot.shuffled ||
-                last.repeat !== newSnapshot.repeat;
-
-            if (!hasChanged) {
-                return lastSnapshotRef.current;
-            }
+        if (
+            lastSnapshotRef.current &&
+            isEqual(lastSnapshotRef.current, newSnapshot)
+        ) {
+            return lastSnapshotRef.current;
         }
 
-        // Create a new snapshot object to avoid reference issues
-        const cachedSnapshot = {
-            playbackTime: newSnapshot.playbackTime,
-            duration: newSnapshot.duration,
-            src: newSnapshot.src,
-            paused: newSnapshot.paused,
-            tracks: newSnapshot.tracks,
-            currentIndex: newSnapshot.currentIndex,
-            shuffled: newSnapshot.shuffled,
-            repeat: newSnapshot.repeat,
-        };
-
-        lastSnapshotRef.current = cachedSnapshot;
-        return cachedSnapshot;
+        lastSnapshotRef.current = newSnapshot;
+        return newSnapshot;
     }, []);
 
     // Single subscription: engine unifies queue + transport
-    const snap = useSyncExternalStore(
-        subscribe,
-        getSnapshot,
-        getSnapshot // server snapshot (same as client for this use case)
-    );
+    const snap = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
 
     useEffect(() => {
         // Use a timeout to ensure the audio element is properly mounted
