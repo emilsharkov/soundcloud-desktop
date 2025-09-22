@@ -20,6 +20,9 @@ const Waveform = (props: WaveformProps) => {
         'get_track_waveform',
         {
             track: track,
+        },
+        {
+            retry: false,
         }
     );
     const { ref, samples } = useWaveform(waveform);

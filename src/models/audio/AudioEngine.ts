@@ -20,6 +20,7 @@ export class AudioEngine {
     readonly transport: AudioTransport;
 
     private listeners = new Set<() => void>();
+    private currentTrackId: string | null = null;
 
     constructor(queue = new PlayerQueue(), transport = new AudioTransport()) {
         this.queue = queue;
@@ -41,6 +42,14 @@ export class AudioEngine {
             const q = this.queue.getSnapshot();
             const currentTrack =
                 q.currentIndex >= 0 ? q.tracks[q.currentIndex] : null;
+
+            // Only reload if the current track actually changed
+            const newTrackId = currentTrack?.id?.toString() || null;
+            if (newTrackId === this.currentTrackId) {
+                return;
+            }
+
+            this.currentTrackId = newTrackId;
             this.transport.setPaused(true);
 
             if (!currentTrack) {
@@ -71,10 +80,8 @@ export class AudioEngine {
                         this.transport.setSrc(streamUrl);
                     }
 
-                    console.log('paused');
                     this.transport.setPaused(false);
                 } catch {
-                    console.log('below');
                     toast.error('Failed to load track');
                 }
             }
@@ -129,7 +136,6 @@ export class AudioEngine {
     setIndex = (i: number) => this.queue.setIndex(i);
     next = () => this.queue.next();
     prev = () => this.queue.prev();
-    setShuffled = (on: boolean) => this.queue.setShuffled(on);
     toggleShuffle = () => this.queue.toggleShuffle();
     setRepeat = (r: Repeat) => this.queue.setRepeat(r);
 }

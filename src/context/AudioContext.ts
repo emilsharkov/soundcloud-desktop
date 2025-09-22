@@ -11,12 +11,14 @@ export interface AudioContextType {
     duration: number;
     src: string;
     paused: boolean;
+    volume: number;
 
     /** Queue/policy */
     tracks: Track[];
     currentIndex: number;
     shuffled: boolean;
     repeat: Repeat;
+    selectedTrackId: string | null;
 
     /** Transport commands */
     setTime: (time: number) => void;
@@ -35,7 +37,6 @@ export interface AudioContextType {
     setIndex: (index: number) => void;
     next: () => void;
     prev: () => void;
-    setShuffled: (shuffled: boolean) => void;
     setRepeat: (repeat: Repeat) => void;
     toggleShuffle: () => void;
 }

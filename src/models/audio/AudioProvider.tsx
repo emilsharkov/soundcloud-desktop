@@ -99,10 +99,6 @@ export const AudioProvider = (props: AudioProviderProps): JSX.Element => {
     );
     const next = useCallback(() => engineRef.current.next(), []);
     const prev = useCallback(() => engineRef.current.prev(), []);
-    const setShuffled = useCallback(
-        (on: boolean) => engineRef.current.setShuffled(on),
-        []
-    );
     const setRepeat = useCallback(
         (r: Repeat) => engineRef.current.setRepeat(r),
         []
@@ -120,12 +116,14 @@ export const AudioProvider = (props: AudioProviderProps): JSX.Element => {
         duration: snap.duration,
         src: snap.src,
         paused: snap.paused,
+        volume: snap.volume,
 
         // queue state
         tracks: snap.tracks,
         currentIndex: snap.currentIndex,
         shuffled: snap.shuffled,
         repeat: snap.repeat,
+        selectedTrackId: snap.selectedTrackId,
 
         // transport commands
         setTime,
@@ -144,7 +142,6 @@ export const AudioProvider = (props: AudioProviderProps): JSX.Element => {
         setIndex,
         next,
         prev,
-        setShuffled,
         setRepeat,
         toggleShuffle,
     };

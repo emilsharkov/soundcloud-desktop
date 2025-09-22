@@ -12,7 +12,7 @@ const MusicPlayer = (): JSX.Element => {
 
     return (
         <div className='w-full h-10'>
-            <audio loop ref={audioRef} />
+            <audio ref={audioRef} />
             <div className='w-full h-full flex flex-row items-center justify-center bg-search gap-4'>
                 <div className='flex flex-row items-center justify-center gap-4'>
                     <Skip direction='backward' />

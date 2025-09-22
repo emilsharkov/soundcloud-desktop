@@ -1,7 +1,25 @@
-import { PlayIcon } from 'lucide-react';
+import { useAudioContext } from '@/context/AudioContext';
+import { PauseIcon, PlayIcon } from 'lucide-react';
 
 const Play = () => {
-    return <PlayIcon className='size-6 text-secondary fill-secondary' />;
+    const { paused, setPaused, selectedTrackId } = useAudioContext();
+    const Icon = paused ? PlayIcon : PauseIcon;
+
+    const handlePlayPause = () => {
+        if (selectedTrackId === null) return;
+        setPaused(!paused);
+    };
+
+    return (
+        <Icon
+            className='size-6 text-secondary fill-secondary'
+            style={{
+                opacity: selectedTrackId === null ? 0.5 : 1,
+                cursor: selectedTrackId === null ? 'not-allowed' : 'pointer',
+            }}
+            onClick={handlePlayPause}
+        />
+    );
 };
 
 export { Play };
