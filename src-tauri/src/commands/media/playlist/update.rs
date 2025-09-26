@@ -2,7 +2,7 @@ use std::sync::Mutex;
 use tauri::State;
 
 use crate::{
-    db::queries::{update_playlist, add_song_to_playlist, remove_song_from_playlist},
+    db::queries::{add_song_to_playlist, remove_song_from_playlist, update_playlist},
     models::app_state::AppState,
 };
 

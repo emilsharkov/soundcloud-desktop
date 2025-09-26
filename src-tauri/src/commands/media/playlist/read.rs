@@ -2,7 +2,7 @@ use std::sync::Mutex;
 use tauri::State;
 
 use crate::{
-    db::queries::{get_playlist, get_playlists, get_playlist_songs},
+    db::queries::{get_playlist, get_playlist_songs, get_playlists},
     models::app_state::AppState,
 };
 

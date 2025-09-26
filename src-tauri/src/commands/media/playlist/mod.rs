@@ -1,12 +1,11 @@
 // Playlist management commands
 mod create;
-mod read;
-mod update;
 mod delete;
+mod read;
 mod reorder;
+mod update;
 
 pub use create::*;
+pub use delete::*;
 pub use read::*;
 pub use update::*;
-pub use delete::*;
-pub use reorder::*;

@@ -2,10 +2,7 @@ use std::sync::Mutex;
 use tauri::State;
 use uuid::Uuid;
 
-use crate::{
-    db::queries::create_playlist,
-    models::app_state::AppState,
-};
+use crate::{db::queries::create_playlist, models::app_state::AppState};
 
 #[tauri::command]
 pub async fn create_playlist_command(
