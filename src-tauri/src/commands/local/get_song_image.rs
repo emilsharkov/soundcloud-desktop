@@ -1,8 +1,8 @@
-use id3::{Tag, TagLike};
+use crate::models::app_state::AppState;
 use base64::Engine as _;
+use id3::Tag;
 use std::sync::Mutex;
 use tauri::State;
-use crate::models::app_state::AppState;
 
 #[tauri::command]
 pub async fn get_song_image(
@@ -16,7 +16,7 @@ pub async fn get_song_image(
     if let Some(picture) = picture_opt {
         let b64 = base64::engine::general_purpose::STANDARD.encode(&picture.data);
         let mime = &picture.mime_type;
-        let image = format!("data:{};base64,{}", mime, b64);
+        let image = format!("data:{mime};base64,{b64}");
         Ok(image)
     } else {
         Err("No image found in ID3 metadata".to_string())

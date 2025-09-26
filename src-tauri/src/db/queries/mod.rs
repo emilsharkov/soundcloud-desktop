@@ -30,8 +30,8 @@ pub struct PlaylistSongRow {
     pub artist: String,
 }
 
-pub mod track;
 pub mod playlist;
+pub mod track;
 
-pub use track::*;
 pub use playlist::*;
+pub use track::*;

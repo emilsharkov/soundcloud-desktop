@@ -7,15 +7,13 @@ pub async fn create_playlist(
     name: &str,
     position: i32,
 ) -> sqlx::Result<(), String> {
-    sqlx::query(
-        "INSERT INTO playlists (id, name, position) VALUES (?1, ?2, ?3)"
-    )
-    .bind(id)
-    .bind(name)
-    .bind(position)
-    .execute(pool)
-    .await
-    .map_err(|e| format!("Failed to create playlist: {e}"))?;
+    sqlx::query("INSERT INTO playlists (id, name, position) VALUES (?1, ?2, ?3)")
+        .bind(id)
+        .bind(name)
+        .bind(position)
+        .execute(pool)
+        .await
+        .map_err(|e| format!("Failed to create playlist: {e}"))?;
     Ok(())
 }
 
@@ -41,13 +39,12 @@ pub async fn get_playlist(
     pool: &SqlitePool,
     id: &str,
 ) -> sqlx::Result<Option<PlaylistRow>, String> {
-    let row = sqlx::query_as::<_, PlaylistRow>(
-        "SELECT id, name, position FROM playlists WHERE id = ?1",
-    )
-    .bind(id)
-    .fetch_optional(pool)
-    .await
-    .map_err(|e| format!("Failed to get playlist: {e}"))?;
+    let row =
+        sqlx::query_as::<_, PlaylistRow>("SELECT id, name, position FROM playlists WHERE id = ?1")
+            .bind(id)
+            .fetch_optional(pool)
+            .await
+            .map_err(|e| format!("Failed to get playlist: {e}"))?;
     Ok(row)
 }
 
@@ -57,22 +54,17 @@ pub async fn update_playlist(
     name: &str,
     position: i32,
 ) -> sqlx::Result<(), String> {
-    sqlx::query(
-        "UPDATE playlists SET name = ?1, position = ?2 WHERE id = ?3"
-    )
-    .bind(name)
-    .bind(position)
-    .bind(id)
-    .execute(pool)
-    .await
-    .map_err(|e| format!("Failed to update playlist: {e}"))?;
+    sqlx::query("UPDATE playlists SET name = ?1, position = ?2 WHERE id = ?3")
+        .bind(name)
+        .bind(position)
+        .bind(id)
+        .execute(pool)
+        .await
+        .map_err(|e| format!("Failed to update playlist: {e}"))?;
     Ok(())
 }
 
-pub async fn delete_playlist(
-    pool: &SqlitePool,
-    id: &str,
-) -> sqlx::Result<(), String> {
+pub async fn delete_playlist(pool: &SqlitePool, id: &str) -> sqlx::Result<(), String> {
     sqlx::query("DELETE FROM playlists WHERE id = ?1")
         .bind(id)
         .execute(pool)
@@ -88,7 +80,7 @@ pub async fn add_song_to_playlist(
 ) -> sqlx::Result<(), String> {
     // Get the next position for this playlist
     let position: Option<i64> = sqlx::query_scalar(
-        "SELECT COALESCE(MAX(position), 0) + 1 FROM playlist_songs WHERE playlist_id = ?1"
+        "SELECT COALESCE(MAX(position), 0) + 1 FROM playlist_songs WHERE playlist_id = ?1",
     )
     .bind(playlist_id)
     .fetch_optional(pool)
@@ -98,9 +90,9 @@ pub async fn add_song_to_playlist(
     let position = position.unwrap_or(1);
 
     sqlx::query(
-        "INSERT INTO playlist_songs (id, playlist_id, track_id, position) VALUES (?1, ?2, ?3, ?4)"
+        "INSERT INTO playlist_songs (id, playlist_id, track_id, position) VALUES (?1, ?2, ?3, ?4)",
     )
-    .bind(format!("{}_{}", playlist_id, track_id))
+    .bind(format!("{playlist_id}_{track_id}"))
     .bind(playlist_id)
     .bind(track_id)
     .bind(position)
@@ -133,7 +125,7 @@ pub async fn get_playlist_songs(
          FROM playlist_songs ps 
          JOIN tracks t ON ps.track_id = t.id 
          WHERE ps.playlist_id = ?1 
-         ORDER BY ps.position"
+         ORDER BY ps.position",
     )
     .bind(playlist_id)
     .fetch_all(pool)
@@ -149,7 +141,7 @@ pub async fn reorder_playlist_tracks(
 ) -> sqlx::Result<(), String> {
     for (track_id, new_position) in track_positions {
         sqlx::query(
-            "UPDATE playlist_songs SET position = ?1 WHERE playlist_id = ?2 AND track_id = ?3"
+            "UPDATE playlist_songs SET position = ?1 WHERE playlist_id = ?2 AND track_id = ?3",
         )
         .bind(new_position)
         .bind(playlist_id)
@@ -166,15 +158,12 @@ pub async fn reorder_playlists(
     playlist_positions: Vec<(String, i32)>, // (playlist_id, new_position)
 ) -> sqlx::Result<(), String> {
     for (playlist_id, new_position) in playlist_positions {
-        sqlx::query(
-            "UPDATE playlists SET position = ?1 WHERE id = ?2"
-        )
-        .bind(new_position)
-        .bind(playlist_id)
-        .execute(pool)
-        .await
-        .map_err(|e| format!("Failed to reorder playlist: {e}"))?;
+        sqlx::query("UPDATE playlists SET position = ?1 WHERE id = ?2")
+            .bind(new_position)
+            .bind(playlist_id)
+            .execute(pool)
+            .await
+            .map_err(|e| format!("Failed to reorder playlist: {e}"))?;
     }
     Ok(())
 }
-

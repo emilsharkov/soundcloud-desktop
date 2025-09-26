@@ -2,8 +2,7 @@ use std::sync::Mutex;
 use tauri::State;
 
 use crate::{
-    commands::local::update_local_track_metadata,
-    db::queries::{update_track, TrackRow},
+    commands::local::update_local_track_metadata, db::queries::update_track,
     models::app_state::AppState,
 };
 

@@ -3,14 +3,12 @@ use id3::{
     Tag, TagLike, Version,
 };
 use std::{
-    fs::{self, File},
-    path::PathBuf,
+    fs::{self},
     sync::Mutex,
 };
-use tauri::{State, Url};
+use tauri::State;
 
 use crate::{
-    db::queries::{update_track, TrackRow},
     models::app_state::AppState,
     utils::classify_path::{classify_path, InputType},
 };

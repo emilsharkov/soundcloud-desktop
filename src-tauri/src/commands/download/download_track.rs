@@ -1,9 +1,8 @@
 use crate::{
-    commands::{download_song_image, update_local_track_metadata},
-    db::queries::create_track,
-    models::app_state::AppState,
+    commands::update_local_track_metadata, db::queries::create_track, models::app_state::AppState,
 };
-use soundcloud_rs::response::{StreamType, Track};
+use soundcloud_rs::response::{
+    StreamType, Track};
 use std::sync::Mutex;
 use tauri::State;
 

@@ -1,7 +1,7 @@
 use super::TrackRow;
 use soundcloud_rs::response::{Track, Waveform};
-use sqlx::SqlitePool;
 use sqlx::types::Json;
+use sqlx::SqlitePool;
 
 pub async fn create_track(
     pool: &SqlitePool,
@@ -11,25 +11,28 @@ pub async fn create_track(
     track: &Track,
     waveform: &Waveform,
 ) -> sqlx::Result<(), String> {
-    sqlx::query("INSERT INTO tracks (id, title, artist, data, waveform) VALUES (?1, ?2, ?3, ?4, ?5)")
-        .bind(id)
-        .bind(title)
-        .bind(artist)
-        .bind(Json(track.clone()))
-        .bind(Json(waveform.clone()))
-        .execute(pool)
-        .await
-        .map_err(|e| format!("Failed to create track: {e}"))?;
+    sqlx::query(
+        "INSERT INTO tracks (id, title, artist, data, waveform) VALUES (?1, ?2, ?3, ?4, ?5)",
+    )
+    .bind(id)
+    .bind(title)
+    .bind(artist)
+    .bind(Json(track.clone()))
+    .bind(Json(waveform.clone()))
+    .execute(pool)
+    .await
+    .map_err(|e| format!("Failed to create track: {e}"))?;
     Ok(())
 }
 
 pub async fn get_track(pool: &SqlitePool, id: &str) -> sqlx::Result<Option<TrackRow>, String> {
-    let result =
-        sqlx::query_as::<_, TrackRow>("SELECT id, title, artist, data, waveform FROM tracks WHERE id = ?1")
-            .bind(id)
-            .fetch_optional(pool)
-            .await
-            .map_err(|e| format!("Failed to get track: {e}"))?;
+    let result = sqlx::query_as::<_, TrackRow>(
+        "SELECT id, title, artist, data, waveform FROM tracks WHERE id = ?1",
+    )
+    .bind(id)
+    .fetch_optional(pool)
+    .await
+    .map_err(|e| format!("Failed to get track: {e}"))?;
 
     if result.is_none() {
         return Err("Track not found".into());
