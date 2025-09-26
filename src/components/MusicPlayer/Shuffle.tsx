@@ -1,4 +1,4 @@
-import { useAudioContext } from '@/context/AudioContext';
+import { useAudioContext } from '@/context/audio/AudioContext';
 import { Shuffle as ShuffleIcon } from 'lucide-react';
 
 const Shuffle = () => {

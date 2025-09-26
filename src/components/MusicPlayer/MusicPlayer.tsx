@@ -1,4 +1,4 @@
-import { useAudioContext } from '@/context/AudioContext';
+import { useAudioContext } from '@/context/audio/AudioContext';
 import { JSX } from 'react';
 import { Play } from './Play';
 import { Repeat } from './Repeat';

@@ -1,6 +1,8 @@
-import { useAudioContext } from '@/context/AudioContext';
+import { useAudioContext } from '@/context/audio/AudioContext';
+import { useNavContext } from '@/context/nav/NavContext';
 import { useTauriInvoke } from '@/hooks/useTauriInvoke';
-import { Track } from '@/models/response';
+import { TrackWaveformQuery } from '@/models/query';
+import { Track, TrackRow } from '@/models/response';
 import { Check, LoaderCircle, Pause, Play } from 'lucide-react';
 import { Download } from './Download';
 import { Settings } from './Settings/Settings';
@@ -14,23 +16,52 @@ export interface TrackQuery {
     id: string;
 }
 
+export interface SongImageQuery {
+    id: string;
+}
+
 const Song = (props: SongProps) => {
     const { track } = props;
     const { title, user, artwork_url } = track;
     const { tracks, currentIndex, paused, setPaused, setQueue } =
         useAudioContext();
-    const { isLoading, isError } = useTauriInvoke<TrackQuery, Track>(
-        'get_local_track',
+    const { selectedTab } = useNavContext();
+    const trackId = track.id?.toString() ?? '';
+    const {
+        data: trackRow,
+        isLoading,
+        isError,
+    } = useTauriInvoke<TrackQuery, TrackRow>('get_local_track', {
+        id: trackId,
+    });
+
+    const { data: image } = useTauriInvoke<SongImageQuery, string>(
+        'get_song_image',
         {
-            id: track.id?.toString() ?? '',
+            id: trackId,
         },
         {
-            retry: false,
+            enabled: selectedTab === 'library' || selectedTab === 'playlists',
+        }
+    );
+
+    const { data: waveform } = useTauriInvoke<TrackWaveformQuery, Waveform>(
+        'get_track_waveform',
+        {
+            track: track,
+        },
+        {
+            enabled: selectedTab === 'search',
         }
     );
 
     const isCurrentTrack = tracks[currentIndex]?.id === track.id;
     const isPlaying = !paused && isCurrentTrack;
+    const artwork =
+        selectedTab === 'library' || selectedTab === 'playlists'
+            ? image
+            : artwork_url;
+    const wave = selectedTab === 'search' ? waveform : trackRow?.waveform;
 
     const handlePlayPause = () => {
         if (isCurrentTrack) {
@@ -45,7 +76,7 @@ const Song = (props: SongProps) => {
             <div className='relative group'>
                 <img
                     className='w-[125px] h-[125px] rounded-lg object-cover'
-                    src={artwork_url}
+                    src={artwork}
                     alt={`${title} artwork`}
                 />
                 <button
@@ -75,7 +106,7 @@ const Song = (props: SongProps) => {
                     <p className='text-secondary'>{user?.username}</p>
                 </div>
                 <div className='flex flex-1'>
-                    <Waveform track={track} />
+                    <Waveform track={track} waveform={wave} />
                 </div>
             </div>
         </div>

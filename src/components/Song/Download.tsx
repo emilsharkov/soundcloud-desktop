@@ -1,4 +1,5 @@
 import { Track } from '@/models/response';
+import { useQueryClient } from '@tanstack/react-query';
 import { invoke } from '@tauri-apps/api/core';
 import { LoaderCircle, LucideDownload } from 'lucide-react';
 import { useState } from 'react';
@@ -11,13 +12,18 @@ interface DownloadProps {
 
 const Download = (props: DownloadProps) => {
     const { track } = props;
+    const trackId = track.id?.toString() ?? '';
+    const queryClient = useQueryClient();
     const [downloading, setDownloading] = useState<boolean>(false);
 
     const handleDownload = async () => {
         setDownloading(true);
-        invoke('download_track', { track })
+        await invoke('download_track', { track })
             .then(() => {
                 toast.success('Downloaded successfully');
+                queryClient.invalidateQueries({
+                    queryKey: ['get_local_track', trackId],
+                });
             })
             .catch(() => {
                 toast.error('Failed to download');

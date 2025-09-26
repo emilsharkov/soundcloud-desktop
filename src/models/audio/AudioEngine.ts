@@ -4,7 +4,7 @@
 import { invoke } from '@tauri-apps/api/core';
 import { BaseDirectory, readFile } from '@tauri-apps/plugin-fs';
 import { toast } from 'sonner';
-import { Track } from '../response';
+import { Track, TrackRow } from '../response';
 import { AudioTransport, type TransportSnapshot } from './AudioTransport';
 import { PlayerQueue, type QueueSnapshot } from './PlayerQueue';
 import { Repeat } from './repeat';
@@ -57,13 +57,13 @@ export class AudioEngine {
             } else {
                 const trackId = currentTrack.id;
                 try {
-                    const track = await invoke<Track>('get_local_track', {
+                    const trackRow = await invoke<TrackRow>('get_local_track', {
                         id: trackId?.toString() || '',
                     }).catch(() => {
                         return undefined;
                     });
 
-                    if (track) {
+                    if (trackRow) {
                         const file = await readFile(`music/${trackId}.mp3`, {
                             baseDir: BaseDirectory.AppLocalData,
                         });

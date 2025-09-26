@@ -226,3 +226,29 @@ export interface Waveform {
     height: number;
     samples: number[];
 }
+
+export interface TrackRow {
+    id: string;
+    title: string;
+    artist: string;
+    data: Track;
+    waveform: Waveform;
+}
+
+export interface PlaylistRow {
+    id: string;
+    name: string;
+    description?: string;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface PlaylistSongRow {
+    id: string;
+    playlist_id: string;
+    track_id: string;
+    position: number;
+    added_at: string;
+    title: string;
+    artist: string;
+}

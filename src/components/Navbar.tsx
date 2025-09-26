@@ -1,5 +1,8 @@
+import { useNavContext } from '@/context/nav/NavContext';
 import { useTauriInvoke } from '@/hooks/useTauriInvoke';
 import { PagingCollection, SearchResult } from '@/models/response';
+import { TABS } from '@/models/tabs';
+import { upperFirst } from 'lodash';
 import { Search } from 'lucide-react';
 import { useState } from 'react';
 import { useDebounceValue } from 'usehooks-ts';
@@ -16,12 +19,8 @@ interface SearchArgs {
     q: string;
 }
 
-export interface NavbarProps {
-    setSelectedOutput: (output: string | undefined) => void;
-}
-
-const Navbar = (props: NavbarProps) => {
-    const { setSelectedOutput } = props;
+const Navbar = () => {
+    const { selectedTab, setSelectedSearch, setSelectedTab } = useNavContext();
     const [search, setSearch] = useState<string>('');
     const [debouncedSearch] = useDebounceValue(search, 500);
     const [popoverOpen, setPopoverOpen] = useState<boolean>(false);
@@ -41,7 +40,7 @@ const Navbar = (props: NavbarProps) => {
 
     const selectSearchResult = (searchResult: SearchResult) => {
         const { output } = searchResult;
-        setSelectedOutput(output);
+        setSelectedSearch(output);
         setSearch(output ?? '');
         setPopoverOpen(false);
     };
@@ -57,9 +56,21 @@ const Navbar = (props: NavbarProps) => {
         <NavigationMenu className='w-full max-w-none max-h-fit'>
             <Soundcloud className='w-14 h-14 mx-6' />
             <NavigationMenuList className='text-tertiary font-semibold text-sm gap-4'>
-                <NavigationMenuItem>Home</NavigationMenuItem>
-                <NavigationMenuItem>Search</NavigationMenuItem>
-                <NavigationMenuItem>Library</NavigationMenuItem>
+                {TABS.map(tab => (
+                    <NavigationMenuItem
+                        key={tab}
+                        onClick={() => setSelectedTab(tab)}
+                        className='cursor-pointer'
+                        style={{
+                            color:
+                                selectedTab === tab
+                                    ? 'var(--color-secondary)'
+                                    : 'var(--color-tertiary)',
+                        }}
+                    >
+                        {upperFirst(tab)}
+                    </NavigationMenuItem>
+                ))}
             </NavigationMenuList>
             <Popover open={searchResults !== undefined && popoverOpen}>
                 <PopoverAnchor>

@@ -1,23 +1,37 @@
-use sqlx::{types::Json, FromRow};
-use serde_json::Value;
 use serde::{Deserialize, Serialize};
+use soundcloud_rs::response::{Track, Waveform};
+use sqlx::{types::Json, FromRow};
 
 #[derive(Debug, FromRow, Clone, Serialize, Deserialize)]
 pub struct TrackRow {
     pub id: String,
     pub title: String,
     pub artist: String,
-    pub data: Json<Value>,
+    pub data: Json<Track>,
+    pub waveform: Json<Waveform>,
 }
 
-pub mod create_track;
-pub mod delete_track;
-pub mod get_track;
-pub mod get_tracks;
-pub mod update_track;
+#[derive(Debug, FromRow, Clone, Serialize, Deserialize)]
+pub struct PlaylistRow {
+    pub id: String,
+    pub name: String,
+    pub position: i32,
+    pub created_at: String,
+    pub updated_at: String,
+}
 
-pub use create_track::create_track;
-pub use delete_track::delete_track;
-pub use get_track::get_track;
-pub use get_tracks::get_tracks;
-pub use update_track::update_track;
+#[derive(Debug, FromRow, Clone, Serialize, Deserialize)]
+pub struct PlaylistSongRow {
+    pub id: String,
+    pub playlist_id: String,
+    pub track_id: String,
+    pub position: i64,
+    pub title: String,
+    pub artist: String,
+}
+
+pub mod track;
+pub mod playlist;
+
+pub use track::*;
+pub use playlist::*;

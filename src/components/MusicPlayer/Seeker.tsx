@@ -1,4 +1,4 @@
-import { useAudioContext } from '@/context/AudioContext';
+import { useAudioContext } from '@/context/audio/AudioContext';
 import * as SliderPrimitive from '@radix-ui/react-slider';
 
 const Seeker = () => {

@@ -1,4 +1,10 @@
-import { AudioContext, type AudioContextType } from '@/context/AudioContext';
+import {
+    AudioContext,
+    type AudioContextType,
+} from '@/context/audio/AudioContext';
+import { AudioEngine, EngineSnapshot } from '@/models/audio/AudioEngine';
+import { Repeat } from '@/models/audio/repeat';
+import { Track } from '@/models/response';
 import { isEqual } from 'lodash';
 import React, {
     JSX,
@@ -7,9 +13,6 @@ import React, {
     useRef,
     useSyncExternalStore,
 } from 'react';
-import { Track } from '../response';
-import { AudioEngine, EngineSnapshot } from './AudioEngine';
-import { Repeat } from './repeat';
 
 export interface AudioProviderProps {
     children: React.ReactNode;

@@ -7,7 +7,7 @@ import { invoke, type InvokeArgs } from '@tauri-apps/api/core';
 
 export const useTauriInvoke = <TArgs extends object, V>(
     command: string,
-    args: TArgs,
+    args: TArgs = {} as TArgs,
     options?: Omit<
         UseQueryOptions<V, Error, V, [string, ...unknown[]]>,
         'queryKey' | 'queryFn'

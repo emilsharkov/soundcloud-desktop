@@ -1,5 +1,7 @@
 use crate::{
-    commands::update_local_track_metadata, db::queries::create_track, models::app_state::AppState,
+    commands::{download_song_image, update_local_track_metadata},
+    db::queries::create_track,
+    models::app_state::AppState,
 };
 use soundcloud_rs::response::{StreamType, Track};
 use std::sync::Mutex;
@@ -14,6 +16,26 @@ pub async fn download_track(
     let soundcloud_client = state.lock().unwrap().soundcloud_client.clone();
     let app_data_dir = state.lock().unwrap().app_data_dir.clone();
     let music_dir = app_data_dir.join("music");
+
+    // Get track metadata
+    let track_id = track
+        .id
+        .as_ref()
+        .ok_or("Failed to get track id")?
+        .to_string();
+    let track_title = track.title.as_ref().ok_or("Failed to get title")?;
+    let track_username = track
+        .user
+        .as_ref()
+        .ok_or("Failed to get user")?
+        .username
+        .as_ref()
+        .ok_or("Failed to get username")?;
+
+    let waveform = soundcloud_client
+        .get_track_waveform(&track)
+        .await
+        .map_err(|e| format!("Failed to get track waveform: {e}"))?;
 
     // Download track
     soundcloud_client
@@ -31,21 +53,6 @@ pub async fn download_track(
         )
         .await
         .map_err(|e| format!("Failed to download track: {e}"))?;
-
-    // Get track metadata
-    let track_id = track
-        .id
-        .as_ref()
-        .ok_or("Failed to get track id")?
-        .to_string();
-    let track_title = track.title.as_ref().ok_or("Failed to get title")?;
-    let track_username = track
-        .user
-        .as_ref()
-        .ok_or("Failed to get user")?
-        .username
-        .as_ref()
-        .ok_or("Failed to get username")?;
 
     // Add track metadata to mp3 file
     update_local_track_metadata(
@@ -72,6 +79,7 @@ pub async fn download_track(
         track_title,
         track_username,
         &track,
+        &waveform,
     )
     .await
     .map_err(|e| format!("Failed to create track: {e}"))?;

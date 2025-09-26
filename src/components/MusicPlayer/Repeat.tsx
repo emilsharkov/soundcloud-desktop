@@ -1,4 +1,4 @@
-import { useAudioContext } from '@/context/AudioContext';
+import { useAudioContext } from '@/context/audio/AudioContext';
 import { Repeat as RepeatType } from '@/models/audio/repeat';
 import { Repeat1Icon, RepeatIcon } from 'lucide-react';
 

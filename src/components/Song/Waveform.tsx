@@ -1,30 +1,21 @@
-import { useAudioContext } from '@/context/AudioContext';
-import { useTauriInvoke } from '@/hooks/useTauriInvoke';
+import { useAudioContext } from '@/context/audio/AudioContext';
 import { useWaveform } from '@/hooks/useWaveform';
 import { getSampleColor } from '@/lib/getSampleColor';
-import { TrackWaveformQuery } from '@/models/query';
 import { Track, type Waveform } from '@/models/response';
 import { useEffect, useState } from 'react';
 
 export interface WaveformProps {
     track: Track;
+    waveform: Waveform | undefined;
 }
 
 const Waveform = (props: WaveformProps) => {
-    const { track } = props;
+    const { waveform, track } = props;
     const { currentIndex, tracks, playbackTime, duration, setTime } =
         useAudioContext();
     const [hoveredSample, setHoveredSample] = useState<number | null>(null);
     const [isHovered, setIsHovered] = useState<boolean>(false);
-    const { data: waveform } = useTauriInvoke<TrackWaveformQuery, Waveform>(
-        'get_track_waveform',
-        {
-            track: track,
-        },
-        {
-            retry: false,
-        }
-    );
+
     const { ref, samples } = useWaveform(waveform);
 
     const currentSample = (playbackTime / duration) * samples.length;

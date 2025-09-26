@@ -28,6 +28,7 @@ fn main() {
 
             init_app_data_dir(&app_data_dir).expect("Failed to init app data dir");
             init_music_dir(&app_data_dir).expect("Failed to init music dir");
+            // init_song_images_dir(&app_data_dir).expect("Failed to init song images dir");
             println!("Music dir: {:?}", app_data_dir.join("music"));
 
             let app_state: AppState = tauri::async_runtime::block_on(async {
@@ -59,6 +60,7 @@ fn main() {
             download_track,
             // Download
             download_playlist,
+            download_song_image,
             download_track,
             // Local
             update_local_track,
@@ -66,6 +68,16 @@ fn main() {
             delete_local_track,
             get_local_track,
             get_local_tracks,
+            get_song_image,
+            // Playlist
+            create_playlist_command,
+            get_playlists_command,
+            get_playlist_command,
+            update_playlist_command,
+            delete_playlist_command,
+            add_song_to_playlist_command,
+            remove_song_from_playlist_command,
+            get_playlist_songs_command,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

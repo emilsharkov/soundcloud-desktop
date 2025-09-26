@@ -1,4 +1,4 @@
-import { useAudioContext } from '@/context/AudioContext';
+import { useAudioContext } from '@/context/audio/AudioContext';
 import { SkipBack, SkipForward } from 'lucide-react';
 
 interface SkipProps {
