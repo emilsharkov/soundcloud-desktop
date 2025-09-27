@@ -5,10 +5,7 @@ use std::sync::Mutex;
 use tauri::State;
 
 #[tauri::command]
-pub async fn get_song_image(
-    state: State<'_, Mutex<AppState>>,
-    id: i64,
-) -> Result<String, String> {
+pub async fn get_song_image(state: State<'_, Mutex<AppState>>, id: i64) -> Result<String, String> {
     let music_dir = state.lock().unwrap().app_data_dir.clone().join("music");
     let path = music_dir.join(id.to_string()).with_extension("mp3");
     let tag = Tag::read_from_path(&path).map_err(|e| format!("Failed to read tag: {e}"))?;

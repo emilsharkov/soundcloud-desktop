@@ -16,7 +16,10 @@ pub async fn download_track(
     let music_dir = app_data_dir.join("music");
 
     // Get track metadata
-    let track = soundcloud_client.get_track(&track_id).await.map_err(|e| format!("Failed to get track: {e}"))?;
+    let track = soundcloud_client
+        .get_track(&track_id)
+        .await
+        .map_err(|e| format!("Failed to get track: {e}"))?;
     let track_title = track.title.as_ref().ok_or("Failed to get title")?;
     let track_username = track
         .user
@@ -51,7 +54,7 @@ pub async fn download_track(
     // Add track metadata to mp3 file
     update_local_track_metadata(
         state.clone(),
-        track_id.clone(),
+        track_id,
         Some(track_title.to_string()),
         Some(track_username.to_string()),
         Some(

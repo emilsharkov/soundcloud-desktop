@@ -1,5 +1,5 @@
 use crate::models::app_state::AppState;
-use soundcloud_rs::response::{Track, Waveform};
+use soundcloud_rs::response::Waveform;
 use std::sync::Mutex;
 use tauri::State;
 

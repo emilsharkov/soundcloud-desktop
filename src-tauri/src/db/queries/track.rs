@@ -79,8 +79,10 @@ pub async fn update_track(
         .await
         .map_err(|e| format!("Failed to update track: {e}"))?;
 
-    let track = get_track(pool, id).await.map_err(|e| format!("Failed to get track: {e}"))?;
-    println!("Track updated: {:?}", track);
+    let track = get_track(pool, id)
+        .await
+        .map_err(|e| format!("Failed to get track: {e}"))?;
+    println!("Track updated: {track:?}");
     Ok(())
 }
 

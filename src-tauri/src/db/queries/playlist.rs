@@ -33,10 +33,7 @@ pub async fn get_playlists(
     Ok(rows)
 }
 
-pub async fn get_playlist(
-    pool: &SqlitePool,
-    id: i64,
-) -> sqlx::Result<Option<PlaylistRow>, String> {
+pub async fn get_playlist(pool: &SqlitePool, id: i64) -> sqlx::Result<Option<PlaylistRow>, String> {
     let row =
         sqlx::query_as::<_, PlaylistRow>("SELECT id, name, position FROM playlists WHERE id = ?1")
             .bind(id)

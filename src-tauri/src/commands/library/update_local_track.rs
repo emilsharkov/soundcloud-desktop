@@ -25,13 +25,8 @@ pub async fn update_local_track(
     .map_err(|e| format!("Failed to update track metadata: {e}"))?;
 
     let pool = state.lock().unwrap().db_pool.clone();
-    update_track(
-        &pool,
-        id,
-        title.as_deref(),
-        artist.as_deref(),
-    )
-    .await
-    .map_err(|e| format!("Failed to update track: {e}"))?;
+    update_track(&pool, id, title.as_deref(), artist.as_deref())
+        .await
+        .map_err(|e| format!("Failed to update track: {e}"))?;
     Ok(())
 }
