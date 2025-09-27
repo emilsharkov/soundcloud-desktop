@@ -2,7 +2,7 @@ use std::sync::Mutex;
 use tauri::State;
 
 use crate::{
-    db::queries::{get_playlist, get_playlist_songs, get_playlists},
+    db::queries::{get_playlist, get_playlist_songs, get_playlists, PlaylistRow, PlaylistSongRow},
     models::app_state::AppState,
 };
 
@@ -22,11 +22,11 @@ pub async fn get_playlists_command(
 #[tauri::command]
 pub async fn get_playlist_command(
     state: State<'_, Mutex<AppState>>,
-    id: String,
-) -> Result<Option<crate::db::queries::PlaylistRow>, String> {
+    id: i64,
+) -> Result<Option<PlaylistRow>, String> {
     let pool = state.lock().unwrap().db_pool.clone();
 
-    get_playlist(&pool, &id)
+    get_playlist(&pool, id)
         .await
         .map_err(|e| format!("Failed to get playlist: {e}"))
 }
@@ -34,11 +34,11 @@ pub async fn get_playlist_command(
 #[tauri::command]
 pub async fn get_playlist_songs_command(
     state: State<'_, Mutex<AppState>>,
-    playlist_id: String,
-) -> Result<Vec<crate::db::queries::PlaylistSongRow>, String> {
+    playlist_id: i64,
+) -> Result<Vec<PlaylistSongRow>, String> {
     let pool = state.lock().unwrap().db_pool.clone();
 
-    get_playlist_songs(&pool, &playlist_id)
+    get_playlist_songs(&pool, playlist_id)
         .await
         .map_err(|e| format!("Failed to get playlist songs: {e}"))
 }

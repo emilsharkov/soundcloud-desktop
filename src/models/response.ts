@@ -228,7 +228,7 @@ export interface Waveform {
 }
 
 export interface TrackRow {
-    id: string;
+    id: number;
     title: string;
     artist: string;
     data: Track;
@@ -236,7 +236,7 @@ export interface TrackRow {
 }
 
 export interface PlaylistRow {
-    id: string;
+    id: number;
     name: string;
     description?: string;
     created_at: string;
@@ -244,9 +244,9 @@ export interface PlaylistRow {
 }
 
 export interface PlaylistSongRow {
-    id: string;
-    playlist_id: string;
-    track_id: string;
+    id: number;
+    playlist_id: number;
+    track_id: number;
     position: number;
     added_at: string;
     title: string;

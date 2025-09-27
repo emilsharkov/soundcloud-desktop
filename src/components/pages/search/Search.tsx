@@ -1,12 +1,12 @@
-import { Song } from '@/components/Song/Song';
 import { useNavContext } from '@/context/nav/NavContext';
-import { useTauriInvoke } from '@/hooks/useTauriInvoke';
+import { useTauriQuery } from '@/hooks/data/query/useTauriQuery';
 import { TracksQuery } from '@/models/query';
 import { PagingCollection, Track } from '@/models/response';
+import { SearchSong } from './SearchSong';
 
 const Search = () => {
     const { selectedSearch } = useNavContext();
-    const { data: tracks } = useTauriInvoke<
+    const { data: tracks } = useTauriQuery<
         TracksQuery,
         PagingCollection<Track>
     >(
@@ -22,7 +22,7 @@ const Search = () => {
     return (
         <div className='flex flex-col gap-4 p-4'>
             {tracks?.collection.map((track: Track) => (
-                <Song key={track.id?.toString()} track={track} />
+                <SearchSong key={track.id} track={track} />
             ))}
         </div>
     );

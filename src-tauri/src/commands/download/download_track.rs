@@ -1,14 +1,14 @@
 use crate::{
     commands::update_local_track_metadata, db::queries::create_track, models::app_state::AppState,
 };
-use soundcloud_rs::response::{StreamType, Track};
+use soundcloud_rs::response::StreamType;
 use std::sync::Mutex;
 use tauri::State;
 
 #[tauri::command]
 pub async fn download_track(
     state: State<'_, Mutex<AppState>>,
-    track: Track,
+    track_id: i64,
     stream_type: Option<StreamType>,
 ) -> Result<(), String> {
     let soundcloud_client = state.lock().unwrap().soundcloud_client.clone();
@@ -16,11 +16,7 @@ pub async fn download_track(
     let music_dir = app_data_dir.join("music");
 
     // Get track metadata
-    let track_id = track
-        .id
-        .as_ref()
-        .ok_or("Failed to get track id")?
-        .to_string();
+    let track = soundcloud_client.get_track(&track_id).await.map_err(|e| format!("Failed to get track: {e}"))?;
     let track_title = track.title.as_ref().ok_or("Failed to get title")?;
     let track_username = track
         .user
@@ -31,14 +27,14 @@ pub async fn download_track(
         .ok_or("Failed to get username")?;
 
     let waveform = soundcloud_client
-        .get_track_waveform(&track)
+        .get_track_waveform(&track_id)
         .await
         .map_err(|e| format!("Failed to get track waveform: {e}"))?;
 
     // Download track
     soundcloud_client
         .download_track(
-            &track,
+            &track_id,
             stream_type.as_ref(),
             Some(music_dir.to_str().ok_or("Failed to get music dir")?),
             Some(
@@ -73,7 +69,7 @@ pub async fn download_track(
     let pool = state.lock().unwrap().db_pool.clone();
     create_track(
         &pool,
-        &track_id.clone(),
+        track_id,
         track_title,
         track_username,
         &track,

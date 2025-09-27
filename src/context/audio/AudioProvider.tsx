@@ -4,7 +4,6 @@ import {
 } from '@/context/audio/AudioContext';
 import { AudioEngine, EngineSnapshot } from '@/models/audio/AudioEngine';
 import { Repeat } from '@/models/audio/repeat';
-import { Track } from '@/models/response';
 import { isEqual } from 'lodash';
 import React, {
     JSX,
@@ -39,6 +38,11 @@ export const AudioProvider = (props: AudioProviderProps): JSX.Element => {
             return lastSnapshotRef.current;
         }
 
+        console.log('AudioProvider: State changed, new snapshot:', {
+            shuffled: newSnapshot.shuffled,
+            repeat: newSnapshot.repeat,
+            trackIds: newSnapshot.trackIds,
+        });
         lastSnapshotRef.current = newSnapshot;
         return newSnapshot;
     }, []);
@@ -80,15 +84,15 @@ export const AudioProvider = (props: AudioProviderProps): JSX.Element => {
         []
     );
     const setQueue = useCallback(
-        (tracks: Track[]) => engineRef.current.setQueue(tracks),
+        (trackIds: number[]) => engineRef.current.setQueue(trackIds),
         []
     );
     const enqueue = useCallback(
-        (t: Track[] | Track) => engineRef.current.enqueue(t),
+        (t: number[] | number) => engineRef.current.enqueue(t),
         []
     );
     const enqueueNext = useCallback(
-        (t: Track[] | Track) => engineRef.current.enqueueNext(t),
+        (t: number[] | number) => engineRef.current.enqueueNext(t),
         []
     );
     const removeAt = useCallback(
@@ -122,7 +126,7 @@ export const AudioProvider = (props: AudioProviderProps): JSX.Element => {
         volume: snap.volume,
 
         // queue state
-        tracks: snap.tracks,
+        trackIds: snap.trackIds,
         currentIndex: snap.currentIndex,
         shuffled: snap.shuffled,
         repeat: snap.repeat,

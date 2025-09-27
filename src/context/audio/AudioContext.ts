@@ -1,5 +1,4 @@
 import { Repeat } from '@/models/audio/repeat';
-import { Track } from '@/models/response';
 import React, { createContext, useContext } from 'react';
 
 export interface AudioContextType {
@@ -14,11 +13,11 @@ export interface AudioContextType {
     volume: number;
 
     /** Queue/policy */
-    tracks: Track[];
+    trackIds: number[];
     currentIndex: number;
     shuffled: boolean;
     repeat: Repeat;
-    selectedTrackId: string | null;
+    selectedTrackId: number | null;
 
     /** Transport commands */
     setTime: (time: number) => void;
@@ -29,9 +28,9 @@ export interface AudioContextType {
     setRate: (r: number) => void;
 
     /** Queue commands */
-    setQueue: (tracks: Track[]) => void;
-    enqueue: (tracks: Track[] | Track) => void;
-    enqueueNext: (tracks: Track[] | Track) => void;
+    setQueue: (trackIds: number[]) => void;
+    enqueue: (trackIds: number[] | number) => void;
+    enqueueNext: (trackIds: number[] | number) => void;
     removeAt: (index: number) => void;
     clearQueue: () => void;
     setIndex: (index: number) => void;

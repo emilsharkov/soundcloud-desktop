@@ -1,17 +1,16 @@
-import { Track } from '../response';
 import { Repeat } from './repeat';
 
 export type QueueSnapshot = {
-    tracks: Track[];
+    trackIds: number[];
     currentIndex: number;
     shuffled: boolean;
     repeat: Repeat;
     shuffleOrder: number[];
-    selectedTrackId: string | null;
+    selectedTrackId: number | null;
 };
 
 export class PlayerQueue {
-    private tracks: Track[] = [];
+    private trackIds: number[] = [];
     private currentIndex = -1;
     private shuffled = false;
     private repeat: Repeat = 'none';
@@ -29,15 +28,12 @@ export class PlayerQueue {
 
     /** Snapshot for useSyncExternalStore */
     getSnapshot = (): QueueSnapshot => ({
-        tracks: this.tracks,
+        trackIds: this.trackIds,
         currentIndex: this.currentIndex,
         shuffled: this.shuffled,
         repeat: this.repeat,
         shuffleOrder: this.shuffleOrder,
-        selectedTrackId:
-            this.currentIndex >= 0
-                ? (this.tracks[this.currentIndex]?.id?.toString() ?? null)
-                : null,
+        selectedTrackId: this.currentId(),
     });
 
     /** Helpers */
@@ -53,62 +49,62 @@ export class PlayerQueue {
         return arr;
     }
     private order() {
-        if (!this.shuffled) return this.makeSequential(this.tracks.length);
-        if (this.shuffleOrder.length !== this.tracks.length) {
-            this.shuffleOrder = this.makeShuffle(this.tracks.length);
+        if (!this.shuffled) return this.makeSequential(this.trackIds.length);
+        if (this.shuffleOrder.length !== this.trackIds.length) {
+            this.shuffleOrder = this.makeShuffle(this.trackIds.length);
         }
         return this.shuffleOrder;
     }
 
     /** Commands */
-    setQueue(tracks: Track[]) {
-        this.tracks = tracks ?? [];
-        this.currentIndex = this.tracks.length ? 0 : -1;
+    setQueue(trackIds: number[]) {
+        this.trackIds = trackIds ?? [];
+        this.currentIndex = this.trackIds.length ? 0 : -1;
         this.shuffleOrder = [];
         this.emit();
     }
-    enqueue(items: Track[] | Track) {
+    enqueue(items: number[] | number) {
         const add = Array.isArray(items) ? items : [items];
-        this.tracks = [...this.tracks, ...add];
+        this.trackIds = [...this.trackIds, ...add];
         this.shuffleOrder = [];
         this.emit();
     }
-    enqueueNext(items: Track[] | Track) {
+    enqueueNext(items: number[] | number) {
         const add = Array.isArray(items) ? items : [items];
         if (this.currentIndex < 0) {
-            this.tracks = [...this.tracks, ...add];
-            this.currentIndex = this.tracks.length ? 0 : -1;
+            this.trackIds = [...this.trackIds, ...add];
+            this.currentIndex = this.trackIds.length ? 0 : -1;
             this.shuffleOrder = [];
             this.emit();
             return;
         }
         const insertAt = this.currentIndex + 1;
-        this.tracks = [
-            ...this.tracks.slice(0, insertAt),
+        this.trackIds = [
+            ...this.trackIds.slice(0, insertAt),
             ...add,
-            ...this.tracks.slice(insertAt),
+            ...this.trackIds.slice(insertAt),
         ];
         this.shuffleOrder = [];
         this.emit();
     }
     removeAt(index: number) {
-        if (index < 0 || index >= this.tracks.length) return;
-        this.tracks = this.tracks.filter((_, i) => i !== index);
+        if (index < 0 || index >= this.trackIds.length) return;
+        this.trackIds = this.trackIds.filter((_, i) => i !== index);
         if (index < this.currentIndex) this.currentIndex -= 1;
-        if (this.tracks.length === 0) this.currentIndex = -1;
-        if (this.currentIndex >= this.tracks.length)
-            this.currentIndex = this.tracks.length - 1;
+        if (this.trackIds.length === 0) this.currentIndex = -1;
+        if (this.currentIndex >= this.trackIds.length)
+            this.currentIndex = this.trackIds.length - 1;
         this.shuffleOrder = [];
         this.emit();
     }
     clear() {
-        this.tracks = [];
+        this.trackIds = [];
         this.currentIndex = -1;
         this.shuffleOrder = [];
         this.emit();
     }
     setIndex(index: number) {
-        const clamped = Math.max(-1, Math.min(index, this.tracks.length - 1));
+        const clamped = Math.max(-1, Math.min(index, this.trackIds.length - 1));
         this.currentIndex = clamped;
         this.emit();
     }
@@ -118,15 +114,33 @@ export class PlayerQueue {
         this.emit();
     }
     toggleShuffle() {
+        console.log(
+            'PlayerQueue.toggleShuffle called, current shuffled:',
+            this.shuffled
+        );
         this.setShuffled(!this.shuffled);
+        console.log(
+            'PlayerQueue.toggleShuffle completed, new shuffled:',
+            this.shuffled
+        );
     }
     setRepeat(r: Repeat) {
+        console.log(
+            'PlayerQueue.setRepeat called, current repeat:',
+            this.repeat,
+            'new repeat:',
+            r
+        );
         this.repeat = r;
         this.emit();
+        console.log(
+            'PlayerQueue.setRepeat completed, new repeat:',
+            this.repeat
+        );
     }
 
     next() {
-        const n = this.tracks.length;
+        const n = this.trackIds.length;
         if (!n) return;
         if (this.repeat === 'song') {
             this.emit();
@@ -147,7 +161,7 @@ export class PlayerQueue {
         this.emit(); // none: stay
     }
     prev() {
-        const n = this.tracks.length;
+        const n = this.trackIds.length;
         if (!n) return;
         const ord = this.order();
         const pos = ord.indexOf(this.currentIndex);
@@ -164,9 +178,9 @@ export class PlayerQueue {
         this.emit();
     }
 
-    current(): Track | null {
+    currentId(): number | null {
         return this.currentIndex >= 0
-            ? (this.tracks[this.currentIndex] ?? null)
+            ? (this.trackIds[this.currentIndex] ?? null)
             : null;
     }
 }

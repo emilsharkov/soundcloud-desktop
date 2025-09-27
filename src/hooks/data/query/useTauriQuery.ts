@@ -5,7 +5,7 @@ import {
 } from '@tanstack/react-query';
 import { invoke, type InvokeArgs } from '@tauri-apps/api/core';
 
-export const useTauriInvoke = <TArgs extends object, V>(
+export const useTauriQuery = <TArgs extends object, V>(
     command: string,
     args: TArgs = {} as TArgs,
     options?: Omit<

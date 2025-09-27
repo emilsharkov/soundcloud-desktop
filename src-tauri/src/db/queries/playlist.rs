@@ -3,12 +3,10 @@ use sqlx::SqlitePool;
 
 pub async fn create_playlist(
     pool: &SqlitePool,
-    id: &str,
     name: &str,
     position: i32,
 ) -> sqlx::Result<(), String> {
-    sqlx::query("INSERT INTO playlists (id, name, position) VALUES (?1, ?2, ?3)")
-        .bind(id)
+    sqlx::query("INSERT INTO playlists (name, position) VALUES (?1, ?2)")
         .bind(name)
         .bind(position)
         .execute(pool)
@@ -37,7 +35,7 @@ pub async fn get_playlists(
 
 pub async fn get_playlist(
     pool: &SqlitePool,
-    id: &str,
+    id: i64,
 ) -> sqlx::Result<Option<PlaylistRow>, String> {
     let row =
         sqlx::query_as::<_, PlaylistRow>("SELECT id, name, position FROM playlists WHERE id = ?1")
@@ -50,7 +48,7 @@ pub async fn get_playlist(
 
 pub async fn update_playlist(
     pool: &SqlitePool,
-    id: &str,
+    id: i64,
     name: &str,
     position: i32,
 ) -> sqlx::Result<(), String> {
@@ -64,7 +62,7 @@ pub async fn update_playlist(
     Ok(())
 }
 
-pub async fn delete_playlist(pool: &SqlitePool, id: &str) -> sqlx::Result<(), String> {
+pub async fn delete_playlist(pool: &SqlitePool, id: i64) -> sqlx::Result<(), String> {
     sqlx::query("DELETE FROM playlists WHERE id = ?1")
         .bind(id)
         .execute(pool)
@@ -75,8 +73,8 @@ pub async fn delete_playlist(pool: &SqlitePool, id: &str) -> sqlx::Result<(), St
 
 pub async fn add_song_to_playlist(
     pool: &SqlitePool,
-    playlist_id: &str,
-    track_id: &str,
+    playlist_id: i64,
+    track_id: i64,
 ) -> sqlx::Result<(), String> {
     // Get the next position for this playlist
     let position: Option<i64> = sqlx::query_scalar(
@@ -104,8 +102,8 @@ pub async fn add_song_to_playlist(
 
 pub async fn remove_song_from_playlist(
     pool: &SqlitePool,
-    playlist_id: &str,
-    track_id: &str,
+    playlist_id: i64,
+    track_id: i64,
 ) -> sqlx::Result<(), String> {
     sqlx::query("DELETE FROM playlist_songs WHERE playlist_id = ?1 AND track_id = ?2")
         .bind(playlist_id)
@@ -118,7 +116,7 @@ pub async fn remove_song_from_playlist(
 
 pub async fn get_playlist_songs(
     pool: &SqlitePool,
-    playlist_id: &str,
+    playlist_id: i64,
 ) -> sqlx::Result<Vec<PlaylistSongRow>, String> {
     let rows = sqlx::query_as::<_, PlaylistSongRow>(
         "SELECT ps.id, ps.playlist_id, ps.track_id, ps.position, t.title, t.artist 
@@ -136,8 +134,8 @@ pub async fn get_playlist_songs(
 
 pub async fn reorder_playlist_tracks(
     pool: &SqlitePool,
-    playlist_id: &str,
-    track_positions: Vec<(String, i32)>, // (track_id, new_position)
+    playlist_id: i64,
+    track_positions: Vec<(i64, i32)>, // (track_id, new_position)
 ) -> sqlx::Result<(), String> {
     for (track_id, new_position) in track_positions {
         sqlx::query(
@@ -155,7 +153,7 @@ pub async fn reorder_playlist_tracks(
 
 pub async fn reorder_playlists(
     pool: &SqlitePool,
-    playlist_positions: Vec<(String, i32)>, // (playlist_id, new_position)
+    playlist_positions: Vec<(i64, i32)>, // (playlist_id, new_position)
 ) -> sqlx::Result<(), String> {
     for (playlist_id, new_position) in playlist_positions {
         sqlx::query("UPDATE playlists SET position = ?1 WHERE id = ?2")

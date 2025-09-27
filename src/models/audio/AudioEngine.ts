@@ -4,7 +4,7 @@
 import { invoke } from '@tauri-apps/api/core';
 import { BaseDirectory, readFile } from '@tauri-apps/plugin-fs';
 import { toast } from 'sonner';
-import { Track, TrackRow } from '../response';
+import { TrackRow } from '../response';
 import { AudioTransport, type TransportSnapshot } from './AudioTransport';
 import { PlayerQueue, type QueueSnapshot } from './PlayerQueue';
 import { Repeat } from './repeat';
@@ -20,7 +20,7 @@ export class AudioEngine {
     readonly transport: AudioTransport;
 
     private listeners = new Set<() => void>();
-    private currentTrackId: string | null = null;
+    private currentTrackId: number | null = null;
 
     constructor(queue = new PlayerQueue(), transport = new AudioTransport()) {
         this.queue = queue;
@@ -40,41 +40,42 @@ export class AudioEngine {
         // 2) When queue selection changes → load src & continue playing if not paused
         const handleQueueChange = async () => {
             const q = this.queue.getSnapshot();
-            const currentTrack =
-                q.currentIndex >= 0 ? q.tracks[q.currentIndex] : null;
 
             // Only reload if the current track actually changed
-            const newTrackId = currentTrack?.id?.toString() || null;
+            const newTrackId = q.selectedTrackId;
             if (newTrackId === this.currentTrackId) {
+                // No track change: still emit so UI can react to queue-only changes
+                // such as shuffled/repeat toggles or order updates.
+                this.emit();
                 return;
             }
 
             this.currentTrackId = newTrackId;
             this.transport.setPaused(true);
 
-            if (!currentTrack) {
+            if (!newTrackId) {
                 this.transport.setSrc('');
             } else {
-                const trackId = currentTrack.id;
                 try {
                     const trackRow = await invoke<TrackRow>('get_local_track', {
-                        id: trackId?.toString() || '',
+                        id: newTrackId,
                     }).catch(() => {
                         return undefined;
                     });
 
                     if (trackRow) {
-                        const file = await readFile(`music/${trackId}.mp3`, {
+                        const file = await readFile(`music/${newTrackId}.mp3`, {
                             baseDir: BaseDirectory.AppLocalData,
                         });
                         const blob = new Blob([file], { type: 'audio/mpeg' });
                         const url = URL.createObjectURL(blob);
                         this.transport.setSrc(url);
                     } else {
+                        // Fetch stream URL from SoundCloud API
                         const streamUrl = await invoke<string>(
                             'get_stream_url',
                             {
-                                track: currentTrack,
+                                trackId: newTrackId,
                             }
                         );
                         this.transport.setSrc(streamUrl);
@@ -128,9 +129,9 @@ export class AudioEngine {
     setRate = (r: number) => this.transport.setRate(r);
 
     // ===== Queue API (proxy to queue) =====
-    setQueue = (tracks: Track[]) => this.queue.setQueue(tracks);
-    enqueue = (t: Track[] | Track) => this.queue.enqueue(t);
-    enqueueNext = (t: Track[] | Track) => this.queue.enqueueNext(t);
+    setQueue = (trackIds: number[]) => this.queue.setQueue(trackIds);
+    enqueue = (t: number[] | number) => this.queue.enqueue(t);
+    enqueueNext = (t: number[] | number) => this.queue.enqueueNext(t);
     removeAt = (i: number) => this.queue.removeAt(i);
     clearQueue = () => this.queue.clear();
     setIndex = (i: number) => this.queue.setIndex(i);

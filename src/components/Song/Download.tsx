@@ -1,36 +1,40 @@
-import { Track } from '@/models/response';
+import { useTauriMutation } from '@/hooks/data/mutation/useTauriMutation';
+import { TrackIdQuery } from '@/models/query';
 import { useQueryClient } from '@tanstack/react-query';
-import { invoke } from '@tauri-apps/api/core';
 import { LoaderCircle, LucideDownload } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '../ui/button';
 
 interface DownloadProps {
-    track: Track;
+    trackId: number;
 }
 
 const Download = (props: DownloadProps) => {
-    const { track } = props;
-    const trackId = track.id?.toString() ?? '';
+    const { trackId } = props;
     const queryClient = useQueryClient();
     const [downloading, setDownloading] = useState<boolean>(false);
-
-    const handleDownload = async () => {
-        setDownloading(true);
-        await invoke('download_track', { track })
-            .then(() => {
+    const { mutate: downloadTrack } = useTauriMutation<TrackIdQuery, void>(
+        'download_track',
+        {
+            onSuccess: () => {
                 toast.success('Downloaded successfully');
                 queryClient.invalidateQueries({
                     queryKey: ['get_local_track', trackId],
                 });
-            })
-            .catch(() => {
+            },
+            onError: () => {
                 toast.error('Failed to download');
-            })
-            .finally(() => {
+            },
+            onSettled: () => {
                 setDownloading(false);
-            });
+            },
+        }
+    );
+
+    const handleDownload = async () => {
+        setDownloading(true);
+        downloadTrack({ id: trackId });
     };
 
     return (

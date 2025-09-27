@@ -1,5 +1,5 @@
 import { useNavContext } from '@/context/nav/NavContext';
-import { useTauriInvoke } from '@/hooks/useTauriInvoke';
+import { useTauriQuery } from '@/hooks/data/query/useTauriQuery';
 import { PagingCollection, SearchResult } from '@/models/response';
 import { TABS } from '@/models/tabs';
 import { upperFirst } from 'lodash';
@@ -25,7 +25,7 @@ const Navbar = () => {
     const [debouncedSearch] = useDebounceValue(search, 500);
     const [popoverOpen, setPopoverOpen] = useState<boolean>(false);
 
-    const { data: searchResults } = useTauriInvoke<
+    const { data: searchResults } = useTauriQuery<
         SearchArgs,
         PagingCollection<SearchResult>
     >(
@@ -49,6 +49,7 @@ const Navbar = () => {
         if (e.key === 'Enter') {
             selectSearchResult({ output: search });
             e.currentTarget.blur();
+            setSelectedTab('search');
         }
     };
 

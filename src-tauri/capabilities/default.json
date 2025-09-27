@@ -9,6 +9,7 @@
         "fs:default",
         {
             "identifier": "fs:allow-appdata-read-recursive"
-        }
+        },
+        "dialog:default"
     ]
 }

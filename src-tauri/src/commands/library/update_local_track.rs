@@ -9,14 +9,14 @@ use crate::{
 #[tauri::command]
 pub async fn update_local_track(
     state: State<'_, Mutex<AppState>>,
-    id: String,
+    id: i64,
     title: Option<String>,
     artist: Option<String>,
     artwork: Option<String>,
 ) -> Result<(), String> {
     update_local_track_metadata(
         state.clone(),
-        id.clone(),
+        id,
         title.clone(),
         artist.clone(),
         artwork.clone(),
@@ -27,10 +27,9 @@ pub async fn update_local_track(
     let pool = state.lock().unwrap().db_pool.clone();
     update_track(
         &pool,
-        &id,
+        id,
         title.as_deref(),
         artist.as_deref(),
-        artwork.as_deref(),
     )
     .await
     .map_err(|e| format!("Failed to update track: {e}"))?;

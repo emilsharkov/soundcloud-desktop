@@ -9,12 +9,12 @@ use crate::{
 #[tauri::command]
 pub async fn reorder_playlist_tracks_command(
     state: State<'_, Mutex<AppState>>,
-    playlist_id: String,
-    track_positions: Vec<(String, i32)>, // (track_id, new_position)
+    playlist_id: i64,
+    track_positions: Vec<(i64, i32)>, // (track_id, new_position)
 ) -> Result<(), String> {
     let pool = state.lock().unwrap().db_pool.clone();
 
-    reorder_playlist_tracks(&pool, &playlist_id, track_positions)
+    reorder_playlist_tracks(&pool, playlist_id, track_positions)
         .await
         .map_err(|e| format!("Failed to reorder playlist tracks: {e}"))
 }
@@ -22,7 +22,7 @@ pub async fn reorder_playlist_tracks_command(
 #[tauri::command]
 pub async fn reorder_playlists_command(
     state: State<'_, Mutex<AppState>>,
-    playlist_positions: Vec<(String, i32)>, // (playlist_id, new_position)
+    playlist_positions: Vec<(i64, i32)>, // (playlist_id, new_position)
 ) -> Result<(), String> {
     let pool = state.lock().unwrap().db_pool.clone();
 

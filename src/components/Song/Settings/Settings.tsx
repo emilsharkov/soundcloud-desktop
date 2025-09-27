@@ -5,31 +5,51 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useTauriInvoke } from '@/hooks/useTauriInvoke';
+import { useTauriMutation } from '@/hooks/data/mutation/useTauriMutation';
+import { useTauriQuery } from '@/hooks/data/query/useTauriQuery';
+import { TrackIdQuery } from '@/models/query';
 import { Track } from '@/models/response';
 import { useQueryClient } from '@tanstack/react-query';
-import { invoke } from '@tauri-apps/api/core';
 import { MoreVertical } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { TrackQuery } from '../Song';
 import { EditMetadataModal } from './EditMetadataModal';
 
 interface SettingsProps {
-    track: Track;
+    trackId: number;
+    title: string;
+    artist: string;
+    artworkPath: string;
 }
 
 const Settings = (props: SettingsProps) => {
-    const { track } = props;
+    const { trackId, title, artist, artworkPath } = props;
     const queryClient = useQueryClient();
-    const trackId = track.id?.toString() ?? '';
-    const { isLoading, isError } = useTauriInvoke<TrackQuery, Track>(
+    const { isLoading, isError } = useTauriQuery<TrackIdQuery, Track>(
         'get_local_track',
         {
             id: trackId,
         },
         {
             retry: false,
+        }
+    );
+
+    const { mutate: deleteTrack } = useTauriMutation<TrackIdQuery, Track>(
+        'delete_local_track',
+        {
+            onSuccess: () => {
+                queryClient.invalidateQueries({
+                    queryKey: ['get_local_tracks'],
+                });
+                queryClient.invalidateQueries({
+                    queryKey: ['get_local_track', trackId],
+                });
+                toast.success('Track deleted successfully');
+            },
+            onError: () => {
+                toast.error('Failed to delete track');
+            },
         }
     );
 
@@ -48,13 +68,8 @@ const Settings = (props: SettingsProps) => {
         });
     };
 
-    const handleDelete = async () => {
-        await invoke('delete_local_track', { id: trackId });
-        queryClient.invalidateQueries({
-            queryKey: ['get_local_track', trackId],
-        });
-        queryClient.invalidateQueries({ queryKey: ['get_local_tracks'] });
-        toast.success('Track deleted successfully');
+    const handleDelete = () => {
+        deleteTrack({ id: trackId });
     };
 
     return (
@@ -86,7 +101,10 @@ const Settings = (props: SettingsProps) => {
                     <EditMetadataModal
                         open={editMetadataModalOpen}
                         onOpenChange={setEditMetadataModalOpen}
-                        track={track}
+                        trackId={trackId}
+                        title={title}
+                        artist={artist}
+                        artworkPath={artworkPath}
                     />
                 </>
             ) : null}

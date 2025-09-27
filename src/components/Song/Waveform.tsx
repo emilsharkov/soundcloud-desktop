@@ -1,25 +1,24 @@
 import { useAudioContext } from '@/context/audio/AudioContext';
 import { useWaveform } from '@/hooks/useWaveform';
 import { getSampleColor } from '@/lib/getSampleColor';
-import { Track, type Waveform } from '@/models/response';
+import { type Waveform } from '@/models/response';
 import { useEffect, useState } from 'react';
 
 export interface WaveformProps {
-    track: Track;
-    waveform: Waveform | undefined;
+    trackId: number;
+    waveform: Waveform;
 }
 
 const Waveform = (props: WaveformProps) => {
-    const { waveform, track } = props;
-    const { currentIndex, tracks, playbackTime, duration, setTime } =
+    const { waveform, trackId } = props;
+    const { selectedTrackId, playbackTime, duration, setTime } =
         useAudioContext();
     const [hoveredSample, setHoveredSample] = useState<number | null>(null);
     const [isHovered, setIsHovered] = useState<boolean>(false);
-
     const { ref, samples } = useWaveform(waveform);
 
     const currentSample = (playbackTime / duration) * samples.length;
-    const isCurrentTrack = tracks[currentIndex]?.id === track.id;
+    const isCurrentTrack = selectedTrackId === trackId;
 
     const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
         if (!isCurrentTrack) return;
@@ -54,7 +53,7 @@ const Waveform = (props: WaveformProps) => {
     return (
         <div
             ref={ref}
-            className='gap-[1px] flex-1 flex flex-row items-center cursor-pointer'
+            className='gap-[1px] flex-1 flex flex-row items-center cursor-pointer overflow-hidden w-full'
             onClick={handleClick}
             onMouseMove={handleMouseMove}
             onMouseEnter={() => handleHoverChange(true)}

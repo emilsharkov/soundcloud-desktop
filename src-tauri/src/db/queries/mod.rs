@@ -4,7 +4,7 @@ use sqlx::{types::Json, FromRow};
 
 #[derive(Debug, FromRow, Clone, Serialize, Deserialize)]
 pub struct TrackRow {
-    pub id: String,
+    pub id: u64,
     pub title: String,
     pub artist: String,
     pub data: Json<Track>,
@@ -13,7 +13,7 @@ pub struct TrackRow {
 
 #[derive(Debug, FromRow, Clone, Serialize, Deserialize)]
 pub struct PlaylistRow {
-    pub id: String,
+    pub id: u64,
     pub name: String,
     pub position: i32,
     pub created_at: String,
@@ -22,9 +22,9 @@ pub struct PlaylistRow {
 
 #[derive(Debug, FromRow, Clone, Serialize, Deserialize)]
 pub struct PlaylistSongRow {
-    pub id: String,
-    pub playlist_id: String,
-    pub track_id: String,
+    pub id: u64,
+    pub playlist_id: u64,
+    pub track_id: u64,
     pub position: i64,
     pub title: String,
     pub artist: String,

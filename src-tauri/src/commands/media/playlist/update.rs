@@ -9,13 +9,13 @@ use crate::{
 #[tauri::command]
 pub async fn update_playlist_command(
     state: State<'_, Mutex<AppState>>,
-    id: String,
+    id: i64,
     name: String,
     position: i32,
 ) -> Result<(), String> {
     let pool = state.lock().unwrap().db_pool.clone();
 
-    update_playlist(&pool, &id, &name, position)
+    update_playlist(&pool, id, &name, position)
         .await
         .map_err(|e| format!("Failed to update playlist: {e}"))
 }
@@ -23,12 +23,12 @@ pub async fn update_playlist_command(
 #[tauri::command]
 pub async fn add_song_to_playlist_command(
     state: State<'_, Mutex<AppState>>,
-    playlist_id: String,
-    track_id: String,
+    playlist_id: i64,
+    track_id: i64,
 ) -> Result<(), String> {
     let pool = state.lock().unwrap().db_pool.clone();
 
-    add_song_to_playlist(&pool, &playlist_id, &track_id)
+    add_song_to_playlist(&pool, playlist_id, track_id)
         .await
         .map_err(|e| format!("Failed to add song to playlist: {e}"))
 }
@@ -36,12 +36,12 @@ pub async fn add_song_to_playlist_command(
 #[tauri::command]
 pub async fn remove_song_from_playlist_command(
     state: State<'_, Mutex<AppState>>,
-    playlist_id: String,
-    track_id: String,
+    playlist_id: i64,
+    track_id: i64,
 ) -> Result<(), String> {
     let pool = state.lock().unwrap().db_pool.clone();
 
-    remove_song_from_playlist(&pool, &playlist_id, &track_id)
+    remove_song_from_playlist(&pool, playlist_id, track_id)
         .await
         .map_err(|e| format!("Failed to remove song from playlist: {e}"))
 }

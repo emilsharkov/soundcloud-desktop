@@ -8,56 +8,92 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Track } from '@/models/response';
-import { invoke } from '@tauri-apps/api/core';
+import { useTauriMutation } from '@/hooks/data/mutation/useTauriMutation';
+import { UpdateTrackQuery } from '@/models/query';
+import { useQueryClient } from '@tanstack/react-query';
+import { open as openDialog } from '@tauri-apps/plugin-dialog';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
 interface EditMetadataModalProps {
-    track: Track;
     open: boolean;
     onOpenChange: (open: boolean) => void;
+    trackId: number;
+    title: string;
+    artist: string;
+    artworkPath: string;
 }
 
 const EditMetadataModal = (props: EditMetadataModalProps) => {
-    const { open, onOpenChange, track } = props;
-    const { id, title: initialTitle, user } = track;
-    const initialArtist = user?.username;
-    const [title, setTitle] = useState(initialTitle);
-    const [artist, setArtist] = useState(initialArtist);
-    const [artworkUrl, setArtworkUrl] = useState('');
-    const [isSubmitting, setIsSubmitting] = useState(false);
+    const {
+        open,
+        onOpenChange,
+        trackId,
+        title: initialTitle,
+        artist: initialArtist,
+        artworkPath: initialArtworkPath,
+    } = props;
+    const [title, setTitle] = useState<string>(initialTitle);
+    const [artist, setArtist] = useState<string>(initialArtist);
+    const [artworkPath, setArtworkPath] = useState<string>(initialArtworkPath);
+    const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+    const queryClient = useQueryClient();
+
+    const { mutate: updateTrack } = useTauriMutation<UpdateTrackQuery, void>(
+        'update_local_track',
+        {
+            onSuccess: () => {
+                queryClient.invalidateQueries({
+                    queryKey: ['get_local_tracks'],
+                });
+                queryClient.invalidateQueries({
+                    queryKey: ['get_local_track', trackId],
+                });
+                toast.success('Metadata updated successfully');
+            },
+            onError: () => {
+                toast.error('Failed to update metadata');
+            },
+            onSettled: () => {
+                setIsSubmitting(false);
+                onOpenChange(false);
+            },
+        }
+    );
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-
-        if (!id) {
-            console.error('No track ID provided');
-            throw new Error('No track ID provided');
-        }
-
         setIsSubmitting(true);
+        updateTrack({
+            id: trackId,
+            title: title,
+            artist: artist,
+            artwork: artworkPath,
+        });
+    };
 
-        try {
-            await invoke('update_local_track', {
-                id: id,
-                title: title || null,
-                artist: artist || null,
-                artwork: artworkUrl || null,
-            });
-
-            onOpenChange(false);
-
-            setTitle(initialTitle);
-            setArtist(initialArtist);
-            setArtworkUrl('');
-
-            toast.success('Metadata updated successfully');
-        } catch (error) {
-            toast.error('Failed to update metadata');
-            console.error('Failed to update metadata:', error);
-        } finally {
-            setIsSubmitting(false);
+    const handleSelectArtwork = async () => {
+        const result: string | null = await openDialog({
+            directory: false,
+            multiple: false,
+            filters: [
+                {
+                    name: 'Images',
+                    extensions: [
+                        'jpg',
+                        'jpeg',
+                        'png',
+                        'gif',
+                        'bmp',
+                        'webp',
+                        'tiff',
+                        'tif',
+                    ],
+                },
+            ],
+        });
+        if (result) {
+            setArtworkPath(result);
         }
     };
 
@@ -93,13 +129,15 @@ const EditMetadataModal = (props: EditMetadataModalProps) => {
 
                     <div className='space-y-2'>
                         <Label htmlFor='artwork'>Artwork URL</Label>
-                        <Input
-                            id='artwork'
-                            type='file'
-                            value={artworkUrl}
-                            onChange={e => setArtworkUrl(e.target.value)}
-                            placeholder='Enter artwork URL'
-                        />
+                        <Button
+                            type='button'
+                            variant='outline'
+                            onClick={handleSelectArtwork}
+                        >
+                            <p className='text-sm text-ellipsis'>
+                                {artworkPath ? artworkPath : 'Select Artwork'}
+                            </p>
+                        </Button>
                     </div>
 
                     <DialogFooter>

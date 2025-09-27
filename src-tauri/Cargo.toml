@@ -13,7 +13,7 @@ tauri = { version = "2", features = [] }
 tauri-plugin-opener = "2"
 serde = { version = "1", features = ["derive"] }
 serde_json = { version = "1", features = ["raw_value"] }
-soundcloud-rs = "0.8.0"
+soundcloud-rs = "0.9.0"
 sqlx = { version = "0.8", features = ["runtime-tokio-rustls", "sqlite", "migrate"] }
 libsqlite3-sys = { version = "0.28.0", features = ["bundled"] }
 tokio = { version = "1", features = ["macros", "rt"] }
@@ -24,3 +24,4 @@ url = "2.5.7"
 image = "0.25.8"
 base64 = "0.22.1"
 uuid = { version = "1.0", features = ["v4"] }
+tauri-plugin-dialog = "2"

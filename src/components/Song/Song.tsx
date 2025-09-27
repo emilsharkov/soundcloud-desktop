@@ -1,73 +1,29 @@
 import { useAudioContext } from '@/context/audio/AudioContext';
-import { useNavContext } from '@/context/nav/NavContext';
-import { useTauriInvoke } from '@/hooks/useTauriInvoke';
-import { TrackWaveformQuery } from '@/models/query';
-import { Track, TrackRow } from '@/models/response';
-import { Check, LoaderCircle, Pause, Play } from 'lucide-react';
-import { Download } from './Download';
-import { Settings } from './Settings/Settings';
+import { PauseIcon, PlayIcon } from 'lucide-react';
 import { Waveform } from './Waveform';
 
 export interface SongProps {
-    track: Track;
-}
-
-export interface TrackQuery {
-    id: string;
-}
-
-export interface SongImageQuery {
-    id: string;
+    trackId: number;
+    title: string;
+    artist: string;
+    artwork: string;
+    waveform: Waveform;
+    buttonBar?: React.ReactNode;
 }
 
 const Song = (props: SongProps) => {
-    const { track } = props;
-    const { title, user, artwork_url } = track;
-    const { tracks, currentIndex, paused, setPaused, setQueue } =
-        useAudioContext();
-    const { selectedTab } = useNavContext();
-    const trackId = track.id?.toString() ?? '';
-    const {
-        data: trackRow,
-        isLoading,
-        isError,
-    } = useTauriInvoke<TrackQuery, TrackRow>('get_local_track', {
-        id: trackId,
-    });
+    const { trackId, title, artist, artwork, waveform, buttonBar } = props;
+    const { paused, selectedTrackId, setPaused, setQueue } = useAudioContext();
 
-    const { data: image } = useTauriInvoke<SongImageQuery, string>(
-        'get_song_image',
-        {
-            id: trackId,
-        },
-        {
-            enabled: selectedTab === 'library' || selectedTab === 'playlists',
-        }
-    );
-
-    const { data: waveform } = useTauriInvoke<TrackWaveformQuery, Waveform>(
-        'get_track_waveform',
-        {
-            track: track,
-        },
-        {
-            enabled: selectedTab === 'search',
-        }
-    );
-
-    const isCurrentTrack = tracks[currentIndex]?.id === track.id;
+    const isCurrentTrack = selectedTrackId === trackId;
     const isPlaying = !paused && isCurrentTrack;
-    const artwork =
-        selectedTab === 'library' || selectedTab === 'playlists'
-            ? image
-            : artwork_url;
-    const wave = selectedTab === 'search' ? waveform : trackRow?.waveform;
+    const PlaybackIcon = isPlaying ? PauseIcon : PlayIcon;
 
     const handlePlayPause = () => {
         if (isCurrentTrack) {
             setPaused(!paused);
         } else {
-            setQueue([track]);
+            setQueue([trackId]);
         }
     };
 
@@ -75,7 +31,7 @@ const Song = (props: SongProps) => {
         <div className='flex flex-row w-full items-center gap-4'>
             <div className='relative group'>
                 <img
-                    className='w-[125px] h-[125px] rounded-lg object-cover'
+                    className='size-[125px] min-w-[125px] min-h-[125px] aspect-square rounded-lg object-cover'
                     src={artwork}
                     alt={`${title} artwork`}
                 />
@@ -83,30 +39,23 @@ const Song = (props: SongProps) => {
                     className='absolute inset-0 m-auto w-12 h-12 bg-white/90 hover:bg-white rounded-full opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all duration-200 shadow-lg hover:shadow-xl'
                     onClick={handlePlayPause}
                 >
-                    {isPlaying ? (
-                        <Pause className='w-6 h-6 text-black' />
-                    ) : (
-                        <Play className='w-6 h-6 text-black' />
-                    )}
+                    <PlaybackIcon className='w-6 h-6 text-black' />
                 </button>
             </div>
-            <div className='flex flex-col flex-1'>
-                <div className='flex-1'>
-                    <div className='flex flex-row items-center gap-2'>
-                        <p className='text-tertiary'>{title}</p>
-                        {isLoading ? (
-                            <LoaderCircle className='w-4 h-4 text-secondary animate-spin' />
-                        ) : isError ? (
-                            <Download track={track} />
-                        ) : (
-                            <Check className='w-4 h-4 text-secondary' />
+            <div className='flex flex-col flex-1 min-w-0'>
+                <div className='flex-shrink-0'>
+                    <div className='flex flex-row items-center gap-3'>
+                        <p className='text-tertiary'>{artist}</p>
+                        {buttonBar !== undefined && (
+                            <div className='flex flex-row items-center gap-2'>
+                                {buttonBar}
+                            </div>
                         )}
-                        <Settings track={track} />
                     </div>
-                    <p className='text-secondary'>{user?.username}</p>
+                    <p className='text-secondary'>{title}</p>
                 </div>
-                <div className='flex flex-1'>
-                    <Waveform track={track} waveform={wave} />
+                <div className='flex flex-1 max-w-full'>
+                    <Waveform trackId={trackId} waveform={waveform} />
                 </div>
             </div>
         </div>
