@@ -61,7 +61,6 @@ fn main() {
             download_track,
             // Download
             download_playlist,
-            download_song_image,
             download_track,
             // Local
             update_local_track,

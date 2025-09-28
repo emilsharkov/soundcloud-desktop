@@ -7,7 +7,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useTauriMutation } from '@/hooks/data/mutation/useTauriMutation';
 import { useTauriQuery } from '@/hooks/data/query/useTauriQuery';
-import { TrackIdQuery } from '@/models/query';
+import { IdQuery } from '@/models/query';
 import { Track } from '@/models/response';
 import { useQueryClient } from '@tanstack/react-query';
 import { MoreVertical } from 'lucide-react';
@@ -19,31 +19,30 @@ interface SettingsProps {
     trackId: number;
     title: string;
     artist: string;
-    artworkPath: string;
 }
 
 const Settings = (props: SettingsProps) => {
-    const { trackId, title, artist, artworkPath } = props;
+    const { trackId, title, artist } = props;
     const queryClient = useQueryClient();
-    const { isLoading, isError } = useTauriQuery<TrackIdQuery, Track>(
+    const { data: localTrack } = useTauriQuery<IdQuery, Track>(
         'get_local_track',
         {
             id: trackId,
-        },
-        {
-            retry: false,
         }
     );
 
-    const { mutate: deleteTrack } = useTauriMutation<TrackIdQuery, Track>(
+    const { mutate: deleteTrack } = useTauriMutation<IdQuery, Track>(
         'delete_local_track',
         {
-            onSuccess: () => {
-                queryClient.invalidateQueries({
+            onSuccess: async () => {
+                await queryClient.invalidateQueries({
                     queryKey: ['get_local_tracks'],
                 });
-                queryClient.invalidateQueries({
+                await queryClient.invalidateQueries({
                     queryKey: ['get_local_track', trackId],
+                });
+                await queryClient.invalidateQueries({
+                    queryKey: ['get_song_image', trackId],
                 });
                 toast.success('Track deleted successfully');
             },
@@ -52,8 +51,6 @@ const Settings = (props: SettingsProps) => {
             },
         }
     );
-
-    const isLocalTrack = !isLoading && !isError;
 
     const [editMetadataModalOpen, setEditMetadataModalOpen] =
         useState<boolean>(false);
@@ -74,9 +71,9 @@ const Settings = (props: SettingsProps) => {
 
     return (
         <>
-            {isLocalTrack ? (
+            {localTrack !== undefined ? (
                 <>
-                    <DropdownMenu>
+                    <DropdownMenu modal={false}>
                         <DropdownMenuTrigger asChild>
                             <Button
                                 className='hover:bg-transparent cursor-pointer'
@@ -104,7 +101,6 @@ const Settings = (props: SettingsProps) => {
                         trackId={trackId}
                         title={title}
                         artist={artist}
-                        artworkPath={artworkPath}
                     />
                 </>
             ) : null}

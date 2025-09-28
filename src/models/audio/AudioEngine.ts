@@ -75,7 +75,7 @@ export class AudioEngine {
                         const streamUrl = await invoke<string>(
                             'get_stream_url',
                             {
-                                trackId: newTrackId,
+                                id: newTrackId,
                             }
                         );
                         this.transport.setSrc(streamUrl);

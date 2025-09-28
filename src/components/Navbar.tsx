@@ -1,5 +1,6 @@
 import { useNavContext } from '@/context/nav/NavContext';
 import { useTauriQuery } from '@/hooks/data/query/useTauriQuery';
+import { SearchArgs } from '@/models/query';
 import { PagingCollection, SearchResult } from '@/models/response';
 import { TABS } from '@/models/tabs';
 import { upperFirst } from 'lodash';
@@ -14,10 +15,6 @@ import {
     NavigationMenuList,
 } from './ui/navigation-menu';
 import { Popover, PopoverAnchor, PopoverContent } from './ui/popover';
-
-interface SearchArgs {
-    q: string;
-}
 
 const Navbar = () => {
     const { selectedTab, setSelectedSearch, setSelectedTab } = useNavContext();

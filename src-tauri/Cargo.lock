@@ -4898,9 +4898,9 @@ dependencies = [
 
 [[package]]
 name = "soundcloud-rs"
-version = "0.9.0"
+version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "85897867bee27914db6e2527ac213d33d801988aaeda13af0cca2cecd6d86ff6"
+checksum = "2838fc1cd8407382345187a50fe8f6e7045ceddf33c9f81f25c7691c8dcf3823"
 dependencies = [
  "ffmpeg-sidecar",
  "regex",

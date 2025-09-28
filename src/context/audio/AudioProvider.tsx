@@ -38,11 +38,6 @@ export const AudioProvider = (props: AudioProviderProps): JSX.Element => {
             return lastSnapshotRef.current;
         }
 
-        console.log('AudioProvider: State changed, new snapshot:', {
-            shuffled: newSnapshot.shuffled,
-            repeat: newSnapshot.repeat,
-            trackIds: newSnapshot.trackIds,
-        });
         lastSnapshotRef.current = newSnapshot;
         return newSnapshot;
     }, []);

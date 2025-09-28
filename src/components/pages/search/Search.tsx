@@ -1,15 +1,12 @@
 import { useNavContext } from '@/context/nav/NavContext';
 import { useTauriQuery } from '@/hooks/data/query/useTauriQuery';
-import { TracksQuery } from '@/models/query';
+import { SearchArgs } from '@/models/query';
 import { PagingCollection, Track } from '@/models/response';
 import { SearchSong } from './SearchSong';
 
 const Search = () => {
     const { selectedSearch } = useNavContext();
-    const { data: tracks } = useTauriQuery<
-        TracksQuery,
-        PagingCollection<Track>
-    >(
+    const { data: tracks } = useTauriQuery<SearchArgs, PagingCollection<Track>>(
         'search_tracks',
         {
             q: selectedSearch ?? '',

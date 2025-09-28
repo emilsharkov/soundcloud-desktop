@@ -114,29 +114,11 @@ export class PlayerQueue {
         this.emit();
     }
     toggleShuffle() {
-        console.log(
-            'PlayerQueue.toggleShuffle called, current shuffled:',
-            this.shuffled
-        );
         this.setShuffled(!this.shuffled);
-        console.log(
-            'PlayerQueue.toggleShuffle completed, new shuffled:',
-            this.shuffled
-        );
     }
     setRepeat(r: Repeat) {
-        console.log(
-            'PlayerQueue.setRepeat called, current repeat:',
-            this.repeat,
-            'new repeat:',
-            r
-        );
         this.repeat = r;
         this.emit();
-        console.log(
-            'PlayerQueue.setRepeat completed, new repeat:',
-            this.repeat
-        );
     }
 
     next() {

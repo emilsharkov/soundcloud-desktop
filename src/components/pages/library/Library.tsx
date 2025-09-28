@@ -1,10 +1,9 @@
 import { useTauriQuery } from '@/hooks/data/query/useTauriQuery';
-import { TracksQuery } from '@/models/query';
 import { TrackRow } from '@/models/response';
 import { LibrarySong } from './LibrarySong';
 
 const Library = () => {
-    const { data: tracks } = useTauriQuery<TracksQuery, TrackRow[]>(
+    const { data: tracks } = useTauriQuery<undefined, TrackRow[]>(
         'get_local_tracks'
     );
 

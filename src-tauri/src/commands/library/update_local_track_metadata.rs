@@ -59,7 +59,7 @@ pub async fn update_local_track_metadata(
 ) -> Result<(), String> {
     let music_dir = state.lock().unwrap().app_data_dir.clone().join("music");
     let path = music_dir.join(id.to_string()).with_extension("mp3");
-    let mut tag = Tag::read_from_path(&path).map_err(|e| format!("Failed to read tag: {e}"))?;
+    let mut tag = Tag::read_from_path(&path).unwrap_or_else(|_| Tag::new());
 
     if let Some(title) = title {
         tag.set_title(title);

@@ -5,7 +5,7 @@ import {
 } from '@tanstack/react-query';
 import { invoke, type InvokeArgs } from '@tauri-apps/api/core';
 
-export const useTauriMutation = <TArgs extends object, V>(
+export const useTauriMutation = <TArgs extends object | undefined, V>(
     command: string,
     options?: Omit<UseMutationOptions<V, Error, TArgs>, 'mutationFn'>
 ): UseMutationResult<V, Error, TArgs> => {

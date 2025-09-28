@@ -34,11 +34,11 @@ pub async fn get_playlist_command(
 #[tauri::command]
 pub async fn get_playlist_songs_command(
     state: State<'_, Mutex<AppState>>,
-    playlist_id: i64,
+    id: i64,
 ) -> Result<Vec<PlaylistSongRow>, String> {
     let pool = state.lock().unwrap().db_pool.clone();
 
-    get_playlist_songs(&pool, playlist_id)
+    get_playlist_songs(&pool, id)
         .await
         .map_err(|e| format!("Failed to get playlist songs: {e}"))
 }

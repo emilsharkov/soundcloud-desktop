@@ -5,9 +5,7 @@ const Shuffle = () => {
     const { shuffled, toggleShuffle } = useAudioContext();
 
     const handleShuffle = () => {
-        console.log('Shuffle clicked, current state:', shuffled);
         toggleShuffle();
-        console.log('Shuffle toggled, new state should be:', !shuffled);
     };
 
     return (

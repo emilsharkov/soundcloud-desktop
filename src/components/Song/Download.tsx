@@ -1,7 +1,9 @@
 import { useTauriMutation } from '@/hooks/data/mutation/useTauriMutation';
-import { TrackIdQuery } from '@/models/query';
+import { useTauriQuery } from '@/hooks/data/query/useTauriQuery';
+import { IdQuery } from '@/models/query';
+import { TrackRow } from '@/models/response';
 import { useQueryClient } from '@tanstack/react-query';
-import { LoaderCircle, LucideDownload } from 'lucide-react';
+import { Check, LoaderCircle, LucideDownload } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '../ui/button';
@@ -14,16 +16,24 @@ const Download = (props: DownloadProps) => {
     const { trackId } = props;
     const queryClient = useQueryClient();
     const [downloading, setDownloading] = useState<boolean>(false);
-    const { mutate: downloadTrack } = useTauriMutation<TrackIdQuery, void>(
+
+    const {
+        data: localTrack,
+        isLoading,
+        isError,
+    } = useTauriQuery<IdQuery, TrackRow>('get_local_track', { id: trackId });
+
+    const { mutate: downloadTrack } = useTauriMutation<IdQuery, void>(
         'download_track',
         {
-            onSuccess: () => {
-                toast.success('Downloaded successfully');
-                queryClient.invalidateQueries({
+            onSuccess: async () => {
+                await queryClient.invalidateQueries({
                     queryKey: ['get_local_track', trackId],
                 });
+                toast.success('Downloaded successfully');
             },
-            onError: () => {
+            onError: error => {
+                console.error('Failed to download', error);
                 toast.error('Failed to download');
             },
             onSettled: () => {
@@ -37,7 +47,14 @@ const Download = (props: DownloadProps) => {
         downloadTrack({ id: trackId });
     };
 
-    return (
+    if (trackId === 2110830129) {
+        console.log(localTrack, isLoading, isError);
+    }
+    const isLocalTrack = localTrack !== undefined && !isLoading && !isError;
+
+    return isLocalTrack ? (
+        <Check className='w-4 h-4 text-secondary' />
+    ) : (
         <Button
             className='hover:bg-transparent cursor-pointer'
             size='icon'

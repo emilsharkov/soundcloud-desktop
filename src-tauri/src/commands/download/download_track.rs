@@ -8,8 +8,7 @@ use tauri::State;
 #[tauri::command]
 pub async fn download_track(
     state: State<'_, Mutex<AppState>>,
-    track_id: i64,
-    stream_type: Option<StreamType>,
+    id: i64,
 ) -> Result<(), String> {
     let soundcloud_client = state.lock().unwrap().soundcloud_client.clone();
     let app_data_dir = state.lock().unwrap().app_data_dir.clone();
@@ -17,7 +16,7 @@ pub async fn download_track(
 
     // Get track metadata
     let track = soundcloud_client
-        .get_track(&track_id)
+        .get_track(&id)
         .await
         .map_err(|e| format!("Failed to get track: {e}"))?;
     let track_title = track.title.as_ref().ok_or("Failed to get title")?;
@@ -30,15 +29,15 @@ pub async fn download_track(
         .ok_or("Failed to get username")?;
 
     let waveform = soundcloud_client
-        .get_track_waveform(&track_id)
+        .get_track_waveform(&id)
         .await
         .map_err(|e| format!("Failed to get track waveform: {e}"))?;
 
     // Download track
     soundcloud_client
         .download_track(
-            &track_id,
-            stream_type.as_ref(),
+            &id,
+            None,
             Some(music_dir.to_str().ok_or("Failed to get music dir")?),
             Some(
                 track
@@ -54,7 +53,7 @@ pub async fn download_track(
     // Add track metadata to mp3 file
     update_local_track_metadata(
         state.clone(),
-        track_id,
+        id,
         Some(track_title.to_string()),
         Some(track_username.to_string()),
         Some(
@@ -72,7 +71,7 @@ pub async fn download_track(
     let pool = state.lock().unwrap().db_pool.clone();
     create_track(
         &pool,
-        track_id,
+        id,
         track_title,
         track_username,
         &track,

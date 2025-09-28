@@ -5,9 +5,9 @@ import {
 } from '@tanstack/react-query';
 import { invoke, type InvokeArgs } from '@tauri-apps/api/core';
 
-export const useTauriQuery = <TArgs extends object, V>(
+export const useTauriQuery = <TArgs extends object | undefined, V>(
     command: string,
-    args: TArgs = {} as TArgs,
+    args: TArgs = undefined as TArgs,
     options?: Omit<
         UseQueryOptions<V, Error, V, [string, ...unknown[]]>,
         'queryKey' | 'queryFn'
@@ -15,7 +15,7 @@ export const useTauriQuery = <TArgs extends object, V>(
 ): UseQueryResult<V, Error> => {
     return useQuery<V, Error, V, [string, ...unknown[]]>({
         ...options,
-        queryKey: [command, ...Object.values(args)],
+        queryKey: [command, ...Object.values(args ?? {})],
         queryFn: async () => await invoke<V>(command, args as InvokeArgs),
     });
 };

@@ -21,7 +21,6 @@ interface EditMetadataModalProps {
     trackId: number;
     title: string;
     artist: string;
-    artworkPath: string;
 }
 
 const EditMetadataModal = (props: EditMetadataModalProps) => {
@@ -31,22 +30,21 @@ const EditMetadataModal = (props: EditMetadataModalProps) => {
         trackId,
         title: initialTitle,
         artist: initialArtist,
-        artworkPath: initialArtworkPath,
     } = props;
     const [title, setTitle] = useState<string>(initialTitle);
     const [artist, setArtist] = useState<string>(initialArtist);
-    const [artworkPath, setArtworkPath] = useState<string>(initialArtworkPath);
+    const [artwork, setArtwork] = useState<string | undefined>(undefined);
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
     const queryClient = useQueryClient();
 
     const { mutate: updateTrack } = useTauriMutation<UpdateTrackQuery, void>(
         'update_local_track',
         {
-            onSuccess: () => {
-                queryClient.invalidateQueries({
+            onSuccess: async () => {
+                await queryClient.invalidateQueries({
                     queryKey: ['get_local_tracks'],
                 });
-                queryClient.invalidateQueries({
+                await queryClient.invalidateQueries({
                     queryKey: ['get_local_track', trackId],
                 });
                 toast.success('Metadata updated successfully');
@@ -64,12 +62,20 @@ const EditMetadataModal = (props: EditMetadataModalProps) => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsSubmitting(true);
-        updateTrack({
+
+        const query: UpdateTrackQuery = {
             id: trackId,
-            title: title,
-            artist: artist,
-            artwork: artworkPath,
-        });
+        };
+        if (title) {
+            query.title = title;
+        }
+        if (artist) {
+            query.artist = artist;
+        }
+        if (artwork) {
+            query.artwork = artwork;
+        }
+        updateTrack(query);
     };
 
     const handleSelectArtwork = async () => {
@@ -92,8 +98,8 @@ const EditMetadataModal = (props: EditMetadataModalProps) => {
                 },
             ],
         });
-        if (result) {
-            setArtworkPath(result);
+        if (result && result !== '') {
+            setArtwork(result);
         }
     };
 
@@ -135,7 +141,9 @@ const EditMetadataModal = (props: EditMetadataModalProps) => {
                             onClick={handleSelectArtwork}
                         >
                             <p className='text-sm text-ellipsis'>
-                                {artworkPath ? artworkPath : 'Select Artwork'}
+                                {artwork !== undefined
+                                    ? artwork
+                                    : 'Select Artwork'}
                             </p>
                         </Button>
                     </div>

@@ -13,7 +13,6 @@ const Repeat = () => {
               : RepeatIcon;
 
     const handleRepeat = () => {
-        console.log('Repeat clicked, current state:', repeat);
         let newRepeat: RepeatType;
         switch (repeat) {
             case 'none':
@@ -26,7 +25,6 @@ const Repeat = () => {
                 newRepeat = 'none';
                 break;
         }
-        console.log('Repeat changing to:', newRepeat);
         setRepeat(newRepeat);
     };
 
