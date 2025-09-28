@@ -1,15 +1,11 @@
 use crate::{
     commands::update_local_track_metadata, db::queries::create_track, models::app_state::AppState,
 };
-use soundcloud_rs::response::StreamType;
 use std::sync::Mutex;
 use tauri::State;
 
 #[tauri::command]
-pub async fn download_track(
-    state: State<'_, Mutex<AppState>>,
-    id: i64,
-) -> Result<(), String> {
+pub async fn download_track(state: State<'_, Mutex<AppState>>, id: i64) -> Result<(), String> {
     let soundcloud_client = state.lock().unwrap().soundcloud_client.clone();
     let app_data_dir = state.lock().unwrap().app_data_dir.clone();
     let music_dir = app_data_dir.join("music");
@@ -69,16 +65,9 @@ pub async fn download_track(
 
     // Add track to database
     let pool = state.lock().unwrap().db_pool.clone();
-    create_track(
-        &pool,
-        id,
-        track_title,
-        track_username,
-        &track,
-        &waveform,
-    )
-    .await
-    .map_err(|e| format!("Failed to create track: {e}"))?;
+    create_track(&pool, id, track_title, track_username, &track, &waveform)
+        .await
+        .map_err(|e| format!("Failed to create track: {e}"))?;
 
     Ok(())
 }

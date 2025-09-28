@@ -3,10 +3,7 @@ use std::sync::Mutex;
 use tauri::State;
 
 #[tauri::command]
-pub async fn download_playlist(
-    state: State<'_, Mutex<AppState>>,
-    id: i64,
-) -> Result<(), String> {
+pub async fn download_playlist(state: State<'_, Mutex<AppState>>, id: i64) -> Result<(), String> {
     let soundcloud_client = state.lock().unwrap().soundcloud_client.clone();
     let app_data_dir = state.lock().unwrap().app_data_dir.clone();
     let music_dir = app_data_dir.join("music");
