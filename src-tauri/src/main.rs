@@ -37,14 +37,22 @@ fn main() {
                     .await
                     .expect("Failed to setup database");
 
-                let soundcloud_client = soundcloud_rs::Client::new()
+                let soundcloud_client = soundcloud_rs::ClientBuilder::new()
+                    .with_max_retries(1)
+                    .with_retry_on_401(true)
+                    .build()
                     .await
-                    .expect("Failed to create soundcloud client");
+                    .ok();
+
+                let is_offline = Arc::new(std::sync::atomic::AtomicBool::new(
+                    soundcloud_client.is_none(),
+                ));
 
                 AppState {
                     db_pool: Arc::new(db_pool),
                     soundcloud_client: Arc::new(soundcloud_client),
                     app_data_dir: Arc::new(app_data_dir),
+                    is_offline,
                 }
             });
             app.manage(Mutex::new(app_state));
@@ -78,6 +86,10 @@ fn main() {
             add_song_to_playlist_command,
             remove_song_from_playlist_command,
             get_playlist_songs_command,
+            // Offline
+            get_offline_mode,
+            set_offline_mode,
+            test_connectivity,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

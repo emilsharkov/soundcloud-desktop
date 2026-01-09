@@ -1,6 +1,10 @@
 use crate::{
-    commands::update_local_track_metadata, db::queries::create_track, models::app_state::AppState,
+    commands::update_local_track_metadata,
+    commands::utils::{format_error_with_context, handle_error},
+    db::queries::create_track,
+    models::app_state::AppState,
 };
+use soundcloud_rs::Identifier;
 use std::sync::Mutex;
 use tauri::State;
 
@@ -9,12 +13,14 @@ pub async fn download_track(state: State<'_, Mutex<AppState>>, id: i64) -> Resul
     let soundcloud_client = state.lock().unwrap().soundcloud_client.clone();
     let app_data_dir = state.lock().unwrap().app_data_dir.clone();
     let music_dir = app_data_dir.join("music");
-
-    // Get track metadata
-    let track = soundcloud_client
-        .get_track(&id)
-        .await
-        .map_err(|e| format!("Failed to get track: {e}"))?;
+    let client = soundcloud_client
+        .as_ref()
+        .as_ref()
+        .ok_or("SoundCloud client is not available")?;
+    let track = client.get_track(&Identifier::Id(id)).await.map_err(|e| {
+        let app_error = handle_error(&state, &e);
+        format_error_with_context("Failed to get track", app_error)
+    })?;
     let track_title = track.title.as_ref().ok_or("Failed to get title")?;
     let track_username = track
         .user
@@ -24,15 +30,18 @@ pub async fn download_track(state: State<'_, Mutex<AppState>>, id: i64) -> Resul
         .as_ref()
         .ok_or("Failed to get username")?;
 
-    let waveform = soundcloud_client
-        .get_track_waveform(&id)
+    let waveform = client
+        .get_track_waveform(&Identifier::Id(id))
         .await
-        .map_err(|e| format!("Failed to get track waveform: {e}"))?;
+        .map_err(|e| {
+            let app_error = handle_error(&state, &e);
+            format_error_with_context("Failed to get track waveform", app_error)
+        })?;
 
     // Download track
-    soundcloud_client
+    client
         .download_track(
-            &id,
+            &Identifier::Id(id),
             None,
             Some(music_dir.to_str().ok_or("Failed to get music dir")?),
             Some(
@@ -44,7 +53,10 @@ pub async fn download_track(state: State<'_, Mutex<AppState>>, id: i64) -> Resul
             ),
         )
         .await
-        .map_err(|e| format!("Failed to download track: {e}"))?;
+        .map_err(|e| {
+            let app_error = handle_error(&state, &e);
+            format_error_with_context("Failed to download track", app_error)
+        })?;
 
     // Add track metadata to mp3 file
     update_local_track_metadata(

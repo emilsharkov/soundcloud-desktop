@@ -1,5 +1,8 @@
-use crate::models::app_state::AppState;
-use soundcloud_rs::response::Waveform;
+use crate::{
+    commands::utils::{check_offline_mode, format_error_with_context, handle_error},
+    models::app_state::AppState,
+};
+use soundcloud_rs::{response::Waveform, Identifier};
 use std::sync::Mutex;
 use tauri::State;
 
@@ -8,10 +11,19 @@ pub async fn get_track_waveform(
     state: State<'_, Mutex<AppState>>,
     id: i64,
 ) -> Result<Waveform, String> {
+    check_offline_mode(&state).map_err(|e| format_error_with_context("App is in offline mode", e))?;
+
     let soundcloud_client = state.lock().unwrap().soundcloud_client.clone();
-    let waveform = soundcloud_client
-        .get_track_waveform(&id)
+    let client = soundcloud_client
+        .as_ref()
+        .as_ref()
+        .ok_or("SoundCloud client is not available")?;
+    let waveform = client
+        .get_track_waveform(&Identifier::Id(id))
         .await
-        .map_err(|e| format!("Failed to get track waveform: {e}"))?;
+        .map_err(|e| {
+            let app_error = handle_error(&state, &e);
+            format_error_with_context("Failed to get track waveform", app_error)
+        })?;
     Ok(waveform)
 }
