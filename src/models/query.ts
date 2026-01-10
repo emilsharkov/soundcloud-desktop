@@ -6,6 +6,8 @@ export interface Paging {
 
 export interface SearchArgs {
     q: string;
+    limit?: number;
+    offset?: number;
 }
 
 export interface IdQuery {

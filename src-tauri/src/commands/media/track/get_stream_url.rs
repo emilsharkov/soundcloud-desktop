@@ -12,7 +12,8 @@ pub async fn get_stream_url(
     id: i64,
     stream_type: Option<StreamType>,
 ) -> Result<String, String> {
-    check_offline_mode(&state).map_err(|e| format_error_with_context("App is in offline mode", e))?;
+    check_offline_mode(&state)
+        .map_err(|e| format_error_with_context("App is in offline mode", e))?;
 
     let soundcloud_client = state.lock().unwrap().soundcloud_client.clone();
     let client = soundcloud_client

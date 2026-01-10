@@ -1,29 +1,44 @@
 import { Button } from '@/components/ui/button';
 import { useNavContext } from '@/context/nav/NavContext';
 import { useOfflineContext } from '@/context/offline/OfflineContext';
-import { useTauriQuery } from '@/hooks/data/query/useTauriQuery';
+import { useTauriInfiniteQuery } from '@/hooks/data/query/useTauriInfiniteQuery';
+import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
 import { SearchArgs } from '@/models/query';
 import { PagingCollection, Track } from '@/models/response';
-import { RefreshCw } from 'lucide-react';
+import { Loader2, RefreshCw } from 'lucide-react';
 import { SearchSong } from './SearchSong';
 
 const Search = () => {
     const { selectedSearch } = useNavContext();
     const { isOffline, retryConnection, isRetrying } = useOfflineContext();
+
     const {
-        data: tracks,
+        data,
         error,
         isError,
         refetch,
-    } = useTauriQuery<SearchArgs, PagingCollection<Track>>(
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage,
+    } = useTauriInfiniteQuery<SearchArgs, Track, PagingCollection<Track>>(
         'search_tracks',
         {
             q: selectedSearch ?? '',
         },
         {
             enabled: !isOffline && selectedSearch !== undefined,
+            limit: 20,
         }
     );
+
+    const { loadMoreRef } = useInfiniteScroll({
+        hasNextPage,
+        isFetchingNextPage,
+        fetchNextPage,
+    });
+
+    // Flatten all pages into a single array of tracks
+    const tracks = data?.pages.flatMap(page => page.collection) ?? [];
 
     // Parse error to check if it's a network error
     const parseError = (
@@ -111,9 +126,16 @@ const Search = () => {
 
     return (
         <div className='flex flex-col gap-4 p-4'>
-            {tracks?.collection.map((track: Track) => (
+            {tracks.map((track: Track) => (
                 <SearchSong key={track.id} track={track} />
             ))}
+
+            {/* Load more trigger */}
+            <div ref={loadMoreRef} className='flex justify-center py-4'>
+                {isFetchingNextPage && (
+                    <Loader2 className='w-6 h-6 animate-spin text-tertiary' />
+                )}
+            </div>
         </div>
     );
 };

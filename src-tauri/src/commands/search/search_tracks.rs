@@ -13,8 +13,11 @@ use tauri::State;
 pub async fn search_tracks(
     state: State<'_, Mutex<AppState>>,
     q: String,
+    limit: Option<i32>,
+    offset: Option<i32>,
 ) -> Result<PagingCollection<Track>, String> {
-    check_offline_mode(&state).map_err(|e| format_error_with_context("App is in offline mode", e))?;
+    check_offline_mode(&state)
+        .map_err(|e| format_error_with_context("App is in offline mode", e))?;
 
     let soundcloud_client = state.lock().unwrap().soundcloud_client.clone();
     let client = soundcloud_client
@@ -23,6 +26,8 @@ pub async fn search_tracks(
         .ok_or("SoundCloud client is not available")?;
     let query = TracksQuery {
         q: Some(q),
+        limit,
+        offset,
         ..Default::default()
     };
     let tracks = client.search_tracks(Some(&query)).await.map_err(|e| {

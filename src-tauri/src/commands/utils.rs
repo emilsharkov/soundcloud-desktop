@@ -29,11 +29,15 @@ impl From<AppError> for String {
                 message: msg.clone(),
             },
         };
-        serde_json::to_string(&error_response).unwrap_or_else(|_| {
-            match err {
-                AppError::Network(msg) => format!("{{\"type\":\"network\",\"message\":\"{}\"}}", msg.replace('"', "\\\"")),
-                AppError::Other(msg) => format!("{{\"type\":\"other\",\"message\":\"{}\"}}", msg.replace('"', "\\\"")),
-            }
+        serde_json::to_string(&error_response).unwrap_or_else(|_| match err {
+            AppError::Network(msg) => format!(
+                "{{\"type\":\"network\",\"message\":\"{}\"}}",
+                msg.replace('"', "\\\"")
+            ),
+            AppError::Other(msg) => format!(
+                "{{\"type\":\"other\",\"message\":\"{}\"}}",
+                msg.replace('"', "\\\"")
+            ),
         })
     }
 }
@@ -50,11 +54,17 @@ pub fn format_error_with_context(context: &str, app_error: AppError) -> String {
             message: format!("{}: {}", context, msg),
         },
     };
-    serde_json::to_string(&error_response).unwrap_or_else(|_| {
-        match app_error {
-            AppError::Network(msg) => format!("{{\"type\":\"network\",\"message\":\"{}: {}\"}}", context.replace('"', "\\\""), msg.replace('"', "\\\"")),
-            AppError::Other(msg) => format!("{{\"type\":\"other\",\"message\":\"{}: {}\"}}", context.replace('"', "\\\""), msg.replace('"', "\\\"")),
-        }
+    serde_json::to_string(&error_response).unwrap_or_else(|_| match app_error {
+        AppError::Network(msg) => format!(
+            "{{\"type\":\"network\",\"message\":\"{}: {}\"}}",
+            context.replace('"', "\\\""),
+            msg.replace('"', "\\\"")
+        ),
+        AppError::Other(msg) => format!(
+            "{{\"type\":\"other\",\"message\":\"{}: {}\"}}",
+            context.replace('"', "\\\""),
+            msg.replace('"', "\\\"")
+        ),
     })
 }
 
@@ -62,7 +72,7 @@ pub fn format_error_with_context(context: &str, app_error: AppError) -> String {
 /// Returns the error type (network or other).
 pub fn handle_error(state: &Mutex<AppState>, error: &soundcloud_rs::Error) -> AppError {
     let error_string = format!("{}", error);
-    
+
     // Check if it's a network-related error
     // Common network error indicators: connection, timeout, network, dns, tcp, http error codes
     let is_network_error = error_string.to_lowercase().contains("connection")
@@ -75,7 +85,7 @@ pub fn handle_error(state: &Mutex<AppState>, error: &soundcloud_rs::Error) -> Ap
         || error_string.to_lowercase().contains("connection refused")
         || error_string.to_lowercase().contains("connection reset")
         || error_string.to_lowercase().contains("connection aborted");
-    
+
     if is_network_error {
         state
             .lock()
@@ -105,4 +115,3 @@ pub fn check_offline_mode(state: &Mutex<AppState>) -> Result<(), AppError> {
         Ok(())
     }
 }
-

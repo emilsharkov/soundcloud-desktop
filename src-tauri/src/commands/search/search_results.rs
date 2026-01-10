@@ -14,7 +14,8 @@ pub async fn search_results(
     state: State<'_, Mutex<AppState>>,
     q: String,
 ) -> Result<PagingCollection<SearchResult>, String> {
-    check_offline_mode(&state).map_err(|e| format_error_with_context("App is in offline mode", e))?;
+    check_offline_mode(&state)
+        .map_err(|e| format_error_with_context("App is in offline mode", e))?;
 
     let soundcloud_client = state.lock().unwrap().soundcloud_client.clone();
     let client = soundcloud_client
