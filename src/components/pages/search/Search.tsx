@@ -1,17 +1,17 @@
 import { Button } from '@/components/ui/button';
-import { useNavContext } from '@/context/nav/NavContext';
-import { useOfflineContext } from '@/context/offline/OfflineContext';
-import { useTauriInfiniteQuery } from '@/hooks/data/query/useTauriInfiniteQuery';
 import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
-import { parseError } from '@/lib/parseError';
-import { SearchArgs } from '@/models/query';
-import { Track, Tracks, TracksSchema } from '@/models/schemas';
+import { useTauriInfiniteQuery } from '@/hooks/useTauriInfiniteQuery';
+import { useNav } from '@/providers/NavProvider';
+import { useOffline } from '@/providers/OfflineProvider';
+import { SearchArgs } from '@/types/query';
+import { Track, Tracks, TracksSchema } from '@/types/schemas';
+import { parseError } from '@/utils/parseError';
 import { Loader2, RefreshCw } from 'lucide-react';
 import { SearchSong } from './SearchSong';
 
 const Search = () => {
-    const { selectedSearch } = useNavContext();
-    const { isOffline, retryConnection, isRetrying } = useOfflineContext();
+    const { selectedSearch } = useNav();
+    const { isOffline, retryConnection, isRetrying } = useOffline();
 
     const {
         data,

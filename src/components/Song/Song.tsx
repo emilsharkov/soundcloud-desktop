@@ -1,4 +1,4 @@
-import { useAudioContext } from '@/context/audio/AudioContext';
+import { useAudio } from '@/providers/AudioProvider';
 import { PauseIcon, PlayIcon } from 'lucide-react';
 import { Waveform } from './Waveform';
 
@@ -13,7 +13,7 @@ export interface SongProps {
 
 const Song = (props: SongProps) => {
     const { trackId, title, artist, artwork, waveform, buttonBar } = props;
-    const { paused, selectedTrackId, setPaused, setQueue } = useAudioContext();
+    const { paused, selectedTrackId, setPaused, setQueue } = useAudio();
 
     const isCurrentTrack = selectedTrackId === trackId;
     const isPlaying = !paused && isCurrentTrack;

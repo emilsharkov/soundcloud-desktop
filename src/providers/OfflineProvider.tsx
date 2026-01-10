@@ -1,6 +1,21 @@
 import { invoke } from '@tauri-apps/api/core';
-import { useEffect, useState } from 'react';
-import { OfflineContext, OfflineContextType } from './OfflineContext';
+import { createContext, useContext, useEffect, useState } from 'react';
+
+export type OfflineContextType = {
+    isOffline: boolean;
+    retryConnection: () => Promise<void>;
+    isRetrying: boolean;
+};
+
+const OfflineContext = createContext<OfflineContextType>({
+    isOffline: false,
+    retryConnection: async () => {},
+    isRetrying: false,
+});
+
+export const useOffline = () => {
+    return useContext(OfflineContext);
+};
 
 export interface OfflineProviderProps {
     children: React.ReactNode;

@@ -1,4 +1,4 @@
-import { canPlayNativeHls, isHlsUrl } from '@/lib/hls';
+import { canPlayNativeHls, isHlsUrl } from '@/utils/hls';
 import Hls from 'hls.js';
 
 export type TransportSnapshot = {

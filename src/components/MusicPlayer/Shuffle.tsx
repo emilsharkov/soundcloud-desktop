@@ -1,8 +1,8 @@
-import { useAudioContext } from '@/context/audio/AudioContext';
+import { useAudio } from '@/providers/AudioProvider';
 import { Shuffle as ShuffleIcon } from 'lucide-react';
 
 const Shuffle = () => {
-    const { shuffled, toggleShuffle } = useAudioContext();
+    const { shuffled, toggleShuffle } = useAudio();
 
     const handleShuffle = () => {
         toggleShuffle();

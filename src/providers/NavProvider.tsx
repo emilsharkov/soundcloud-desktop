@@ -1,6 +1,23 @@
-import { Tab } from '@/models/tabs';
-import { useState } from 'react';
-import { NavContext, NavContextType } from './NavContext';
+import { Tab } from '@/types/tabs';
+import { createContext, useContext, useState } from 'react';
+
+export type NavContextType = {
+    selectedTab: Tab;
+    setSelectedTab: (tab: Tab) => void;
+    selectedSearch: string | undefined;
+    setSelectedSearch: (search: string | undefined) => void;
+};
+
+const NavContext = createContext<NavContextType>({
+    selectedTab: 'search',
+    setSelectedTab: () => {},
+    selectedSearch: undefined,
+    setSelectedSearch: () => {},
+});
+
+export const useNav = () => {
+    return useContext(NavContext);
+};
 
 export interface NavProviderProps {
     children: React.ReactNode;

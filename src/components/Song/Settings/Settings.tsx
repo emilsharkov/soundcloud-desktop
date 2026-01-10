@@ -5,10 +5,10 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useTauriMutation } from '@/hooks/data/mutation/useTauriMutation';
-import { useTauriQuery } from '@/hooks/data/query/useTauriQuery';
-import { IdQuery } from '@/models/query';
-import { Track } from '@/models/schemas';
+import { useTauriMutation } from '@/hooks/useTauriMutation';
+import { useTauriQuery } from '@/hooks/useTauriQuery';
+import { IdQuery } from '@/types/query';
+import { Track } from '@/types/schemas';
 import { useQueryClient } from '@tanstack/react-query';
 import { MoreVertical } from 'lucide-react';
 import { useState } from 'react';

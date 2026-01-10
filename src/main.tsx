@@ -1,6 +1,6 @@
-import { AudioProvider } from '@/context/audio/AudioProvider';
-import { NavProvider } from '@/context/nav/NavProvider';
-import { OfflineProvider } from '@/context/offline/OfflineProvider';
+import { AudioProvider } from '@/providers/AudioProvider';
+import { NavProvider } from '@/providers/NavProvider';
+import { OfflineProvider } from '@/providers/OfflineProvider';
 import '@fontsource-variable/inter';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import ReactDOM from 'react-dom/client';

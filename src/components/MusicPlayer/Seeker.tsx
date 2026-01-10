@@ -1,9 +1,8 @@
-import { useAudioContext } from '@/context/audio/AudioContext';
+import { useAudio } from '@/providers/AudioProvider';
 import * as SliderPrimitive from '@radix-ui/react-slider';
 
 const Seeker = () => {
-    const { playbackTime, duration, selectedTrackId, setTime } =
-        useAudioContext();
+    const { playbackTime, duration, selectedTrackId, setTime } = useAudio();
     const disabled = selectedTrackId === null;
 
     const formatTime = (time: number) => {

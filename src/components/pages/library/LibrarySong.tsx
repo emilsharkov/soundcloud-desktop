@@ -1,9 +1,9 @@
 import { Settings } from '@/components/Song/Settings/Settings';
 import { Song } from '@/components/Song/Song';
 import { SongSkeleton } from '@/components/Song/SongSkeleton';
-import { useTauriQuery } from '@/hooks/data/query/useTauriQuery';
-import { IdQuery } from '@/models/query';
-import { TrackRow } from '@/models/schemas';
+import { useTauriQuery } from '@/hooks/useTauriQuery';
+import { IdQuery } from '@/types/query';
+import { TrackRow } from '@/types/schemas';
 import { Check } from 'lucide-react';
 
 interface LibrarySongProps {

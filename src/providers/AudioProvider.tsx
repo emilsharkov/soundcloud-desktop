@@ -1,17 +1,62 @@
-import {
-    AudioContext,
-    type AudioContextType,
-} from '@/context/audio/AudioContext';
-import { AudioEngine, EngineSnapshot } from '@/models/audio/AudioEngine';
-import { Repeat } from '@/models/audio/repeat';
+import { AudioEngine, EngineSnapshot } from '@/core/audio/AudioEngine';
+import { Repeat } from '@/core/audio/types';
 import { isEqual } from 'lodash';
 import React, {
+    createContext,
     JSX,
     useCallback,
+    useContext,
     useEffect,
     useRef,
     useSyncExternalStore,
 } from 'react';
+
+export interface AudioContextType {
+    /** DOM ref exposed for custom controls if desired */
+    audioRef: React.RefObject<HTMLAudioElement | null>;
+
+    /** Transport state */
+    playbackTime: number;
+    duration: number;
+    src: string;
+    paused: boolean;
+    volume: number;
+
+    /** Queue/policy */
+    trackIds: number[];
+    currentIndex: number;
+    shuffled: boolean;
+    repeat: Repeat;
+    selectedTrackId: number | null;
+
+    /** Transport commands */
+    setTime: (time: number) => void;
+    reset: () => void;
+    setPaused: (paused: boolean) => void;
+    setSrc: (src: string) => void;
+    setVolume: (v: number) => void;
+    setRate: (r: number) => void;
+
+    /** Queue commands */
+    setQueue: (trackIds: number[]) => void;
+    enqueue: (trackIds: number[] | number) => void;
+    enqueueNext: (trackIds: number[] | number) => void;
+    removeAt: (index: number) => void;
+    clearQueue: () => void;
+    setIndex: (index: number) => void;
+    next: () => void;
+    prev: () => void;
+    setRepeat: (repeat: Repeat) => void;
+    toggleShuffle: () => void;
+}
+
+const AudioContext = createContext<AudioContextType | null>(null);
+
+export const useAudio = () => {
+    const ctx = useContext(AudioContext);
+    if (!ctx) throw new Error('useAudio must be used within an AudioProvider');
+    return ctx;
+};
 
 export interface AudioProviderProps {
     children: React.ReactNode;

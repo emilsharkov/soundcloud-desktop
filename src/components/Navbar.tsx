@@ -1,8 +1,8 @@
-import { useNavContext } from '@/context/nav/NavContext';
-import { useTauriQuery } from '@/hooks/data/query/useTauriQuery';
-import { SearchArgs } from '@/models/query';
-import { PagingCollection, SearchResult } from '@/models/schemas';
-import { TABS } from '@/models/tabs';
+import { useTauriQuery } from '@/hooks/useTauriQuery';
+import { useNav } from '@/providers/NavProvider';
+import { SearchArgs } from '@/types/query';
+import { PagingCollection, SearchResult } from '@/types/schemas';
+import { TABS } from '@/types/tabs';
 import { upperFirst } from 'lodash';
 import { Search } from 'lucide-react';
 import { useState } from 'react';
@@ -17,7 +17,7 @@ import {
 import { Popover, PopoverAnchor, PopoverContent } from './ui/popover';
 
 const Navbar = () => {
-    const { selectedTab, setSelectedSearch, setSelectedTab } = useNavContext();
+    const { selectedTab, setSelectedSearch, setSelectedTab } = useNav();
     const [search, setSearch] = useState<string>('');
     const [debouncedSearch] = useDebounceValue(search, 500);
     const [popoverOpen, setPopoverOpen] = useState<boolean>(false);
@@ -37,14 +37,14 @@ const Navbar = () => {
 
     const selectSearchResult = (searchResult: SearchResult) => {
         const { output } = searchResult;
-        setSelectedSearch(output);
+        setSelectedSearch(output ?? undefined);
         setSearch(output ?? '');
         setPopoverOpen(false);
     };
 
     const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter') {
-            selectSearchResult({ output: search });
+            selectSearchResult({ output: search, query: null });
             e.currentTarget.blur();
             setSelectedTab('search');
         }

@@ -8,8 +8,8 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useTauriMutation } from '@/hooks/data/mutation/useTauriMutation';
-import { UpdateTrackQuery } from '@/models/query';
+import { useTauriMutation } from '@/hooks/useTauriMutation';
+import { UpdateTrackQuery } from '@/types/query';
 import { useQueryClient } from '@tanstack/react-query';
 import { open as openDialog } from '@tauri-apps/plugin-dialog';
 import { useState } from 'react';

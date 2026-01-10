@@ -3,14 +3,14 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from '@/components/ui/popover';
-import { useAudioContext } from '@/context/audio/AudioContext';
 import { cn } from '@/lib/utils';
+import { useAudio } from '@/providers/AudioProvider';
 import * as SliderPrimitive from '@radix-ui/react-slider';
 import { Volume2 } from 'lucide-react';
 import { useState } from 'react';
 
 const Volume = () => {
-    const { volume, setVolume } = useAudioContext();
+    const { volume, setVolume } = useAudio();
     const [isHovered, setIsHovered] = useState<boolean>(false);
 
     const onMouseHandle = (isHovered: boolean) => {

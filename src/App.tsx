@@ -3,9 +3,9 @@ import { Navbar } from '@/components/Navbar';
 import { Library } from '@/components/pages/library/Library';
 import { Playlists } from '@/components/pages/playlists/Playlists';
 import { Search } from '@/components/pages/search/Search';
-import { useNavContext } from '@/context/nav/NavContext';
+import { useNav } from '@/providers/NavProvider';
+import { Tab } from '@/types/tabs';
 import './App.css';
-import { Tab } from './models/tabs';
 
 const TabComponents: Record<Tab, React.FC> = {
     search: Search,
@@ -14,7 +14,7 @@ const TabComponents: Record<Tab, React.FC> = {
 };
 
 const App = () => {
-    const { selectedTab } = useNavContext();
+    const { selectedTab } = useNav();
     const TabComponent = TabComponents[selectedTab];
 
     return (

@@ -1,9 +1,9 @@
-import { useAudioContext } from '@/context/audio/AudioContext';
-import { Repeat as RepeatType } from '@/models/audio/repeat';
+import { Repeat as RepeatType } from '@/core/audio/types';
+import { useAudio } from '@/providers/AudioProvider';
 import { Repeat1Icon, RepeatIcon } from 'lucide-react';
 
 const Repeat = () => {
-    const { repeat, setRepeat } = useAudioContext();
+    const { repeat, setRepeat } = useAudio();
 
     const Icon =
         repeat === 'none'

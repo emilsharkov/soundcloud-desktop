@@ -1,8 +1,8 @@
-import { useAudioContext } from '@/context/audio/AudioContext';
+import { useAudio } from '@/providers/AudioProvider';
 import { PauseIcon, PlayIcon } from 'lucide-react';
 
 const Play = () => {
-    const { paused, setPaused, selectedTrackId } = useAudioContext();
+    const { paused, setPaused, selectedTrackId } = useAudio();
     const Icon = paused ? PlayIcon : PauseIcon;
 
     const handlePlayPause = () => {

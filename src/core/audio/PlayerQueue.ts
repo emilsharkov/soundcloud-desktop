@@ -1,4 +1,4 @@
-import { Repeat } from './repeat';
+import { Repeat } from './types';
 
 export type QueueSnapshot = {
     trackIds: number[];

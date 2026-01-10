@@ -1,4 +1,4 @@
-import { useAudioContext } from '@/context/audio/AudioContext';
+import { useAudio } from '@/providers/AudioProvider';
 import { JSX } from 'react';
 import { Play } from './Play';
 import { Repeat } from './Repeat';
@@ -8,7 +8,7 @@ import { Skip } from './Skip';
 import { Volume } from './Volume';
 
 const MusicPlayer = (): JSX.Element => {
-    const { audioRef } = useAudioContext();
+    const { audioRef } = useAudio();
 
     return (
         <div className='w-full h-10'>

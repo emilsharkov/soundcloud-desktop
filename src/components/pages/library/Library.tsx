@@ -1,5 +1,5 @@
-import { useTauriQuery } from '@/hooks/data/query/useTauriQuery';
-import { TrackRow } from '@/models/schemas';
+import { useTauriQuery } from '@/hooks/useTauriQuery';
+import { TrackRow } from '@/types/schemas';
 import { LibrarySong } from './LibrarySong';
 
 const Library = () => {

@@ -1,7 +1,7 @@
-import { useAudioContext } from '@/context/audio/AudioContext';
 import { useWaveform } from '@/hooks/useWaveform';
-import { getSampleColor } from '@/lib/getSampleColor';
-import { type Waveform } from '@/models/schemas';
+import { useAudio } from '@/providers/AudioProvider';
+import { type Waveform } from '@/types/schemas';
+import { getSampleColor } from '@/utils/getSampleColor';
 import { useEffect, useState } from 'react';
 
 export interface WaveformProps {
@@ -11,8 +11,7 @@ export interface WaveformProps {
 
 const Waveform = (props: WaveformProps) => {
     const { waveform, trackId } = props;
-    const { selectedTrackId, playbackTime, duration, setTime } =
-        useAudioContext();
+    const { selectedTrackId, playbackTime, duration, setTime } = useAudio();
     const [hoveredSample, setHoveredSample] = useState<number | null>(null);
     const [isHovered, setIsHovered] = useState<boolean>(false);
     const { ref, samples } = useWaveform(waveform);
