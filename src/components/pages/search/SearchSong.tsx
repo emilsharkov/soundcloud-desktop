@@ -3,7 +3,7 @@ import { Song } from '@/components/Song/Song';
 import { SongSkeleton } from '@/components/Song/SongSkeleton';
 import { useTauriQuery } from '@/hooks/data/query/useTauriQuery';
 import { IdQuery } from '@/models/query';
-import { Track, Waveform } from '@/models/response';
+import { Track, Waveform } from '@/models/schemas';
 
 interface SearchSongProps {
     track: Track;

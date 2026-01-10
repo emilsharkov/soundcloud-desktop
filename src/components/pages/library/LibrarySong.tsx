@@ -3,7 +3,7 @@ import { Song } from '@/components/Song/Song';
 import { SongSkeleton } from '@/components/Song/SongSkeleton';
 import { useTauriQuery } from '@/hooks/data/query/useTauriQuery';
 import { IdQuery } from '@/models/query';
-import { TrackRow } from '@/models/response';
+import { TrackRow } from '@/models/schemas';
 import { Check } from 'lucide-react';
 
 interface LibrarySongProps {

@@ -4,6 +4,7 @@ import {
     type UseInfiniteQueryResult,
 } from '@tanstack/react-query';
 import { invoke, type InvokeArgs } from '@tauri-apps/api/core';
+import { type ZodType } from 'zod';
 
 export interface PaginatedArgs {
     limit?: number;
@@ -32,15 +33,17 @@ export const useTauriInfiniteQuery = <
         'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
     > & {
         limit?: number;
+        schema?: ZodType<TResponse>;
     }
 ): UseInfiniteQueryResult<
     { pages: TResponse[]; pageParams: number[] },
     Error
 > => {
-    const limit = options?.limit ?? 20;
+    const { limit: optionsLimit, schema, ...queryOptions } = options ?? {};
+    const limit = optionsLimit ?? 20;
 
     return useInfiniteQuery({
-        ...options,
+        ...queryOptions,
         queryKey: [command, ...Object.values(args ?? {})],
         queryFn: async ({ pageParam }) => {
             const paginatedArgs = {
@@ -48,7 +51,11 @@ export const useTauriInfiniteQuery = <
                 limit,
                 offset: pageParam,
             } as InvokeArgs;
-            return await invoke<TResponse>(command, paginatedArgs);
+            const response = await invoke<TResponse>(command, paginatedArgs);
+            if (schema) {
+                return schema.parse(response);
+            }
+            return response;
         },
         initialPageParam: 0,
         getNextPageParam: (lastPage, allPages) => {

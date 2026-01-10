@@ -1,7 +1,7 @@
 import { useAudioContext } from '@/context/audio/AudioContext';
 import { useWaveform } from '@/hooks/useWaveform';
 import { getSampleColor } from '@/lib/getSampleColor';
-import { type Waveform } from '@/models/response';
+import { type Waveform } from '@/models/schemas';
 import { useEffect, useState } from 'react';
 
 export interface WaveformProps {

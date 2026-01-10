@@ -1,5 +1,5 @@
 import { resizeSamples } from '@/lib/resizeSamples';
-import { Waveform } from '@/models/response';
+import { Waveform } from '@/models/schemas';
 import { RefObject, useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 export interface UseWaveformReturn {

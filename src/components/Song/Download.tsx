@@ -1,7 +1,7 @@
 import { useTauriMutation } from '@/hooks/data/mutation/useTauriMutation';
 import { useTauriQuery } from '@/hooks/data/query/useTauriQuery';
 import { IdQuery } from '@/models/query';
-import { TrackRow } from '@/models/response';
+import { TrackRow } from '@/models/schemas';
 import { useQueryClient } from '@tanstack/react-query';
 import { Check, LoaderCircle, LucideDownload } from 'lucide-react';
 import { useState } from 'react';

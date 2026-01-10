@@ -1,7 +1,7 @@
 import { useNavContext } from '@/context/nav/NavContext';
 import { useTauriQuery } from '@/hooks/data/query/useTauriQuery';
 import { SearchArgs } from '@/models/query';
-import { PagingCollection, SearchResult } from '@/models/response';
+import { PagingCollection, SearchResult } from '@/models/schemas';
 import { TABS } from '@/models/tabs';
 import { upperFirst } from 'lodash';
 import { Search } from 'lucide-react';

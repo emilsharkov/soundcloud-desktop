@@ -3,8 +3,9 @@ import { useNavContext } from '@/context/nav/NavContext';
 import { useOfflineContext } from '@/context/offline/OfflineContext';
 import { useTauriInfiniteQuery } from '@/hooks/data/query/useTauriInfiniteQuery';
 import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
+import { parseError } from '@/lib/parseError';
 import { SearchArgs } from '@/models/query';
-import { PagingCollection, Track } from '@/models/response';
+import { Track, Tracks, TracksSchema } from '@/models/schemas';
 import { Loader2, RefreshCw } from 'lucide-react';
 import { SearchSong } from './SearchSong';
 
@@ -20,7 +21,7 @@ const Search = () => {
         fetchNextPage,
         hasNextPage,
         isFetchingNextPage,
-    } = useTauriInfiniteQuery<SearchArgs, Track, PagingCollection<Track>>(
+    } = useTauriInfiniteQuery<SearchArgs, Track, Tracks>(
         'search_tracks',
         {
             q: selectedSearch ?? '',
@@ -28,6 +29,7 @@ const Search = () => {
         {
             enabled: !isOffline && selectedSearch !== undefined,
             limit: 20,
+            schema: TracksSchema,
         }
     );
 
@@ -39,37 +41,6 @@ const Search = () => {
 
     // Flatten all pages into a single array of tracks
     const tracks = data?.pages.flatMap(page => page.collection) ?? [];
-
-    // Parse error to check if it's a network error
-    const parseError = (
-        error: Error | null
-    ): { type: string; message: string } | null => {
-        if (!error?.message) return null;
-
-        try {
-            // Try to parse as JSON first
-            const parsed = JSON.parse(error.message);
-            if (parsed && typeof parsed === 'object' && 'type' in parsed) {
-                return {
-                    type: parsed.type,
-                    message: parsed.message || error.message,
-                };
-            }
-        } catch {
-            // If not JSON, check if it's a legacy format
-            if (error.message.includes('NETWORK_ERROR')) {
-                return {
-                    type: 'network',
-                    message: error.message,
-                };
-            }
-        }
-
-        return {
-            type: 'other',
-            message: error.message,
-        };
-    };
 
     const errorInfo = parseError(error);
     const isNetworkError = errorInfo?.type === 'network';
