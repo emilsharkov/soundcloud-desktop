@@ -1,59 +1,27 @@
-import { Button } from '@/components/ui/button';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
-import { useTauriMutation } from '@/hooks/useTauriMutation';
+import { useDragAndDrop } from '@/hooks/useDragAndDrop';
 import { useTauriQuery } from '@/hooks/useTauriQuery';
 import {
-    AddSongToPlaylistResponse,
-    AddSongToPlaylistResponseSchema,
     GetLocalTracksResponse,
     GetLocalTracksResponseSchema,
     GetPlaylistSongsResponse,
     GetPlaylistSongsResponseSchema,
     PlaylistRow,
-    RemoveSongFromPlaylistResponse,
-    RemoveSongFromPlaylistResponseSchema,
-    ReorderPlaylistTracksResponse,
-    ReorderPlaylistTracksResponseSchema,
 } from '@/types/schemas';
 import {
-    AddSongToPlaylistQuery,
-    AddSongToPlaylistQuerySchema,
     GetLocalTracksQuery,
     GetLocalTracksQuerySchema,
     GetPlaylistSongsQuery,
     GetPlaylistSongsQuerySchema,
-    RemoveSongFromPlaylistQuery,
-    RemoveSongFromPlaylistQuerySchema,
-    ReorderPlaylistTracksQuery,
-    ReorderPlaylistTracksQuerySchema,
 } from '@/types/schemas/query';
+import { closestCenter, DndContext } from '@dnd-kit/core';
 import {
-    closestCenter,
-    DndContext,
-    DragEndEvent,
-    KeyboardSensor,
-    Modifier,
-    PointerSensor,
-    useSensor,
-    useSensors,
-} from '@dnd-kit/core';
-import {
-    arrayMove,
     SortableContext,
-    sortableKeyboardCoordinates,
     verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import { useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
-import { toast } from 'sonner';
+import { AddSongsDialog } from './AddSongsDialog';
+import { usePlaylistMutations } from './hooks/usePlaylistMutations';
+import { PlaylistDetailHeader } from './PlaylistDetailHeader';
 import { PlaylistSong } from './PlaylistSong';
 
 interface PlaylistDetailProps {
@@ -65,7 +33,6 @@ interface PlaylistDetailProps {
 const PlaylistDetail = (props: PlaylistDetailProps) => {
     const { playlist, onBack, onDelete } = props;
     const { id, name } = playlist;
-    const queryClient = useQueryClient();
     const [addSongsDialogOpen, setAddSongsDialogOpen] = useState(false);
 
     const { data: songs } = useTauriQuery<
@@ -89,92 +56,19 @@ const PlaylistDetail = (props: PlaylistDetailProps) => {
         enabled: addSongsDialogOpen,
     });
 
-    const { mutate: addSongToPlaylist } = useTauriMutation<
-        AddSongToPlaylistQuery,
-        AddSongToPlaylistResponse
-    >('add_song_to_playlist_command', {
-        querySchema: AddSongToPlaylistQuerySchema,
-        responseSchema: AddSongToPlaylistResponseSchema,
-        onSuccess: async () => {
-            await queryClient.invalidateQueries({
-                queryKey: ['get_playlist_songs_command', id],
-            });
-            toast.success('Added to playlist');
-        },
-        onError: error => {
-            console.error('Failed to add song to playlist', error);
-            toast.error('Failed to add to playlist');
-        },
-    });
+    const { addSongToPlaylist, removeSong, reorderTracks } =
+        usePlaylistMutations(id);
 
-    const { mutate: removeSong } = useTauriMutation<
-        RemoveSongFromPlaylistQuery,
-        RemoveSongFromPlaylistResponse
-    >('remove_song_from_playlist_command', {
-        querySchema: RemoveSongFromPlaylistQuerySchema,
-        responseSchema: RemoveSongFromPlaylistResponseSchema,
-        onSuccess: async () => {
-            await queryClient.invalidateQueries({
-                queryKey: ['get_playlist_songs_command', id],
-            });
-        },
-    });
-
-    const { mutate: reorderTracks } = useTauriMutation<
-        ReorderPlaylistTracksQuery,
-        ReorderPlaylistTracksResponse
-    >('reorder_playlist_tracks_command', {
-        querySchema: ReorderPlaylistTracksQuerySchema,
-        responseSchema: ReorderPlaylistTracksResponseSchema,
-        onSuccess: async () => {
-            await queryClient.invalidateQueries({
-                queryKey: ['get_playlist_songs_command', id],
-            });
-        },
-        onError: error => {
-            console.error('Failed to reorder tracks', error);
-            toast.error('Failed to reorder tracks');
-        },
-    });
-
-    const restrictToVerticalAxis: Modifier = ({ transform }) => {
-        return {
-            ...transform,
-            x: 0,
-        };
-    };
-
-    const sensors = useSensors(
-        useSensor(PointerSensor, {
-            activationConstraint: {
-                distance: 8, // Require 8px of movement before dragging starts
-            },
-        }),
-        useSensor(KeyboardSensor, {
-            coordinateGetter: sortableKeyboardCoordinates,
-        })
-    );
-
-    const handleDragEnd = (event: DragEndEvent) => {
-        const { active, over } = event;
-
-        if (!over || !songs) return;
-
-        const oldIndex = songs.findIndex(s => s.track_id === Number(active.id));
-        const newIndex = songs.findIndex(s => s.track_id === Number(over.id));
-
-        if (oldIndex !== newIndex) {
-            const newSongs = arrayMove(songs, oldIndex, newIndex);
-            const trackPositions = newSongs.map(
-                (song, index) => [song.track_id, index] as [number, number]
-            );
-
+    const { sensors, restrictToVerticalAxis, handleDragEnd } = useDragAndDrop(
+        songs,
+        song => song.track_id,
+        trackPositions => {
             reorderTracks({
                 id,
                 trackPositions,
             });
         }
-    };
+    );
 
     const handleRemoveSong = (trackId: number) => {
         removeSong({
@@ -195,37 +89,12 @@ const PlaylistDetail = (props: PlaylistDetailProps) => {
 
     return (
         <div className='flex flex-col gap-4 p-4'>
-            <div className='flex flex-row items-center gap-4'>
-                <Button
-                    variant='ghost'
-                    size='icon'
-                    onClick={onBack}
-                    className='shrink-0'
-                >
-                    <ArrowLeft className='w-5 h-5' />
-                </Button>
-                <h1 className='text-2xl font-semibold text-secondary flex-1'>
-                    {name}
-                </h1>
-                <Button
-                    variant='outline'
-                    size='sm'
-                    onClick={() => setAddSongsDialogOpen(true)}
-                    className='shrink-0'
-                >
-                    <Plus className='w-4 h-4 mr-2' />
-                    Add Songs
-                </Button>
-                <Button
-                    variant='destructive'
-                    size='sm'
-                    onClick={onDelete}
-                    className='shrink-0'
-                >
-                    <Trash2 className='w-4 h-4 mr-2' />
-                    Delete Playlist
-                </Button>
-            </div>
+            <PlaylistDetailHeader
+                name={name}
+                onBack={onBack}
+                onAddSongs={() => setAddSongsDialogOpen(true)}
+                onDelete={onDelete}
+            />
             {songs && songs.length > 0 ? (
                 <DndContext
                     sensors={sensors}
@@ -256,59 +125,13 @@ const PlaylistDetail = (props: PlaylistDetailProps) => {
                 </div>
             )}
 
-            <Dialog
+            <AddSongsDialog
                 open={addSongsDialogOpen}
                 onOpenChange={setAddSongsDialogOpen}
-            >
-                <DialogContent className='max-w-2xl max-h-[80vh]'>
-                    <DialogHeader>
-                        <DialogTitle>Add Songs to Playlist</DialogTitle>
-                        <DialogDescription>
-                            Select songs from your library to add to this
-                            playlist.
-                        </DialogDescription>
-                    </DialogHeader>
-                    <div className='flex flex-col gap-2 max-h-[60vh] overflow-y-auto py-4'>
-                        {libraryTracks && libraryTracks.length > 0 ? (
-                            libraryTracks
-                                .filter(
-                                    track => !playlistTrackIds.has(track.id)
-                                )
-                                .map(track => (
-                                    <button
-                                        key={track.id}
-                                        className='flex flex-row items-center gap-3 p-3 rounded-lg hover:bg-accent text-left'
-                                        onClick={() => {
-                                            handleAddSong(track.id);
-                                        }}
-                                    >
-                                        <div className='flex flex-col flex-1 min-w-0'>
-                                            <p className='text-secondary font-medium truncate'>
-                                                {track.title}
-                                            </p>
-                                            <p className='text-tertiary text-sm truncate'>
-                                                {track.artist}
-                                            </p>
-                                        </div>
-                                        <Plus className='w-5 h-5 text-tertiary shrink-0' />
-                                    </button>
-                                ))
-                        ) : (
-                            <p className='text-tertiary text-center py-8'>
-                                No songs available to add
-                            </p>
-                        )}
-                    </div>
-                    <DialogFooter>
-                        <Button
-                            variant='outline'
-                            onClick={() => setAddSongsDialogOpen(false)}
-                        >
-                            Close
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
+                libraryTracks={libraryTracks}
+                playlistTrackIds={playlistTrackIds}
+                onAddSong={handleAddSong}
+            />
         </div>
     );
 };

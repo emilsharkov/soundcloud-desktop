@@ -1,3 +1,4 @@
+import { useDragAndDrop } from '@/hooks/useDragAndDrop';
 import { useTauriMutation } from '@/hooks/useTauriMutation';
 import { useTauriQuery } from '@/hooks/useTauriQuery';
 import {
@@ -11,20 +12,9 @@ import {
     ReorderTracksQuery,
     ReorderTracksQuerySchema,
 } from '@/types/schemas/query';
+import { closestCenter, DndContext } from '@dnd-kit/core';
 import {
-    closestCenter,
-    DndContext,
-    DragEndEvent,
-    KeyboardSensor,
-    Modifier,
-    PointerSensor,
-    useSensor,
-    useSensors,
-} from '@dnd-kit/core';
-import {
-    arrayMove,
     SortableContext,
-    sortableKeyboardCoordinates,
     verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { useQueryClient } from '@tanstack/react-query';
@@ -60,41 +50,13 @@ const Library = () => {
         },
     });
 
-    const restrictToVerticalAxis: Modifier = ({ transform }) => {
-        return {
-            ...transform,
-            x: 0,
-        };
-    };
-
-    const sensors = useSensors(
-        useSensor(PointerSensor, {
-            activationConstraint: {
-                distance: 8, // Require 8px of movement before dragging starts
-            },
-        }),
-        useSensor(KeyboardSensor, {
-            coordinateGetter: sortableKeyboardCoordinates,
-        })
-    );
-
-    const handleDragEnd = (event: DragEndEvent) => {
-        const { active, over } = event;
-
-        if (!over || !tracks) return;
-
-        const oldIndex = tracks.findIndex(t => t.id === Number(active.id));
-        const newIndex = tracks.findIndex(t => t.id === Number(over.id));
-
-        if (oldIndex !== newIndex) {
-            const newTracks = arrayMove(tracks, oldIndex, newIndex);
-            const trackPositions = newTracks.map(
-                (track, index) => [track.id, index] as [number, number]
-            );
-
+    const { sensors, restrictToVerticalAxis, handleDragEnd } = useDragAndDrop(
+        tracks,
+        track => track.id,
+        trackPositions => {
             reorderTracks({ trackPositions });
         }
-    };
+    );
 
     return (
         <div className='flex flex-col gap-4 p-4'>
