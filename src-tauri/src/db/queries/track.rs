@@ -12,12 +12,11 @@ pub async fn create_track(
     waveform: &Waveform,
 ) -> sqlx::Result<(), String> {
     // Get the next position
-    let position: Option<i64> = sqlx::query_scalar(
-        "SELECT COALESCE(MAX(position), 0) + 1 FROM tracks",
-    )
-    .fetch_optional(pool)
-    .await
-    .map_err(|e| format!("Failed to get next position: {e}"))?;
+    let position: Option<i64> =
+        sqlx::query_scalar("SELECT COALESCE(MAX(position), 0) + 1 FROM tracks")
+            .fetch_optional(pool)
+            .await
+            .map_err(|e| format!("Failed to get next position: {e}"))?;
 
     let position = position.unwrap_or(1) as i32;
 
