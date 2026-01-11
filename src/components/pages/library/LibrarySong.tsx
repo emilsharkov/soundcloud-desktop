@@ -11,6 +11,8 @@ import {
     GetSongImageQuery,
     GetSongImageQuerySchema,
 } from '@/types/schemas/query';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import { Check } from 'lucide-react';
 
 interface LibrarySongProps {
@@ -20,6 +22,21 @@ interface LibrarySongProps {
 const LibrarySong = (props: LibrarySongProps) => {
     const { trackRow } = props;
     const { id, title, artist, waveform } = trackRow;
+
+    const {
+        attributes,
+        listeners,
+        setNodeRef,
+        transform,
+        transition,
+        isDragging,
+    } = useSortable({ id: id.toString() });
+
+    const style = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+        opacity: isDragging ? 0.5 : 1,
+    };
 
     const { data: artwork, isLoading } = useTauriQuery<
         GetSongImageQuery,
@@ -45,15 +62,23 @@ const LibrarySong = (props: LibrarySongProps) => {
     );
 
     return (
-        <Song
-            key={id}
-            trackId={id}
-            title={title}
-            artist={artist}
-            artwork={artwork}
-            waveform={waveform}
-            buttonBar={buttonBar}
-        />
+        <div
+            ref={setNodeRef}
+            style={style}
+            {...attributes}
+            {...listeners}
+            className='cursor-grab active:cursor-grabbing'
+        >
+            <Song
+                key={id}
+                trackId={id}
+                title={title}
+                artist={artist}
+                artwork={artwork}
+                waveform={waveform}
+                buttonBar={buttonBar}
+            />
+        </div>
     );
 };
 

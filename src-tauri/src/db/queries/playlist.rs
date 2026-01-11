@@ -85,9 +85,8 @@ pub async fn add_song_to_playlist(
     let position = position.unwrap_or(1);
 
     sqlx::query(
-        "INSERT INTO playlist_songs (id, playlist_id, track_id, position) VALUES (?1, ?2, ?3, ?4)",
+        "INSERT INTO playlist_songs (playlist_id, track_id, position) VALUES (?1, ?2, ?3)",
     )
-    .bind(format!("{playlist_id}_{track_id}"))
     .bind(playlist_id)
     .bind(track_id)
     .bind(position)

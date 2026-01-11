@@ -1,7 +1,12 @@
 import { z } from 'zod';
 
 // ===== Media - Playlist =====
-export const GetPlaylistsQuerySchema = z.undefined();
+export const GetPlaylistsQuerySchema = z
+    .object({
+        limit: z.number().optional(),
+        offset: z.number().optional(),
+    })
+    .optional();
 
 export const GetPlaylistQuerySchema = z.object({
     id: z.number(),
@@ -27,13 +32,22 @@ export const DeletePlaylistQuerySchema = z.object({
 });
 
 export const AddSongToPlaylistQuerySchema = z.object({
-    playlist_id: z.number(),
-    track_id: z.number(),
+    playlistId: z.number(),
+    trackId: z.number(),
 });
 
 export const RemoveSongFromPlaylistQuerySchema = z.object({
-    playlist_id: z.number(),
-    track_id: z.number(),
+    playlistId: z.number(),
+    trackId: z.number(),
+});
+
+export const ReorderPlaylistsQuerySchema = z.object({
+    positions: z.array(z.tuple([z.number(), z.number()])), // [(playlistId, position), ...]
+});
+
+export const ReorderPlaylistTracksQuerySchema = z.object({
+    id: z.number(),
+    trackPositions: z.array(z.tuple([z.number(), z.number()])), // [(trackId, position), ...]
 });
 
 // ===== Type exports =====
@@ -48,4 +62,8 @@ export type AddSongToPlaylistQuery = z.infer<
 >;
 export type RemoveSongFromPlaylistQuery = z.infer<
     typeof RemoveSongFromPlaylistQuerySchema
+>;
+export type ReorderPlaylistsQuery = z.infer<typeof ReorderPlaylistsQuerySchema>;
+export type ReorderPlaylistTracksQuery = z.infer<
+    typeof ReorderPlaylistTracksQuerySchema
 >;

@@ -14,14 +14,13 @@ export const TrackRowSchema = z.object({
     artist: z.string(),
     data: TrackSchema,
     waveform: WaveformSchema,
+    position: z.number().nullable(),
 });
 
 export const PlaylistRowSchema = z.object({
     id: z.number(),
     name: z.string(),
-    description: z.string().nullable(),
-    created_at: z.string(),
-    updated_at: z.string(),
+    position: z.number(),
 });
 
 export const PlaylistSongRowSchema = z.object({
@@ -29,7 +28,6 @@ export const PlaylistSongRowSchema = z.object({
     playlist_id: z.number(),
     track_id: z.number(),
     position: z.number(),
-    added_at: z.string(),
     title: z.string(),
     artist: z.string(),
 });
@@ -41,9 +39,21 @@ export const GetLocalTrackResponseSchema = TrackRowSchema;
 
 export const GetLocalTracksResponseSchema = z.array(TrackRowSchema);
 
-export const DownloadTrackResponseSchema = z.void();
+export const DownloadTrackResponseSchema = z.null();
 
-export const UpdateLocalTrackResponseSchema = z.void();
+export const UpdateLocalTrackResponseSchema = z.null();
+
+export const GetPlaylistsResponseSchema = z.array(PlaylistRowSchema);
+export const GetPlaylistResponseSchema = PlaylistRowSchema.nullable();
+export const GetPlaylistSongsResponseSchema = z.array(PlaylistSongRowSchema);
+export const CreatePlaylistResponseSchema = z.null();
+export const UpdatePlaylistResponseSchema = z.null();
+export const DeletePlaylistResponseSchema = z.null();
+export const AddSongToPlaylistResponseSchema = z.null();
+export const RemoveSongFromPlaylistResponseSchema = z.null();
+export const ReorderPlaylistsResponseSchema = z.null();
+export const ReorderPlaylistTracksResponseSchema = z.null();
+export const ReorderTracksResponseSchema = z.null();
 
 // ===== Type exports =====
 export type Waveform = z.infer<typeof WaveformSchema>;
@@ -59,3 +69,30 @@ export type DownloadTrackResponse = z.infer<typeof DownloadTrackResponseSchema>;
 export type UpdateLocalTrackResponse = z.infer<
     typeof UpdateLocalTrackResponseSchema
 >;
+export type GetPlaylistsResponse = z.infer<typeof GetPlaylistsResponseSchema>;
+export type GetPlaylistResponse = z.infer<typeof GetPlaylistResponseSchema>;
+export type GetPlaylistSongsResponse = z.infer<
+    typeof GetPlaylistSongsResponseSchema
+>;
+export type CreatePlaylistResponse = z.infer<
+    typeof CreatePlaylistResponseSchema
+>;
+export type UpdatePlaylistResponse = z.infer<
+    typeof UpdatePlaylistResponseSchema
+>;
+export type DeletePlaylistResponse = z.infer<
+    typeof DeletePlaylistResponseSchema
+>;
+export type AddSongToPlaylistResponse = z.infer<
+    typeof AddSongToPlaylistResponseSchema
+>;
+export type RemoveSongFromPlaylistResponse = z.infer<
+    typeof RemoveSongFromPlaylistResponseSchema
+>;
+export type ReorderPlaylistsResponse = z.infer<
+    typeof ReorderPlaylistsResponseSchema
+>;
+export type ReorderPlaylistTracksResponse = z.infer<
+    typeof ReorderPlaylistTracksResponseSchema
+>;
+export type ReorderTracksResponse = z.infer<typeof ReorderTracksResponseSchema>;

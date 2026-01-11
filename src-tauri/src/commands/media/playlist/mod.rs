@@ -8,4 +8,5 @@ mod update;
 pub use create::*;
 pub use delete::*;
 pub use read::*;
+pub use reorder::*;
 pub use update::*;

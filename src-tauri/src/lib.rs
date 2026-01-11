@@ -75,6 +75,7 @@ pub fn run() {
             get_local_track,
             get_local_tracks,
             get_song_image,
+            reorder_tracks_command,
             // Playlist
             create_playlist_command,
             get_playlists_command,
@@ -84,6 +85,8 @@ pub fn run() {
             add_song_to_playlist_command,
             remove_song_from_playlist_command,
             get_playlist_songs_command,
+            reorder_playlists_command,
+            reorder_playlist_tracks_command,
             // Offline
             get_offline_mode,
             set_offline_mode,

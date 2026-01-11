@@ -3,7 +3,8 @@ CREATE TABLE IF NOT EXISTS tracks (
     title TEXT,
     artist TEXT,
     data BLOB,
-    waveform BLOB
+    waveform BLOB,
+    position INTEGER
 );
 
 CREATE TABLE IF NOT EXISTS playlists (

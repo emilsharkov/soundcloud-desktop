@@ -1,3 +1,4 @@
+import { AddToPlaylist } from '@/components/Song/AddToPlaylist';
 import { Button } from '@/components/ui/button';
 import {
     DropdownMenu,
@@ -70,12 +71,6 @@ const Settings = (props: SettingsProps) => {
         setEditMetadataModalOpen(true);
     };
 
-    const handleAddToPlaylist = () => {
-        toast.message('Add to playlist', {
-            description: 'Coming soon',
-        });
-    };
-
     const handleDelete = () => {
         deleteTrack({ id: trackId });
     };
@@ -98,9 +93,7 @@ const Settings = (props: SettingsProps) => {
                             <DropdownMenuItem onClick={handleEditMetadata}>
                                 Edit metadata
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={handleAddToPlaylist}>
-                                Add to playlist
-                            </DropdownMenuItem>
+                            <AddToPlaylist trackId={trackId} variant='menu' />
                             <DropdownMenuItem onClick={handleDelete}>
                                 Delete
                             </DropdownMenuItem>

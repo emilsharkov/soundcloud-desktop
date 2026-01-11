@@ -9,6 +9,7 @@ pub struct TrackRow {
     pub artist: String,
     pub data: Json<Track>,
     pub waveform: Json<Waveform>,
+    pub position: Option<i32>,
 }
 
 #[derive(Debug, FromRow, Clone, Serialize, Deserialize)]
@@ -16,8 +17,6 @@ pub struct PlaylistRow {
     pub id: u64,
     pub name: String,
     pub position: i32,
-    pub created_at: String,
-    pub updated_at: String,
 }
 
 #[derive(Debug, FromRow, Clone, Serialize, Deserialize)]
