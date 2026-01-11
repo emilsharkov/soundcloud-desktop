@@ -1,7 +1,14 @@
 import { useTauriQuery } from '@/hooks/useTauriQuery';
 import { useNav } from '@/providers/NavProvider';
-import { SearchArgs } from '@/types/query';
-import { PagingCollection, SearchResult } from '@/types/schemas';
+import {
+    SearchResult,
+    SearchResultsResponse,
+    SearchResultsResponseSchema,
+} from '@/types/schemas';
+import {
+    SearchResultsQuery,
+    SearchResultsQuerySchema,
+} from '@/types/schemas/query';
 import { TABS } from '@/types/tabs';
 import { upperFirst } from 'lodash';
 import { Search } from 'lucide-react';
@@ -23,8 +30,8 @@ const Navbar = () => {
     const [popoverOpen, setPopoverOpen] = useState<boolean>(false);
 
     const { data: searchResults } = useTauriQuery<
-        SearchArgs,
-        PagingCollection<SearchResult>
+        SearchResultsQuery,
+        SearchResultsResponse
     >(
         'search_results',
         {
@@ -32,6 +39,8 @@ const Navbar = () => {
         },
         {
             enabled: debouncedSearch.trim() !== '',
+            querySchema: SearchResultsQuerySchema,
+            responseSchema: SearchResultsResponseSchema,
         }
     );
 

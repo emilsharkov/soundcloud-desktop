@@ -9,7 +9,14 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useTauriMutation } from '@/hooks/useTauriMutation';
-import { UpdateTrackQuery } from '@/types/query';
+import {
+    UpdateLocalTrackResponse,
+    UpdateLocalTrackResponseSchema,
+} from '@/types/schemas';
+import {
+    UpdateLocalTrackQuery,
+    UpdateLocalTrackQuerySchema,
+} from '@/types/schemas/query';
 import { useQueryClient } from '@tanstack/react-query';
 import { open as openDialog } from '@tauri-apps/plugin-dialog';
 import { useState } from 'react';
@@ -37,33 +44,35 @@ const EditMetadataModal = (props: EditMetadataModalProps) => {
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
     const queryClient = useQueryClient();
 
-    const { mutate: updateTrack } = useTauriMutation<UpdateTrackQuery, void>(
-        'update_local_track',
-        {
-            onSuccess: async () => {
-                await queryClient.invalidateQueries({
-                    queryKey: ['get_local_tracks'],
-                });
-                await queryClient.invalidateQueries({
-                    queryKey: ['get_local_track', trackId],
-                });
-                toast.success('Metadata updated successfully');
-            },
-            onError: () => {
-                toast.error('Failed to update metadata');
-            },
-            onSettled: () => {
-                setIsSubmitting(false);
-                onOpenChange(false);
-            },
-        }
-    );
+    const { mutate: updateTrack } = useTauriMutation<
+        UpdateLocalTrackQuery,
+        UpdateLocalTrackResponse
+    >('update_local_track', {
+        querySchema: UpdateLocalTrackQuerySchema,
+        responseSchema: UpdateLocalTrackResponseSchema,
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({
+                queryKey: ['get_local_tracks'],
+            });
+            await queryClient.invalidateQueries({
+                queryKey: ['get_local_track', trackId],
+            });
+            toast.success('Metadata updated successfully');
+        },
+        onError: () => {
+            toast.error('Failed to update metadata');
+        },
+        onSettled: () => {
+            setIsSubmitting(false);
+            onOpenChange(false);
+        },
+    });
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsSubmitting(true);
 
-        const query: UpdateTrackQuery = {
+        const query: UpdateLocalTrackQuery = {
             id: trackId,
         };
         if (title) {

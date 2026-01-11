@@ -2,8 +2,15 @@ import { Settings } from '@/components/Song/Settings/Settings';
 import { Song } from '@/components/Song/Song';
 import { SongSkeleton } from '@/components/Song/SongSkeleton';
 import { useTauriQuery } from '@/hooks/useTauriQuery';
-import { IdQuery } from '@/types/query';
-import { TrackRow } from '@/types/schemas';
+import {
+    GetSongImageResponse,
+    GetSongImageResponseSchema,
+    TrackRow,
+} from '@/types/schemas';
+import {
+    GetSongImageQuery,
+    GetSongImageQuerySchema,
+} from '@/types/schemas/query';
 import { Check } from 'lucide-react';
 
 interface LibrarySongProps {
@@ -14,9 +21,16 @@ const LibrarySong = (props: LibrarySongProps) => {
     const { trackRow } = props;
     const { id, title, artist, waveform } = trackRow;
 
-    const { data: artwork, isLoading } = useTauriQuery<IdQuery, string>(
+    const { data: artwork, isLoading } = useTauriQuery<
+        GetSongImageQuery,
+        GetSongImageResponse
+    >(
         'get_song_image',
-        { id }
+        { id },
+        {
+            querySchema: GetSongImageQuerySchema,
+            responseSchema: GetSongImageResponseSchema,
+        }
     );
 
     if (isLoading || !artwork) {

@@ -9,24 +9,40 @@ import { type ZodType } from 'zod';
 export const useTauriQuery = <TArgs extends object | undefined, V>(
     command: string,
     args: TArgs = undefined as TArgs,
-    options?: Omit<
+    options: Omit<
         UseQueryOptions<V, Error, V, [string, ...unknown[]]>,
         'queryKey' | 'queryFn'
     > & {
-        schema?: ZodType<V>;
+        querySchema?: ZodType<TArgs>;
+        responseSchema: ZodType<V>;
     }
 ): UseQueryResult<V, Error> => {
-    const { schema, ...queryOptions } = options ?? {};
+    const { querySchema, responseSchema, ...queryOptions } = options;
 
     return useQuery<V, Error, V, [string, ...unknown[]]>({
         ...queryOptions,
         queryKey: [command, ...Object.values(args ?? {})],
         queryFn: async () => {
-            const response = await invoke<V>(command, args as InvokeArgs);
-            if (schema) {
-                return schema.parse(response);
+            // Validate query arguments
+            if (querySchema) {
+                const argsResult = querySchema.safeParse(args);
+                if (!argsResult.success) {
+                    throw new Error(
+                        `Query schema validation failed for command "${command}": ${argsResult.error.message}`
+                    );
+                }
             }
-            return response;
+
+            const response = await invoke<V>(command, args as InvokeArgs);
+
+            // Validate response (required)
+            const responseResult = responseSchema.safeParse(response);
+            if (!responseResult.success) {
+                throw new Error(
+                    `Response schema validation failed for command "${command}": ${responseResult.error.message}`
+                );
+            }
+            return responseResult.data;
         },
     });
 };

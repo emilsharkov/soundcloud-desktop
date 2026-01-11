@@ -3,8 +3,11 @@ import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
 import { useTauriInfiniteQuery } from '@/hooks/useTauriInfiniteQuery';
 import { useNav } from '@/providers/NavProvider';
 import { useOffline } from '@/providers/OfflineProvider';
-import { SearchArgs } from '@/types/query';
 import { Track, Tracks, TracksSchema } from '@/types/schemas';
+import {
+    SearchTracksQuery,
+    SearchTracksQuerySchema,
+} from '@/types/schemas/query';
 import { parseError } from '@/utils/parseError';
 import { Loader2, RefreshCw } from 'lucide-react';
 import { SearchSong } from './SearchSong';
@@ -21,7 +24,7 @@ const Search = () => {
         fetchNextPage,
         hasNextPage,
         isFetchingNextPage,
-    } = useTauriInfiniteQuery<SearchArgs, Track, Tracks>(
+    } = useTauriInfiniteQuery<SearchTracksQuery, Track, Tracks>(
         'search_tracks',
         {
             q: selectedSearch ?? '',
@@ -29,7 +32,8 @@ const Search = () => {
         {
             enabled: !isOffline && selectedSearch !== undefined,
             limit: 20,
-            schema: TracksSchema,
+            querySchema: SearchTracksQuerySchema,
+            responseSchema: TracksSchema,
         }
     );
 

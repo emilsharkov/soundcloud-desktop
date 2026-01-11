@@ -7,8 +7,13 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useTauriMutation } from '@/hooks/useTauriMutation';
 import { useTauriQuery } from '@/hooks/useTauriQuery';
-import { IdQuery } from '@/types/query';
-import { Track } from '@/types/schemas';
+import { Track, TrackSchema } from '@/types/schemas';
+import {
+    DeleteLocalTrackQuery,
+    DeleteLocalTrackQuerySchema,
+    GetLocalTrackQuery,
+    GetLocalTrackQuerySchema,
+} from '@/types/schemas/query';
 import { useQueryClient } from '@tanstack/react-query';
 import { MoreVertical } from 'lucide-react';
 import { useState } from 'react';
@@ -24,33 +29,39 @@ interface SettingsProps {
 const Settings = (props: SettingsProps) => {
     const { trackId, title, artist } = props;
     const queryClient = useQueryClient();
-    const { data: localTrack } = useTauriQuery<IdQuery, Track>(
+    const { data: localTrack } = useTauriQuery<GetLocalTrackQuery, Track>(
         'get_local_track',
         {
             id: trackId,
+        },
+        {
+            querySchema: GetLocalTrackQuerySchema,
+            responseSchema: TrackSchema,
         }
     );
 
-    const { mutate: deleteTrack } = useTauriMutation<IdQuery, Track>(
-        'delete_local_track',
-        {
-            onSuccess: async () => {
-                await queryClient.invalidateQueries({
-                    queryKey: ['get_local_tracks'],
-                });
-                await queryClient.invalidateQueries({
-                    queryKey: ['get_local_track', trackId],
-                });
-                await queryClient.invalidateQueries({
-                    queryKey: ['get_song_image', trackId],
-                });
-                toast.success('Track deleted successfully');
-            },
-            onError: () => {
-                toast.error('Failed to delete track');
-            },
-        }
-    );
+    const { mutate: deleteTrack } = useTauriMutation<
+        DeleteLocalTrackQuery,
+        Track
+    >('delete_local_track', {
+        querySchema: DeleteLocalTrackQuerySchema,
+        responseSchema: TrackSchema,
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({
+                queryKey: ['get_local_tracks'],
+            });
+            await queryClient.invalidateQueries({
+                queryKey: ['get_local_track', trackId],
+            });
+            await queryClient.invalidateQueries({
+                queryKey: ['get_song_image', trackId],
+            });
+            toast.success('Track deleted successfully');
+        },
+        onError: () => {
+            toast.error('Failed to delete track');
+        },
+    });
 
     const [editMetadataModalOpen, setEditMetadataModalOpen] =
         useState<boolean>(false);

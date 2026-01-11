@@ -22,7 +22,7 @@ export const useTauriInfiniteQuery = <
 >(
     command: string,
     args: Omit<TArgs, 'offset'>,
-    options?: Omit<
+    options: Omit<
         UseInfiniteQueryOptions<
             TResponse,
             Error,
@@ -33,13 +33,19 @@ export const useTauriInfiniteQuery = <
         'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
     > & {
         limit?: number;
-        schema?: ZodType<TResponse>;
+        querySchema?: ZodType<TArgs>;
+        responseSchema: ZodType<TResponse>;
     }
 ): UseInfiniteQueryResult<
     { pages: TResponse[]; pageParams: number[] },
     Error
 > => {
-    const { limit: optionsLimit, schema, ...queryOptions } = options ?? {};
+    const {
+        limit: optionsLimit,
+        querySchema,
+        responseSchema,
+        ...queryOptions
+    } = options;
     const limit = optionsLimit ?? 20;
 
     return useInfiniteQuery({
@@ -50,12 +56,31 @@ export const useTauriInfiniteQuery = <
                 ...args,
                 limit,
                 offset: pageParam,
-            } as InvokeArgs;
-            const response = await invoke<TResponse>(command, paginatedArgs);
-            if (schema) {
-                return schema.parse(response);
+            } as TArgs;
+
+            // Validate query arguments
+            if (querySchema) {
+                const argsResult = querySchema.safeParse(paginatedArgs);
+                if (!argsResult.success) {
+                    throw new Error(
+                        `Query schema validation failed for command "${command}": ${argsResult.error.message}`
+                    );
+                }
             }
-            return response;
+
+            const response = await invoke<TResponse>(
+                command,
+                paginatedArgs as InvokeArgs
+            );
+
+            // Validate response (required)
+            const responseResult = responseSchema.safeParse(response);
+            if (!responseResult.success) {
+                throw new Error(
+                    `Response schema validation failed for command "${command}": ${responseResult.error.message}`
+                );
+            }
+            return responseResult.data;
         },
         initialPageParam: 0,
         getNextPageParam: (lastPage, allPages) => {

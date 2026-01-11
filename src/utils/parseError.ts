@@ -1,4 +1,4 @@
-import { ErrorResponse, ErrorResponseSchema } from '@/types/schemas';
+import { ErrorResponse, ErrorResponseSchema } from '@/types/schemas/response';
 
 export const parseError = (error: Error | null): ErrorResponse | null => {
     if (!error?.message) return null;

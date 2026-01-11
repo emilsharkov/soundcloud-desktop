@@ -1,10 +1,16 @@
 import { useTauriQuery } from '@/hooks/useTauriQuery';
-import { TrackRow } from '@/types/schemas';
+import { GetLocalTracksResponseSchema, TrackRow } from '@/types/schemas';
+import { GetLocalTracksQuerySchema } from '@/types/schemas/query';
 import { LibrarySong } from './LibrarySong';
 
 const Library = () => {
     const { data: tracks } = useTauriQuery<undefined, TrackRow[]>(
-        'get_local_tracks'
+        'get_local_tracks',
+        undefined,
+        {
+            querySchema: GetLocalTracksQuerySchema,
+            responseSchema: GetLocalTracksResponseSchema,
+        }
     );
 
     return (
