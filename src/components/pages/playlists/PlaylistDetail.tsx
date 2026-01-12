@@ -1,4 +1,4 @@
-import { useDragAndDrop } from '@/hooks/useDragAndDrop';
+import { SortableList } from '@/components/ui/sortable-list';
 import { useTauriQuery } from '@/hooks/useTauriQuery';
 import {
     GetLocalTracksResponse,
@@ -13,11 +13,6 @@ import {
     GetPlaylistSongsQuery,
     GetPlaylistSongsQuerySchema,
 } from '@/types/schemas/query';
-import { closestCenter, DndContext } from '@dnd-kit/core';
-import {
-    SortableContext,
-    verticalListSortingStrategy,
-} from '@dnd-kit/sortable';
 import { useState } from 'react';
 import { AddSongsDialog } from './AddSongsDialog';
 import { usePlaylistMutations } from './hooks/usePlaylistMutations';
@@ -59,17 +54,6 @@ const PlaylistDetail = (props: PlaylistDetailProps) => {
     const { addSongToPlaylist, removeSong, reorderTracks } =
         usePlaylistMutations(id);
 
-    const { sensors, restrictToVerticalAxis, handleDragEnd } = useDragAndDrop(
-        songs,
-        song => song.track_id,
-        trackPositions => {
-            reorderTracks({
-                id,
-                trackPositions,
-            });
-        }
-    );
-
     const handleRemoveSong = (trackId: number) => {
         removeSong({
             playlistId: id,
@@ -95,35 +79,26 @@ const PlaylistDetail = (props: PlaylistDetailProps) => {
                 onAddSongs={() => setAddSongsDialogOpen(true)}
                 onDelete={onDelete}
             />
-            {songs && songs.length > 0 ? (
-                <DndContext
-                    sensors={sensors}
-                    collisionDetection={closestCenter}
-                    onDragEnd={handleDragEnd}
-                    modifiers={[restrictToVerticalAxis]}
-                >
-                    <SortableContext
-                        items={songs.map(s => s.track_id.toString())}
-                        strategy={verticalListSortingStrategy}
-                    >
-                        <div className='flex flex-col gap-4'>
-                            {songs.map(song => (
-                                <PlaylistSong
-                                    key={song.id}
-                                    playlistSong={song}
-                                    onRemove={() =>
-                                        handleRemoveSong(song.track_id)
-                                    }
-                                />
-                            ))}
-                        </div>
-                    </SortableContext>
-                </DndContext>
-            ) : (
-                <div className='flex flex-col items-center justify-center py-12 text-tertiary'>
-                    <p>This playlist is empty</p>
-                </div>
-            )}
+            <SortableList
+                items={songs}
+                getId={song => song.track_id}
+                onReorder={trackPositions => {
+                    reorderTracks({
+                        id,
+                        trackPositions,
+                    });
+                }}
+                className='flex flex-col gap-4'
+                emptyMessage='This playlist is empty'
+            >
+                {songs?.map(song => (
+                    <PlaylistSong
+                        key={song.id}
+                        playlistSong={song}
+                        onRemove={() => handleRemoveSong(song.track_id)}
+                    />
+                ))}
+            </SortableList>
 
             <AddSongsDialog
                 open={addSongsDialogOpen}

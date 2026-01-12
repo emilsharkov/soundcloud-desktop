@@ -17,6 +17,7 @@ export const useTauriMutation = <TArgs extends object | undefined, V>(
 
     return useMutation<V, Error, TArgs>({
         ...mutationOptions,
+        networkMode: 'always', // Tauri commands are local IPC calls, not network requests, so they work offline
         mutationFn: async (args: TArgs) => {
             // Validate query arguments
             if (querySchema) {

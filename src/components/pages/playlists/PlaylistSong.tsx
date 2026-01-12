@@ -1,6 +1,7 @@
 import { Settings } from '@/components/Song/Settings/Settings';
 import { Song } from '@/components/Song/Song';
 import { SongSkeleton } from '@/components/Song/SongSkeleton';
+import { SortableItem } from '@/components/ui/sortable-item';
 import { useTauriQuery } from '@/hooks/useTauriQuery';
 import {
     GetLocalTrackResponse,
@@ -15,8 +16,6 @@ import {
     GetSongImageQuery,
     GetSongImageQuerySchema,
 } from '@/types/schemas/query';
-import { useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
 import { X } from 'lucide-react';
 
 interface PlaylistSongProps {
@@ -53,21 +52,6 @@ const PlaylistSong = (props: PlaylistSongProps) => {
         }
     );
 
-    const {
-        attributes,
-        listeners,
-        setNodeRef,
-        transform,
-        transition,
-        isDragging,
-    } = useSortable({ id: track_id.toString() });
-
-    const style = {
-        transform: CSS.Transform.toString(transform),
-        transition,
-        opacity: isDragging ? 0.5 : 1,
-    };
-
     if (isLoadingTrack || isLoadingArtwork || !artwork || !localTrack) {
         return <SongSkeleton />;
     }
@@ -89,11 +73,8 @@ const PlaylistSong = (props: PlaylistSongProps) => {
     );
 
     return (
-        <div
-            ref={setNodeRef}
-            style={style}
-            {...attributes}
-            {...listeners}
+        <SortableItem
+            id={track_id}
             className='cursor-grab active:cursor-grabbing'
         >
             <Song
@@ -105,7 +86,7 @@ const PlaylistSong = (props: PlaylistSongProps) => {
                 waveform={localTrack.waveform}
                 buttonBar={buttonBar}
             />
-        </div>
+        </SortableItem>
     );
 };
 

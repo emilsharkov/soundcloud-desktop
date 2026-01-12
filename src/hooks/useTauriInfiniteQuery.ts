@@ -50,6 +50,7 @@ export const useTauriInfiniteQuery = <
 
     return useInfiniteQuery({
         ...queryOptions,
+        networkMode: 'always', // Tauri commands are local IPC calls, not network requests, so they work offline
         queryKey: [command, ...Object.values(args ?? {})],
         queryFn: async ({ pageParam }) => {
             const paginatedArgs = {

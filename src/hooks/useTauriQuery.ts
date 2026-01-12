@@ -21,6 +21,7 @@ export const useTauriQuery = <TArgs extends object | undefined, V>(
 
     return useQuery<V, Error, V, [string, ...unknown[]]>({
         ...queryOptions,
+        networkMode: 'always', // Tauri commands are local IPC calls, not network requests, so they work offline
         queryKey: [command, ...Object.values(args ?? {})],
         queryFn: async () => {
             // Validate query arguments
