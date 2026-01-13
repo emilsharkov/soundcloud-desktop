@@ -51,15 +51,7 @@ const PlaylistDetail = (props: PlaylistDetailProps) => {
         enabled: addSongsDialogOpen,
     });
 
-    const { addSongToPlaylist, removeSong, reorderTracks } =
-        usePlaylistMutations(id);
-
-    const handleRemoveSong = (trackId: number) => {
-        removeSong({
-            playlistId: id,
-            trackId: trackId,
-        });
-    };
+    const { addSongToPlaylist, reorderTracks } = usePlaylistMutations(id);
 
     const handleAddSong = (trackId: number) => {
         addSongToPlaylist({
@@ -92,11 +84,7 @@ const PlaylistDetail = (props: PlaylistDetailProps) => {
                 emptyMessage='This playlist is empty'
             >
                 {songs?.map(song => (
-                    <PlaylistSong
-                        key={song.id}
-                        playlistSong={song}
-                        onRemove={() => handleRemoveSong(song.track_id)}
-                    />
+                    <PlaylistSong key={song.id} playlistSong={song} />
                 ))}
             </SortableList>
 

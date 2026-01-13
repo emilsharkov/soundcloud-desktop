@@ -1,4 +1,9 @@
-import { Settings } from '@/components/Song/Settings/Settings';
+import {
+    Settings,
+    SettingsAddToPlaylist,
+    SettingsDelete,
+    SettingsEditMetadata,
+} from '@/components/Song/Settings';
 import { Song } from '@/components/Song/Song';
 import { SongSkeleton } from '@/components/Song/SongSkeleton';
 import { SortableItem } from '@/components/ui/sortable-item';
@@ -12,7 +17,6 @@ import {
     GetSongImageQuery,
     GetSongImageQuerySchema,
 } from '@/types/schemas/query';
-import { Check } from 'lucide-react';
 
 interface LibrarySongProps {
     trackRow: TrackRow;
@@ -40,8 +44,11 @@ const LibrarySong = (props: LibrarySongProps) => {
 
     const buttonBar = (
         <>
-            <Check className='w-4 h-4 text-secondary' />
-            <Settings trackId={id} title={title} artist={artist} />
+            <Settings trackId={id} title={title} artist={artist}>
+                <SettingsEditMetadata />
+                <SettingsAddToPlaylist />
+                <SettingsDelete />
+            </Settings>
         </>
     );
 

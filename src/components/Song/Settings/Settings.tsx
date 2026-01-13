@@ -1,35 +1,42 @@
-import { AddToPlaylist } from '@/components/Song/AddToPlaylist';
-import { Button } from '@/components/ui/button';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { useTauriMutation } from '@/hooks/useTauriMutation';
+import { DropdownMenu } from '@/components/ui/dropdown-menu';
 import { useTauriQuery } from '@/hooks/useTauriQuery';
 import { Track, TrackSchema } from '@/types/schemas';
 import {
-    DeleteLocalTrackQuery,
-    DeleteLocalTrackQuerySchema,
     GetLocalTrackQuery,
     GetLocalTrackQuerySchema,
 } from '@/types/schemas/query';
-import { useQueryClient } from '@tanstack/react-query';
-import { MoreVertical } from 'lucide-react';
-import { useState } from 'react';
-import { toast } from 'sonner';
-import { EditMetadataModal } from './EditMetadataModal';
+import { createContext, ReactNode, useContext } from 'react';
+import { SettingsContent } from './SettingsContent';
+import { SettingsTrigger } from './SettingsTrigger';
+
+interface SettingsContextValue {
+    trackId: number;
+    title: string;
+    artist: string;
+    localTrack: Track | undefined;
+}
+
+const SettingsContext = createContext<SettingsContextValue | null>(null);
+
+export const useSettingsContext = () => {
+    const context = useContext(SettingsContext);
+    if (!context) {
+        throw new Error(
+            'Settings components must be used within a Settings provider'
+        );
+    }
+    return context;
+};
 
 interface SettingsProps {
     trackId: number;
     title: string;
     artist: string;
+    children: ReactNode;
 }
 
 const Settings = (props: SettingsProps) => {
-    const { trackId, title, artist } = props;
-    const queryClient = useQueryClient();
+    const { trackId, title, artist, children } = props;
     const { data: localTrack } = useTauriQuery<GetLocalTrackQuery, Track>(
         'get_local_track',
         {
@@ -41,74 +48,24 @@ const Settings = (props: SettingsProps) => {
         }
     );
 
-    const { mutate: deleteTrack } = useTauriMutation<
-        DeleteLocalTrackQuery,
-        Track
-    >('delete_local_track', {
-        querySchema: DeleteLocalTrackQuerySchema,
-        responseSchema: TrackSchema,
-        onSuccess: async () => {
-            await queryClient.invalidateQueries({
-                queryKey: ['get_local_tracks'],
-            });
-            await queryClient.invalidateQueries({
-                queryKey: ['get_local_track', trackId],
-            });
-            await queryClient.invalidateQueries({
-                queryKey: ['get_song_image', trackId],
-            });
-            toast.success('Track deleted successfully');
-        },
-        onError: () => {
-            toast.error('Failed to delete track');
-        },
-    });
-
-    const [editMetadataModalOpen, setEditMetadataModalOpen] =
-        useState<boolean>(false);
-
-    const handleEditMetadata = () => {
-        setEditMetadataModalOpen(true);
+    const contextValue: SettingsContextValue = {
+        trackId,
+        title,
+        artist,
+        localTrack,
     };
 
-    const handleDelete = () => {
-        deleteTrack({ id: trackId });
-    };
+    if (localTrack === undefined) {
+        return null;
+    }
 
     return (
-        <>
-            {localTrack !== undefined ? (
-                <>
-                    <DropdownMenu modal={false}>
-                        <DropdownMenuTrigger asChild>
-                            <Button
-                                className='hover:bg-transparent cursor-pointer'
-                                variant='ghost'
-                                size='icon'
-                            >
-                                <MoreVertical className='w-4 h-4 text-secondary' />
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align='start'>
-                            <DropdownMenuItem onClick={handleEditMetadata}>
-                                Edit metadata
-                            </DropdownMenuItem>
-                            <AddToPlaylist trackId={trackId} variant='menu' />
-                            <DropdownMenuItem onClick={handleDelete}>
-                                Delete
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                    <EditMetadataModal
-                        open={editMetadataModalOpen}
-                        onOpenChange={setEditMetadataModalOpen}
-                        trackId={trackId}
-                        title={title}
-                        artist={artist}
-                    />
-                </>
-            ) : null}
-        </>
+        <SettingsContext.Provider value={contextValue}>
+            <DropdownMenu>
+                <SettingsTrigger />
+                <SettingsContent>{children}</SettingsContent>
+            </DropdownMenu>
+        </SettingsContext.Provider>
     );
 };
 

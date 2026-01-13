@@ -1,4 +1,10 @@
-import { Settings } from '@/components/Song/Settings/Settings';
+import {
+    Settings,
+    SettingsAddToPlaylist,
+    SettingsDelete,
+    SettingsEditMetadata,
+    SettingsRemoveFromPlaylist,
+} from '@/components/Song/Settings';
 import { Song } from '@/components/Song/Song';
 import { SongSkeleton } from '@/components/Song/SongSkeleton';
 import { SortableItem } from '@/components/ui/sortable-item';
@@ -16,16 +22,14 @@ import {
     GetSongImageQuery,
     GetSongImageQuerySchema,
 } from '@/types/schemas/query';
-import { X } from 'lucide-react';
 
 interface PlaylistSongProps {
     playlistSong: PlaylistSongRow;
-    onRemove: () => void;
 }
 
 const PlaylistSong = (props: PlaylistSongProps) => {
-    const { playlistSong, onRemove } = props;
-    const { track_id, title, artist } = playlistSong;
+    const { playlistSong } = props;
+    const { track_id, title, artist, playlist_id } = playlistSong;
 
     const { data: localTrack, isLoading: isLoadingTrack } = useTauriQuery<
         GetLocalTrackQuery,
@@ -58,17 +62,12 @@ const PlaylistSong = (props: PlaylistSongProps) => {
 
     const buttonBar = (
         <>
-            <button
-                className='p-1 hover:bg-destructive/10 rounded transition-colors'
-                onClick={e => {
-                    e.stopPropagation();
-                    onRemove();
-                }}
-                title='Remove from playlist'
-            >
-                <X className='w-4 h-4 text-destructive' />
-            </button>
-            <Settings trackId={track_id} title={title} artist={artist} />
+            <Settings trackId={track_id} title={title} artist={artist}>
+                <SettingsEditMetadata />
+                <SettingsAddToPlaylist />
+                <SettingsRemoveFromPlaylist playlistId={playlist_id} />
+                <SettingsDelete />
+            </Settings>
         </>
     );
 

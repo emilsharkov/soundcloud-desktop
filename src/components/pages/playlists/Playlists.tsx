@@ -93,7 +93,6 @@ const Playlists = () => {
                         key={playlist.id}
                         playlist={playlist}
                         onClick={() => setSelectedPlaylist(playlist)}
-                        onDelete={() => handleDeletePlaylist(playlist)}
                     />
                 ))}
             </SortableList>

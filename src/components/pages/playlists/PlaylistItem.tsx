@@ -15,11 +15,10 @@ import { PlaylistImageGrid } from './PlaylistImageGrid';
 interface PlaylistItemProps {
     playlist: PlaylistRow;
     onClick: () => void;
-    onDelete: () => void;
 }
 
 const PlaylistItem = (props: PlaylistItemProps) => {
-    const { playlist, onClick, onDelete } = props;
+    const { playlist, onClick } = props;
     const { name, id } = playlist;
 
     const { data: songs } = useTauriQuery<
@@ -58,15 +57,6 @@ const PlaylistItem = (props: PlaylistItemProps) => {
                     </p>
                 </div>
             </div>
-            <button
-                className='opacity-0 group-hover:opacity-100 px-3 py-1 text-sm text-destructive hover:bg-destructive/10 rounded transition-opacity'
-                onClick={e => {
-                    e.stopPropagation();
-                    onDelete();
-                }}
-            >
-                Delete
-            </button>
         </SortableItem>
     );
 };
