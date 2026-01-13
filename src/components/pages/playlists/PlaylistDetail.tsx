@@ -66,6 +66,7 @@ const PlaylistDetail = (props: PlaylistDetailProps) => {
     return (
         <div className='flex flex-col gap-4 p-4'>
             <PlaylistDetailHeader
+                playlistId={id}
                 name={name}
                 onBack={onBack}
                 onAddSongs={() => setAddSongsDialogOpen(true)}

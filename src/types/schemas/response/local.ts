@@ -55,6 +55,10 @@ export const ReorderPlaylistsResponseSchema = z.null();
 export const ReorderPlaylistTracksResponseSchema = z.null();
 export const ReorderTracksResponseSchema = z.null();
 
+export const ExportSongResponseSchema = z.null();
+export const ExportLibraryResponseSchema = z.null();
+export const ExportPlaylistResponseSchema = z.null();
+
 // ===== Type exports =====
 export type Waveform = z.infer<typeof WaveformSchema>;
 export type TrackRow = z.infer<typeof TrackRowSchema>;
@@ -96,3 +100,8 @@ export type ReorderPlaylistTracksResponse = z.infer<
     typeof ReorderPlaylistTracksResponseSchema
 >;
 export type ReorderTracksResponse = z.infer<typeof ReorderTracksResponseSchema>;
+export type ExportSongResponse = z.infer<typeof ExportSongResponseSchema>;
+export type ExportLibraryResponse = z.infer<typeof ExportLibraryResponseSchema>;
+export type ExportPlaylistResponse = z.infer<
+    typeof ExportPlaylistResponseSchema
+>;

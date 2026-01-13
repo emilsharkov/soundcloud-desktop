@@ -79,10 +79,10 @@ pub async fn update_local_track_metadata(
                 // Download image bytes (reqwest works nicely here)
                 let bytes = reqwest::get(url_clone)
                     .await
-                    .map_err(|e| e.to_string())?
+                    .map_err(|e| format!("Failed to download artwork from URL: {e}"))?
                     .bytes()
                     .await
-                    .map_err(|e| e.to_string())?;
+                    .map_err(|e| format!("Failed to read artwork bytes from URL: {e}"))?;
 
                 // Try to detect MIME type from URL
                 let mime_type = detect_mime_type_from_url(&url_str);
@@ -95,8 +95,13 @@ pub async fn update_local_track_metadata(
                 });
             }
             InputType::Path(p) => {
-                let bytes = fs::read(&p).map_err(|e| e.to_string())?;
-                let mime_type = detect_mime_type_from_path(Path::new(&p));
+                // Read image bytes from local file
+                let bytes = fs::read(&p)
+                    .map_err(|e| format!("Failed to read artwork file: {e}"))?;
+                
+                // Detect MIME type from file path
+                let mime_type = detect_mime_type_from_path(&p);
+                
                 tag.add_frame(Picture {
                     mime_type,
                     picture_type: PictureType::CoverFront,

@@ -3,6 +3,7 @@ import {
     SettingsAddToPlaylist,
     SettingsDelete,
     SettingsEditMetadata,
+    SettingsExport,
 } from '@/components/Song/Settings';
 import { Song } from '@/components/Song/Song';
 import { SongSkeleton } from '@/components/Song/SongSkeleton';
@@ -47,6 +48,7 @@ const LibrarySong = (props: LibrarySongProps) => {
             <Settings trackId={id} title={title} artist={artist}>
                 <SettingsEditMetadata />
                 <SettingsAddToPlaylist />
+                <SettingsExport />
                 <SettingsDelete />
             </Settings>
         </>

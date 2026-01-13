@@ -76,6 +76,10 @@ pub fn run() {
             get_local_tracks,
             get_song_image,
             reorder_tracks_command,
+            // Export
+            export_song,
+            export_library,
+            export_playlist,
             // Playlist
             create_playlist_command,
             get_playlists_command,

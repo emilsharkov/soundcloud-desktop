@@ -13,10 +13,22 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { ArrowLeft, MoreVertical, Plus, Trash2 } from 'lucide-react';
+import { useTauriMutation } from '@/hooks/useTauriMutation';
+import {
+    ExportPlaylistQuery,
+    ExportPlaylistQuerySchema,
+} from '@/types/schemas/query';
+import {
+    ExportPlaylistResponse,
+    ExportPlaylistResponseSchema,
+} from '@/types/schemas/response';
+import { open as openDialog } from '@tauri-apps/plugin-dialog';
+import { ArrowLeft, MoreVertical, Plus } from 'lucide-react';
 import { useState } from 'react';
+import { toast } from 'sonner';
 
 interface PlaylistDetailHeaderProps {
+    playlistId: number;
     name: string;
     onBack: () => void;
     onAddSongs: () => void;
@@ -24,8 +36,22 @@ interface PlaylistDetailHeaderProps {
 }
 
 export const PlaylistDetailHeader = (props: PlaylistDetailHeaderProps) => {
-    const { name, onBack, onAddSongs, onDelete } = props;
+    const { playlistId, name, onBack, onAddSongs, onDelete } = props;
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+
+    const { mutate: exportPlaylist, isPending: isExporting } = useTauriMutation<
+        ExportPlaylistQuery,
+        ExportPlaylistResponse
+    >('export_playlist', {
+        querySchema: ExportPlaylistQuerySchema,
+        responseSchema: ExportPlaylistResponseSchema,
+        onSuccess: () => {
+            toast.success('Playlist exported successfully');
+        },
+        onError: error => {
+            toast.error(`Failed to export playlist: ${error.message}`);
+        },
+    });
 
     const handleDelete = () => {
         // Close dialog first, then delete after a small delay to allow animation
@@ -34,6 +60,19 @@ export const PlaylistDetailHeader = (props: PlaylistDetailHeaderProps) => {
         setTimeout(() => {
             onDelete();
         }, 200);
+    };
+
+    const handleExportPlaylist = async () => {
+        const folderPath = await openDialog({
+            directory: true,
+            multiple: false,
+        });
+
+        if (!folderPath) {
+            return;
+        }
+
+        exportPlaylist({ playlistId, folderPath });
     };
 
     return (
@@ -62,10 +101,15 @@ export const PlaylistDetailHeader = (props: PlaylistDetailHeaderProps) => {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align='end'>
                         <DropdownMenuItem
+                            onClick={handleExportPlaylist}
+                            disabled={isExporting}
+                        >
+                            Export Playlist
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
                             variant='destructive'
                             onClick={() => setDeleteDialogOpen(true)}
                         >
-                            <Trash2 className='w-4 h-4' />
                             Delete Playlist
                         </DropdownMenuItem>
                     </DropdownMenuContent>

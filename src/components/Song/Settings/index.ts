@@ -3,5 +3,6 @@ export { SettingsAddToPlaylist } from './SettingsAddToPlaylist';
 export { SettingsContent } from './SettingsContent';
 export { SettingsDelete } from './SettingsDelete';
 export { SettingsEditMetadata } from './SettingsEditMetadata';
+export { SettingsExport } from './SettingsExport';
 export { SettingsRemoveFromPlaylist } from './SettingsRemoveFromPlaylist';
 export { SettingsTrigger } from './SettingsTrigger';
