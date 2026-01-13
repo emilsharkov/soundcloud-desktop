@@ -1,5 +1,18 @@
 import { AudioEngine, EngineSnapshot } from '@/core/audio/AudioEngine';
 import { Repeat } from '@/core/audio/types';
+import { useMediaSession } from '@/hooks/useMediaSession';
+import { useTauriQuery } from '@/hooks/useTauriQuery';
+import {
+    GetLocalTrackQuery,
+    GetLocalTrackQuerySchema,
+    GetSongImageQuery,
+    GetSongImageQuerySchema,
+} from '@/types/schemas/query';
+import {
+    GetLocalTrackResponseSchema,
+    GetSongImageResponseSchema,
+    TrackRow,
+} from '@/types/schemas/response';
 import { isEqual } from 'lodash';
 import React, {
     createContext,
@@ -7,6 +20,7 @@ import React, {
     useCallback,
     useContext,
     useEffect,
+    useMemo,
     useRef,
     useSyncExternalStore,
 } from 'react';
@@ -90,20 +104,6 @@ export const AudioProvider = (props: AudioProviderProps): JSX.Element => {
     // Single subscription: engine unifies queue + transport
     const snap = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
 
-    useEffect(() => {
-        // Use a timeout to ensure the audio element is properly mounted
-        const timeoutId = setTimeout(() => {
-            if (audioRef.current) {
-                engineRef.current.attach(audioRef.current);
-            }
-        }, 0);
-
-        return () => {
-            clearTimeout(timeoutId);
-            engineRef.current.attach(null);
-        };
-    }, []);
-
     // Create stable command functions to avoid unnecessary re-renders
     const setTime = useCallback(
         (t: number) => engineRef.current.setTime(t),
@@ -154,6 +154,68 @@ export const AudioProvider = (props: AudioProviderProps): JSX.Element => {
         () => engineRef.current.toggleShuffle(),
         []
     );
+
+    // Fetch current track metadata for Media Session
+    const { data: currentTrack } = useTauriQuery<GetLocalTrackQuery, TrackRow>(
+        'get_local_track',
+        snap.selectedTrackId ? { id: snap.selectedTrackId } : undefined,
+        {
+            querySchema: GetLocalTrackQuerySchema,
+            responseSchema: GetLocalTrackResponseSchema,
+            enabled: snap.selectedTrackId !== null,
+        }
+    );
+
+    // Fetch artwork for Media Session
+    const { data: artwork } = useTauriQuery<GetSongImageQuery, string>(
+        'get_song_image',
+        snap.selectedTrackId ? { id: snap.selectedTrackId } : undefined,
+        {
+            querySchema: GetSongImageQuerySchema,
+            responseSchema: GetSongImageResponseSchema,
+            enabled: snap.selectedTrackId !== null,
+        }
+    );
+
+    // Prepare Media Session metadata
+    const mediaSessionMetadata = useMemo(() => {
+        if (!currentTrack || !artwork) {
+            return null;
+        }
+        return {
+            title: currentTrack.title,
+            artist: currentTrack.artist,
+            artwork: artwork,
+        };
+    }, [currentTrack, artwork]);
+
+    // Set up Media Session
+    useMediaSession({
+        metadata: mediaSessionMetadata,
+        paused: snap.paused,
+        duration: snap.duration,
+        playbackTime: snap.playbackTime,
+        actions: {
+            onPlay: () => setPaused(false),
+            onPause: () => setPaused(true),
+            onNext: () => next(),
+            onPrevious: () => prev(),
+        },
+    });
+
+    useEffect(() => {
+        // Use a timeout to ensure the audio element is properly mounted
+        const timeoutId = setTimeout(() => {
+            if (audioRef.current) {
+                engineRef.current.attach(audioRef.current);
+            }
+        }, 0);
+
+        return () => {
+            clearTimeout(timeoutId);
+            engineRef.current.attach(null);
+        };
+    }, []);
 
     const value: AudioContextType = {
         audioRef,
