@@ -8,6 +8,7 @@ import {
 import { Song } from '@/components/Song/Song';
 import { SongSkeleton } from '@/components/Song/SongSkeleton';
 import { SortableItem } from '@/components/ui/sortable-item';
+import { QueueContext } from '@/hooks/useQueueStrategy';
 import { useTauriQuery } from '@/hooks/useTauriQuery';
 import {
     GetSongImageResponse,
@@ -21,10 +22,11 @@ import {
 
 interface LibrarySongProps {
     trackRow: TrackRow;
+    queueContext?: QueueContext;
 }
 
 const LibrarySong = (props: LibrarySongProps) => {
-    const { trackRow } = props;
+    const { trackRow, queueContext } = props;
     const { id, title, artist, waveform } = trackRow;
 
     const { data: artwork, isLoading } = useTauriQuery<
@@ -64,6 +66,7 @@ const LibrarySong = (props: LibrarySongProps) => {
                 artwork={artwork}
                 waveform={waveform}
                 buttonBar={buttonBar}
+                queueContext={queueContext}
             />
         </SortableItem>
     );

@@ -45,6 +45,7 @@ const Search = () => {
 
     // Flatten all pages into a single array of tracks
     const tracks = data?.pages.flatMap(page => page.collection) ?? [];
+    const trackIds = tracks.map(track => track.id as number);
 
     const errorInfo = parseError(error);
     const isNetworkError = errorInfo?.type === 'network';
@@ -99,10 +100,21 @@ const Search = () => {
         );
     }
 
+    // Create queue context for search
+    const queueContext = {
+        tab: 'search' as const,
+        trackIds,
+        searchQuery: selectedSearch,
+    };
+
     return (
         <div className='flex flex-col gap-4 p-4'>
             {tracks.map((track: Track) => (
-                <SearchSong key={track.id} track={track} />
+                <SearchSong
+                    key={track.id}
+                    track={track}
+                    queueContext={queueContext}
+                />
             ))}
 
             {/* Load more trigger */}

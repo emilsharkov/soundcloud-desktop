@@ -8,6 +8,7 @@ import {
 import { Song } from '@/components/Song/Song';
 import { SongSkeleton } from '@/components/Song/SongSkeleton';
 import { SortableItem } from '@/components/ui/sortable-item';
+import { QueueContext } from '@/hooks/useQueueStrategy';
 import { useTauriQuery } from '@/hooks/useTauriQuery';
 import {
     GetLocalTrackResponse,
@@ -25,10 +26,11 @@ import {
 
 interface PlaylistSongProps {
     playlistSong: PlaylistSongRow;
+    queueContext?: QueueContext;
 }
 
 const PlaylistSong = (props: PlaylistSongProps) => {
-    const { playlistSong } = props;
+    const { playlistSong, queueContext } = props;
     const { track_id, title, artist, playlist_id } = playlistSong;
 
     const { data: localTrack, isLoading: isLoadingTrack } = useTauriQuery<
@@ -84,6 +86,7 @@ const PlaylistSong = (props: PlaylistSongProps) => {
                 artwork={artwork}
                 waveform={localTrack.waveform}
                 buttonBar={buttonBar}
+                queueContext={queueContext}
             />
         </SortableItem>
     );

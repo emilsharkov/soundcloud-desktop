@@ -152,6 +152,11 @@ export class PlayerQueue {
             this.emit();
             return;
         }
+        if (this.currentIndex === 0) {
+            this.currentIndex = ord.length - 1;
+            this.emit();
+            return;
+        }
         if (this.repeat === 'songs') {
             this.currentIndex = ord[ord.length - 1];
             this.emit();

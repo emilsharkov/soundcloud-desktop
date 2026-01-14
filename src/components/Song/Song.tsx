@@ -1,3 +1,4 @@
+import { QueueContext, useQueueStrategy } from '@/hooks/useQueueStrategy';
 import { useAudio } from '@/providers/AudioProvider';
 import { PauseIcon, PlayIcon } from 'lucide-react';
 import { Waveform } from './Waveform';
@@ -9,11 +10,21 @@ export interface SongProps {
     artwork: string;
     waveform: Waveform;
     buttonBar?: React.ReactNode;
+    queueContext?: QueueContext;
 }
 
 const Song = (props: SongProps) => {
-    const { trackId, title, artist, artwork, waveform, buttonBar } = props;
-    const { paused, selectedTrackId, setPaused, setQueue } = useAudio();
+    const {
+        trackId,
+        title,
+        artist,
+        artwork,
+        waveform,
+        buttonBar,
+        queueContext,
+    } = props;
+    const { paused, selectedTrackId, setPaused } = useAudio();
+    const { playTrack } = useQueueStrategy(queueContext);
 
     const isCurrentTrack = selectedTrackId === trackId;
     const isPlaying = !paused && isCurrentTrack;
@@ -23,7 +34,7 @@ const Song = (props: SongProps) => {
         if (isCurrentTrack) {
             setPaused(!paused);
         } else {
-            setQueue([trackId]);
+            playTrack(trackId);
         }
     };
 

@@ -117,9 +117,19 @@ const Library = () => {
                 }}
                 emptyMessage='No tracks in library'
             >
-                {tracks?.map((trackRow: TrackRow) => (
-                    <LibrarySong key={trackRow.id} trackRow={trackRow} />
-                ))}
+                {tracks?.map((trackRow: TrackRow) => {
+                    const queueContext = {
+                        tab: 'library' as const,
+                        trackIds: tracks.map(t => t.id),
+                    };
+                    return (
+                        <LibrarySong
+                            key={trackRow.id}
+                            trackRow={trackRow}
+                            queueContext={queueContext}
+                        />
+                    );
+                })}
             </SortableList>
         </div>
     );

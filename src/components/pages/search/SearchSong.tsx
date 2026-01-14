@@ -1,6 +1,7 @@
 import { Download } from '@/components/Song/Download';
 import { Song } from '@/components/Song/Song';
 import { SongSkeleton } from '@/components/Song/SongSkeleton';
+import { QueueContext } from '@/hooks/useQueueStrategy';
 import { useTauriQuery } from '@/hooks/useTauriQuery';
 import { Track, Waveform, WaveformSchema } from '@/types/schemas';
 import {
@@ -10,10 +11,11 @@ import {
 
 interface SearchSongProps {
     track: Track;
+    queueContext?: QueueContext;
 }
 
 const SearchSong = (props: SearchSongProps) => {
-    const { track } = props;
+    const { track, queueContext } = props;
     const { id: trackId, title, user, artwork_url } = track;
     const id = trackId as number;
 
@@ -44,6 +46,7 @@ const SearchSong = (props: SearchSongProps) => {
             artwork={artwork_url as string}
             waveform={waveform}
             buttonBar={buttonBar}
+            queueContext={queueContext}
         />
     );
 };

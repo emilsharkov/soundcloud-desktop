@@ -84,9 +84,19 @@ const PlaylistDetail = (props: PlaylistDetailProps) => {
                 className='flex flex-col gap-4'
                 emptyMessage='This playlist is empty'
             >
-                {songs?.map(song => (
-                    <PlaylistSong key={song.id} playlistSong={song} />
-                ))}
+                {songs?.map(song => {
+                    const queueContext = {
+                        tab: 'playlists' as const,
+                        trackIds: songs.map(s => s.track_id),
+                    };
+                    return (
+                        <PlaylistSong
+                            key={song.id}
+                            playlistSong={song}
+                            queueContext={queueContext}
+                        />
+                    );
+                })}
             </SortableList>
 
             <AddSongsDialog

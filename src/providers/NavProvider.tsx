@@ -6,6 +6,10 @@ export type NavContextType = {
     setSelectedTab: (tab: Tab) => void;
     selectedSearch: string | undefined;
     setSelectedSearch: (search: string | undefined) => void;
+    lastQueuedTab: Tab | null;
+    setLastQueuedTab: (tab: Tab | null) => void;
+    lastQueuedSearch: string | undefined;
+    setLastQueuedSearch: (search: string | undefined) => void;
 };
 
 const NavContext = createContext<NavContextType>({
@@ -13,6 +17,10 @@ const NavContext = createContext<NavContextType>({
     setSelectedTab: () => {},
     selectedSearch: undefined,
     setSelectedSearch: () => {},
+    lastQueuedTab: null,
+    setLastQueuedTab: () => {},
+    lastQueuedSearch: undefined,
+    setLastQueuedSearch: () => {},
 });
 
 export const useNav = () => {
@@ -29,12 +37,20 @@ export const NavProvider = (props: NavProviderProps) => {
     const [selectedSearch, setSelectedSearch] = useState<string | undefined>(
         undefined
     );
+    const [lastQueuedTab, setLastQueuedTab] = useState<Tab | null>(null);
+    const [lastQueuedSearch, setLastQueuedSearch] = useState<
+        string | undefined
+    >(undefined);
 
     const contextValue: NavContextType = {
         selectedTab,
         setSelectedTab,
         selectedSearch,
         setSelectedSearch,
+        lastQueuedTab,
+        setLastQueuedTab,
+        lastQueuedSearch,
+        setLastQueuedSearch,
     };
 
     return (

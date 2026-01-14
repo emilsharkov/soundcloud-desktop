@@ -7,7 +7,7 @@ interface SkipProps {
 
 const Skip = (props: SkipProps) => {
     const { direction } = props;
-    const { selectedTrackId } = useAudio();
+    const { selectedTrackId, next, prev } = useAudio();
     const Icon = direction === 'forward' ? SkipForward : SkipBack;
 
     return (
@@ -16,6 +16,13 @@ const Skip = (props: SkipProps) => {
             style={{
                 cursor: selectedTrackId === null ? 'not-allowed' : 'pointer',
                 opacity: selectedTrackId === null ? 0.5 : 1,
+            }}
+            onClick={() => {
+                if (direction === 'forward') {
+                    next();
+                } else {
+                    prev();
+                }
             }}
         />
     );
