@@ -19,6 +19,8 @@ const SearchSong = (props: SearchSongProps) => {
     const { id: trackId, title, user, artwork_url } = track;
     const id = trackId as number;
 
+    const biggerArtwork = artwork_url?.replace('large', 't1080x1080');
+
     const { data: waveform, isLoading } = useTauriQuery<
         GetTrackWaveformQuery,
         Waveform
@@ -43,7 +45,8 @@ const SearchSong = (props: SearchSongProps) => {
             trackId={id}
             title={title as string}
             artist={user?.username as string}
-            artwork={artwork_url as string}
+            artwork={biggerArtwork!}
+            fallbackArtwork={artwork_url || undefined}
             waveform={waveform}
             buttonBar={buttonBar}
             queueContext={queueContext}

@@ -1,6 +1,6 @@
 use id3::{Tag, TagLike};
 use std::fs;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 /// Sanitizes a filename or folder name by replacing invalid filesystem characters with underscores.
 ///
@@ -29,7 +29,7 @@ pub fn sanitize_folder_name(name: &str) -> String {
 ///
 /// # Returns
 /// A filename string with `.mp3` extension
-pub fn get_export_filename(source_path: &PathBuf, id: u64) -> String {
+pub fn get_export_filename(source_path: &Path, id: u64) -> String {
     // Try to read title from ID3 metadata
     if let Ok(tag) = Tag::read_from_path(source_path) {
         if let Some(title) = tag.title() {
@@ -56,8 +56,8 @@ pub fn get_export_filename(source_path: &PathBuf, id: u64) -> String {
 /// `Ok(())` if successful, or an error message
 pub fn export_tracks(
     track_ids: &[u64],
-    music_dir: &PathBuf,
-    base_folder_path: &PathBuf,
+    music_dir: &Path,
+    base_folder_path: &Path,
     subfolder_name: Option<&str>,
 ) -> Result<(), String> {
     if track_ids.is_empty() {
@@ -69,7 +69,7 @@ pub fn export_tracks(
         let sanitized_name = sanitize_folder_name(subfolder);
         base_folder_path.join(sanitized_name)
     } else {
-        base_folder_path.clone()
+        base_folder_path.to_path_buf()
     };
 
     // Create the export folder if it doesn't exist

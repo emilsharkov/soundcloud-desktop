@@ -1,6 +1,7 @@
 import { QueueContext, useQueueStrategy } from '@/hooks/useQueueStrategy';
 import { useAudio } from '@/providers/AudioProvider';
 import { PauseIcon, PlayIcon } from 'lucide-react';
+import { useState } from 'react';
 import { Waveform } from './Waveform';
 
 export interface SongProps {
@@ -11,6 +12,7 @@ export interface SongProps {
     waveform: Waveform;
     buttonBar?: React.ReactNode;
     queueContext?: QueueContext;
+    fallbackArtwork?: string;
 }
 
 const Song = (props: SongProps) => {
@@ -22,9 +24,11 @@ const Song = (props: SongProps) => {
         waveform,
         buttonBar,
         queueContext,
+        fallbackArtwork,
     } = props;
     const { paused, selectedTrackId, setPaused } = useAudio();
     const { playTrack } = useQueueStrategy(queueContext);
+    const [imageError, setImageError] = useState(false);
 
     const isCurrentTrack = selectedTrackId === trackId;
     const isPlaying = !paused && isCurrentTrack;
@@ -38,13 +42,23 @@ const Song = (props: SongProps) => {
         }
     };
 
+    const handleImageError = () => {
+        if (fallbackArtwork && !imageError) {
+            setImageError(true);
+        }
+    };
+
+    const currentArtwork =
+        imageError && fallbackArtwork ? fallbackArtwork : artwork;
+
     return (
         <div className='flex flex-row w-full items-center gap-4'>
             <div className='relative group'>
                 <img
                     className='size-[125px] min-w-[125px] min-h-[125px] aspect-square rounded-lg object-cover'
-                    src={artwork}
+                    src={currentArtwork}
                     alt={`${title} artwork`}
+                    onError={handleImageError}
                 />
                 <button
                     className='absolute inset-0 m-auto w-12 h-12 bg-white/90 hover:bg-white rounded-full opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all duration-200 shadow-lg hover:shadow-xl'
