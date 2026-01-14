@@ -1,9 +1,9 @@
+use id3::{Tag, TagLike};
 use std::fs;
 use std::path::PathBuf;
-use id3::{Tag, TagLike};
 
 /// Sanitizes a filename or folder name by replacing invalid filesystem characters with underscores.
-/// 
+///
 /// Invalid characters: `<`, `>`, `:`, `"`, `/`, `\`, `|`, `?`, `*`
 pub fn sanitize_filename(name: &str) -> String {
     name.chars()
@@ -22,11 +22,11 @@ pub fn sanitize_folder_name(name: &str) -> String {
 
 /// Gets the export filename for a track, using the title from ID3 metadata if available,
 /// otherwise falling back to the track ID.
-/// 
+///
 /// # Arguments
 /// * `source_path` - Path to the source MP3 file
 /// * `id` - Track ID to use as fallback if no title is found
-/// 
+///
 /// # Returns
 /// A filename string with `.mp3` extension
 pub fn get_export_filename(source_path: &PathBuf, id: u64) -> String {
@@ -39,19 +39,19 @@ pub fn get_export_filename(source_path: &PathBuf, id: u64) -> String {
             }
         }
     }
-    
+
     // Fall back to track ID if no title found
     format!("{}.mp3", id)
 }
 
 /// Exports tracks to a destination folder.
-/// 
+///
 /// # Arguments
 /// * `track_ids` - Array of track IDs to export
 /// * `music_dir` - Path to the music directory containing the source files
 /// * `base_folder_path` - Base folder path where exports should be placed
 /// * `subfolder_name` - Optional subfolder name to create (e.g., playlist name or "library")
-/// 
+///
 /// # Returns
 /// `Ok(())` if successful, or an error message
 pub fn export_tracks(
@@ -79,16 +79,13 @@ pub fn export_tracks(
     // Copy all track files
     for &track_id in track_ids {
         let source_path = music_dir.join(track_id.to_string()).with_extension("mp3");
-        
+
         if source_path.exists() {
             // Get filename from metadata or fall back to track ID
             let file_name = get_export_filename(&source_path, track_id);
-            
-            fs::copy(
-                &source_path,
-                export_folder.join(&file_name),
-            )
-            .map_err(|e| format!("Failed to copy file {}: {e}", source_path.display()))?;
+
+            fs::copy(&source_path, export_folder.join(&file_name))
+                .map_err(|e| format!("Failed to copy file {}: {e}", source_path.display()))?;
         }
     }
 

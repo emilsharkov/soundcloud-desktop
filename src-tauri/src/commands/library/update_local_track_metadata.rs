@@ -96,12 +96,12 @@ pub async fn update_local_track_metadata(
             }
             InputType::Path(p) => {
                 // Read image bytes from local file
-                let bytes = fs::read(&p)
-                    .map_err(|e| format!("Failed to read artwork file: {e}"))?;
-                
+                let bytes =
+                    fs::read(&p).map_err(|e| format!("Failed to read artwork file: {e}"))?;
+
                 // Detect MIME type from file path
                 let mime_type = detect_mime_type_from_path(&p);
-                
+
                 tag.add_frame(Picture {
                     mime_type,
                     picture_type: PictureType::CoverFront,

@@ -15,13 +15,13 @@ pub async fn export_playlist(
     folder_path: String,
 ) -> Result<(), String> {
     let pool = state.lock().unwrap().db_pool.clone();
-    
+
     // Get playlist to get the name
     let playlist = get_playlist(&pool, playlist_id)
         .await
         .map_err(|e| format!("Failed to get playlist: {e}"))?
         .ok_or("Playlist not found")?;
-    
+
     let playlist_songs = get_playlist_songs(&pool, playlist_id)
         .await
         .map_err(|e| format!("Failed to get playlist songs: {e}"))?;
@@ -34,7 +34,7 @@ pub async fn export_playlist(
 
     // Convert folder path string to PathBuf
     let folder_path_buf = PathBuf::from(folder_path);
-    
+
     // Extract track IDs from playlist songs
     let track_ids: Vec<u64> = playlist_songs.iter().map(|song| song.track_id).collect();
 

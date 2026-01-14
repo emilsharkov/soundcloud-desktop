@@ -2,10 +2,7 @@ use std::path::PathBuf;
 use std::sync::Mutex;
 use tauri::State;
 
-use crate::{
-    models::app_state::AppState,
-    utils::export::export_tracks,
-};
+use crate::{models::app_state::AppState, utils::export::export_tracks};
 
 #[tauri::command]
 pub async fn export_song(
@@ -24,12 +21,7 @@ pub async fn export_song(
     let folder_path_buf = PathBuf::from(folder_path);
 
     // Export the single track (no subfolder)
-    export_tracks(
-        &[id as u64],
-        &music_dir,
-        &folder_path_buf,
-        None,
-    )?;
+    export_tracks(&[id as u64], &music_dir, &folder_path_buf, None)?;
 
     Ok(())
 }
