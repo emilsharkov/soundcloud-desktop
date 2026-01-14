@@ -4,15 +4,15 @@ use crate::{
     db::queries::create_track,
     models::app_state::AppState,
 };
+use reqwest::Client;
 use soundcloud_rs::Identifier;
 use std::sync::Mutex;
 use tauri::State;
-use reqwest::Client;
 
 /// Tries to use bigger artwork (t1080x1080) if available, falls back to original artwork URL
 async fn get_best_artwork_url(artwork_url: &str) -> String {
     let bigger_artwork = artwork_url.replace("large", "t1080x1080");
-    
+
     if bigger_artwork != artwork_url {
         // Check if the bigger artwork URL exists
         let client = Client::new();
@@ -82,9 +82,9 @@ pub async fn download_track(state: State<'_, Mutex<AppState>>, id: i64) -> Resul
         .as_ref()
         .ok_or("Failed to get artwork url")?
         .to_string();
-    
+
     let final_artwork = get_best_artwork_url(&artwork_url).await;
-    
+
     update_local_track_metadata(
         state.clone(),
         id,

@@ -1,6 +1,6 @@
 use id3::{Tag, TagLike};
 use std::fs;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 /// Sanitizes a filename or folder name by replacing invalid filesystem characters with underscores.
 ///
