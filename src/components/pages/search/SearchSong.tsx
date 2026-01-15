@@ -8,6 +8,8 @@ import {
     GetTrackWaveformQuery,
     GetTrackWaveformQuerySchema,
 } from '@/types/schemas/query';
+import { getArtwork } from '@/utils/getArtwork';
+import { useQuery } from '@tanstack/react-query';
 
 interface SearchSongProps {
     track: Track;
@@ -19,9 +21,12 @@ const SearchSong = (props: SearchSongProps) => {
     const { id: trackId, title, user, artwork_url } = track;
     const id = trackId as number;
 
-    const biggerArtwork = artwork_url?.replace('large', 't1080x1080');
+    const { data: artwork, isLoading: isArtworkLoading } = useQuery({
+        queryKey: ['artwork', trackId],
+        queryFn: () => getArtwork(artwork_url),
+    });
 
-    const { data: waveform, isLoading } = useTauriQuery<
+    const { data: waveform, isLoading: isWaveformLoading } = useTauriQuery<
         GetTrackWaveformQuery,
         Waveform
     >(
@@ -33,7 +38,12 @@ const SearchSong = (props: SearchSongProps) => {
         }
     );
 
-    if (isLoading || !waveform) {
+    if (
+        isArtworkLoading ||
+        isWaveformLoading ||
+        waveform === undefined ||
+        artwork === undefined
+    ) {
         return <SongSkeleton />;
     }
 
@@ -45,8 +55,7 @@ const SearchSong = (props: SearchSongProps) => {
             trackId={id}
             title={title as string}
             artist={user?.username as string}
-            artwork={biggerArtwork!}
-            fallbackArtwork={artwork_url || undefined}
+            artwork={artwork}
             waveform={waveform}
             buttonBar={buttonBar}
             queueContext={queueContext}

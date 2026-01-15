@@ -3,24 +3,19 @@ import { Repeat } from '@/core/audio/types';
 import { useMediaSession } from '@/hooks/useMediaSession';
 import { useTauriQuery } from '@/hooks/useTauriQuery';
 import {
-    GetLocalTrackQuery,
-    GetLocalTrackQuerySchema,
-    GetSongImageQuery,
-    GetSongImageQuerySchema,
+    GetTrackMediaMetadataQuery,
+    GetTrackMediaMetadataQuerySchema,
 } from '@/types/schemas/query';
 import {
-    GetLocalTrackResponseSchema,
-    GetSongImageResponseSchema,
-    TrackRow,
+    TrackMediaMetadata,
+    TrackMediaMetadataSchema,
 } from '@/types/schemas/response';
 import { isEqual } from 'lodash';
 import React, {
     createContext,
-    JSX,
     useCallback,
     useContext,
     useEffect,
-    useMemo,
     useRef,
     useSyncExternalStore,
 } from 'react';
@@ -42,6 +37,7 @@ export interface AudioContextType {
     shuffled: boolean;
     repeat: Repeat;
     selectedTrackId: number | null;
+    trackMediaMetadata: TrackMediaMetadata | null;
 
     /** Transport commands */
     setTime: (time: number) => void;
@@ -76,7 +72,7 @@ export interface AudioProviderProps {
     children: React.ReactNode;
 }
 
-export const AudioProvider = (props: AudioProviderProps): JSX.Element => {
+export const AudioProvider = (props: AudioProviderProps): React.ReactNode => {
     const { children } = props;
     const audioRef = useRef<HTMLAudioElement | null>(null);
     const engineRef = useRef<AudioEngine>(new AudioEngine());
@@ -156,42 +152,22 @@ export const AudioProvider = (props: AudioProviderProps): JSX.Element => {
     );
 
     // Fetch current track metadata for Media Session
-    const { data: currentTrack } = useTauriQuery<GetLocalTrackQuery, TrackRow>(
-        'get_local_track',
-        snap.selectedTrackId ? { id: snap.selectedTrackId } : undefined,
+    const { data: trackMediaMetadata } = useTauriQuery<
+        GetTrackMediaMetadataQuery,
+        TrackMediaMetadata
+    >(
+        'get_track_media_metadata',
+        { id: snap.selectedTrackId! },
         {
-            querySchema: GetLocalTrackQuerySchema,
-            responseSchema: GetLocalTrackResponseSchema,
+            querySchema: GetTrackMediaMetadataQuerySchema,
+            responseSchema: TrackMediaMetadataSchema,
             enabled: snap.selectedTrackId !== null,
         }
     );
-
-    // Fetch artwork for Media Session
-    const { data: artwork } = useTauriQuery<GetSongImageQuery, string>(
-        'get_song_image',
-        snap.selectedTrackId ? { id: snap.selectedTrackId } : undefined,
-        {
-            querySchema: GetSongImageQuerySchema,
-            responseSchema: GetSongImageResponseSchema,
-            enabled: snap.selectedTrackId !== null,
-        }
-    );
-
-    // Prepare Media Session metadata
-    const mediaSessionMetadata = useMemo(() => {
-        if (!currentTrack || !artwork) {
-            return null;
-        }
-        return {
-            title: currentTrack.title,
-            artist: currentTrack.artist,
-            artwork: artwork,
-        };
-    }, [currentTrack, artwork]);
 
     // Set up Media Session
     useMediaSession({
-        metadata: mediaSessionMetadata,
+        metadata: trackMediaMetadata,
         paused: snap.paused,
         duration: snap.duration,
         playbackTime: snap.playbackTime,
@@ -233,6 +209,7 @@ export const AudioProvider = (props: AudioProviderProps): JSX.Element => {
         shuffled: snap.shuffled,
         repeat: snap.repeat,
         selectedTrackId: snap.selectedTrackId,
+        trackMediaMetadata: trackMediaMetadata ?? null,
 
         // transport commands
         setTime,

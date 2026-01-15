@@ -1,33 +1,19 @@
 use crate::{
-    commands::update_local_track_metadata,
-    commands::utils::{format_error_with_context, handle_error},
+    commands::{update_local_track_metadata, utils::{check_offline_mode, format_error_with_context, handle_error}},
     db::queries::create_track,
-    models::app_state::AppState,
+    models::app_state::AppState, utils::get_artwork,
 };
-use reqwest::Client;
 use soundcloud_rs::Identifier;
 use std::sync::Mutex;
 use tauri::State;
 
-/// Tries to use bigger artwork (t1080x1080) if available, falls back to original artwork URL
-async fn get_best_artwork_url(artwork_url: &str) -> String {
-    let bigger_artwork = artwork_url.replace("large", "t1080x1080");
 
-    if bigger_artwork != artwork_url {
-        // Check if the bigger artwork URL exists
-        let client = Client::new();
-        let response = client.head(&bigger_artwork).send().await;
-        match response {
-            Ok(resp) if resp.status().is_success() => bigger_artwork,
-            _ => artwork_url.to_string(), // Fall back to original if bigger doesn't exist
-        }
-    } else {
-        artwork_url.to_string() // No replacement happened, use original
-    }
-}
 
 #[tauri::command]
 pub async fn download_track(state: State<'_, Mutex<AppState>>, id: i64) -> Result<(), String> {
+    check_offline_mode(&state)
+    .map_err(|e| format_error_with_context("App is in offline mode", e))?;
+
     let soundcloud_client = state.lock().unwrap().soundcloud_client.clone();
     let app_data_dir = state.lock().unwrap().app_data_dir.clone();
     let music_dir = app_data_dir.join("music");
@@ -83,7 +69,7 @@ pub async fn download_track(state: State<'_, Mutex<AppState>>, id: i64) -> Resul
         .ok_or("Failed to get artwork url")?
         .to_string();
 
-    let final_artwork = get_best_artwork_url(&artwork_url).await;
+    let final_artwork = get_artwork(&artwork_url).await;
 
     update_local_track_metadata(
         state.clone(),

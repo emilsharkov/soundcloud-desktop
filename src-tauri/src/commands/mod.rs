@@ -1,4 +1,6 @@
 pub mod download;
+pub mod get_song_image;
+pub mod get_track_media_metadata;
 pub mod library;
 pub mod media;
 pub mod offline;
@@ -10,3 +12,5 @@ pub use library::*;
 pub use media::*;
 pub use offline::*;
 pub use search::*;
+pub use get_song_image::*;
+pub use get_track_media_metadata::*;

@@ -64,6 +64,7 @@ pub fn run() {
             // Track
             get_stream_url,
             get_track_waveform,
+            get_track,
             download_track,
             // Download
             download_playlist,
@@ -74,7 +75,6 @@ pub fn run() {
             delete_local_track,
             get_local_track,
             get_local_tracks,
-            get_song_image,
             reorder_tracks_command,
             // Export
             export_song,
@@ -95,6 +95,9 @@ pub fn run() {
             get_offline_mode,
             set_offline_mode,
             test_connectivity,
+            // Media
+            get_song_image,
+            get_track_media_metadata,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

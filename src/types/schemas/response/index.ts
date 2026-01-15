@@ -2,6 +2,7 @@
 export * from './all';
 export * from './errors';
 export * from './local';
+export * from './media';
 export * from './playlists';
 export * from './search';
 export * from './tracks';

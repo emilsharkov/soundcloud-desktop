@@ -1,3 +1,4 @@
+import { TrackMediaMetadata } from '@/types/schemas';
 import { useEffect, useRef } from 'react';
 
 export interface MediaSessionMetadata {
@@ -14,7 +15,7 @@ export interface MediaSessionActions {
 }
 
 export interface UseMediaSessionOptions {
-    metadata: MediaSessionMetadata | null;
+    metadata: TrackMediaMetadata | undefined;
     paused: boolean;
     duration: number;
     playbackTime: number;

@@ -94,29 +94,42 @@ const Navbar = () => {
                         <Search className='absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-tertiary pointer-events-none' />
                     </div>
                 </PopoverAnchor>
-                <PopoverContent
-                    onOpenAutoFocus={e => e.preventDefault()}
-                    onCloseAutoFocus={e => e.preventDefault()}
-                >
-                    <div className='w-full bg-white rounded-lg flex flex-col'>
-                        {searchResults?.collection.map(
-                            (searchResult: SearchResult, idx: number) => {
-                                const { output } = searchResult;
-                                return (
-                                    <div
-                                        key={idx}
-                                        className='px-3 py-1 text-black'
-                                        onClick={() =>
-                                            selectSearchResult(searchResult)
-                                        }
-                                    >
-                                        {output}
-                                    </div>
-                                );
-                            }
-                        )}
-                    </div>
-                </PopoverContent>
+                {searchResults !== undefined ? (
+                    <PopoverContent
+                        onOpenAutoFocus={e => e.preventDefault()}
+                        onCloseAutoFocus={e => e.preventDefault()}
+                    >
+                        <div className='w-full bg-white rounded-lg flex flex-col'>
+                            {searchResults.collection.length === 0 ? (
+                                <div className='text-black text-center'>
+                                    No results found
+                                </div>
+                            ) : (
+                                searchResults.collection.map(
+                                    (
+                                        searchResult: SearchResult,
+                                        idx: number
+                                    ) => {
+                                        const { output } = searchResult;
+                                        return (
+                                            <div
+                                                key={idx}
+                                                className='px-3 py-1 text-black'
+                                                onClick={() =>
+                                                    selectSearchResult(
+                                                        searchResult
+                                                    )
+                                                }
+                                            >
+                                                {output}
+                                            </div>
+                                        );
+                                    }
+                                )
+                            )}
+                        </div>
+                    </PopoverContent>
+                ) : null}
             </Popover>
         </NavigationMenu>
     );
