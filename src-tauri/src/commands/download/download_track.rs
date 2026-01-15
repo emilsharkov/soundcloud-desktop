@@ -1,18 +1,20 @@
 use crate::{
-    commands::{update_local_track_metadata, utils::{check_offline_mode, format_error_with_context, handle_error}},
+    commands::{
+        update_local_track_metadata,
+        utils::{check_offline_mode, format_error_with_context, handle_error},
+    },
     db::queries::create_track,
-    models::app_state::AppState, utils::get_artwork,
+    models::app_state::AppState,
+    utils::get_artwork,
 };
 use soundcloud_rs::Identifier;
 use std::sync::Mutex;
 use tauri::State;
 
-
-
 #[tauri::command]
 pub async fn download_track(state: State<'_, Mutex<AppState>>, id: i64) -> Result<(), String> {
     check_offline_mode(&state)
-    .map_err(|e| format_error_with_context("App is in offline mode", e))?;
+        .map_err(|e| format_error_with_context("App is in offline mode", e))?;
 
     let soundcloud_client = state.lock().unwrap().soundcloud_client.clone();
     let app_data_dir = state.lock().unwrap().app_data_dir.clone();

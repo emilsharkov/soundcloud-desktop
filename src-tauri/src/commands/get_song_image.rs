@@ -1,4 +1,11 @@
-use crate::{commands::{get_local_track, utils::{check_offline_mode, format_error_with_context, handle_error}}, models::app_state::AppState, utils::get_artwork};
+use crate::{
+    commands::{
+        get_local_track,
+        utils::{check_offline_mode, format_error_with_context, handle_error},
+    },
+    models::app_state::AppState,
+    utils::get_artwork,
+};
 use base64::Engine as _;
 use id3::Tag;
 use soundcloud_rs::{Identifier, Track};
@@ -9,9 +16,9 @@ use tauri::State;
 pub async fn get_song_image(state: State<'_, Mutex<AppState>>, id: i64) -> Result<String, String> {
     let local_track = get_local_track(state.clone(), id).await.ok();
 
-    if let Some(_) = local_track {
+    if local_track.is_some() {
         let music_dir = state.lock().unwrap().app_data_dir.clone().join("music");
-        return get_image_from_local_track(music_dir, id).await;
+        get_image_from_local_track(music_dir, id).await
     } else {
         check_offline_mode(&state)
             .map_err(|e| format_error_with_context("App is in offline mode", e))?;
@@ -43,7 +50,10 @@ async fn get_image_from_local_track(music_dir: PathBuf, id: i64) -> Result<Strin
 }
 
 async fn get_image_from_online_track(track: &Track) -> Result<String, String> {
-    let artwork_url = track.artwork_url.as_ref().ok_or("Failed to get artwork url")?;
+    let artwork_url = track
+        .artwork_url
+        .as_ref()
+        .ok_or("Failed to get artwork url")?;
     let artwork = get_artwork(artwork_url).await;
     Ok(artwork)
 }

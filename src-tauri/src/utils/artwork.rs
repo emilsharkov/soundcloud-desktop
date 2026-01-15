@@ -1,6 +1,5 @@
 use reqwest::Client;
 
-
 /// Tries to use bigger artwork (t1080x1080) if available, falls back to original artwork URL
 pub async fn get_artwork(artwork_url: &str) -> String {
     let bigger_artwork = artwork_url.replace("large", "t1080x1080");

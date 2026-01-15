@@ -9,7 +9,7 @@ use tauri::State;
 #[tauri::command]
 pub async fn download_playlist(state: State<'_, Mutex<AppState>>, id: i64) -> Result<(), String> {
     check_offline_mode(&state)
-    .map_err(|e| format_error_with_context("App is in offline mode", e))?;
+        .map_err(|e| format_error_with_context("App is in offline mode", e))?;
 
     let soundcloud_client = state.lock().unwrap().soundcloud_client.clone();
     let client = soundcloud_client

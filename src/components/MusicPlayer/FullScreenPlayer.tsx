@@ -25,25 +25,28 @@ interface FullScreenPlayerProps {
 const DraggableContainer = ({
     artwork,
     onClose,
-    position,
+    percentageCompleted,
+    width,
     waveform,
 }: {
     artwork?: string;
     onClose: () => void;
-    position: number;
+    width: number;
+    percentageCompleted: number;
     waveform: Waveform;
 }) => {
     const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
         id: 'fullscreen-player',
     });
+    const { ref, samples } = useWaveform(waveform);
+    const sampleIndex = Math.floor(percentageCompleted * (samples.length - 1));
+    const position = Math.floor(percentageCompleted * width * -1);
 
     const style = {
         backgroundImage: `url(${artwork})`,
         width: '200vw',
         transform: `translate3d(${position}px, 0, 0)`,
     };
-
-    const { ref, samples } = useWaveform(waveform);
 
     return (
         <div
@@ -66,7 +69,10 @@ const DraggableContainer = ({
                                 className='w-[2px]'
                                 style={{
                                     height: `${sample}px`,
-                                    backgroundColor: 'orange',
+                                    backgroundColor:
+                                        sampleIndex >= index
+                                            ? 'orange'
+                                            : 'white',
                                 }}
                             />
                         );
@@ -79,13 +85,24 @@ const DraggableContainer = ({
 
 const FullScreenPlayer = (props: FullScreenPlayerProps): React.ReactNode => {
     const { isOpen, onClose } = props;
-    const { trackMediaMetadata, selectedTrackId } = useAudio();
+    const {
+        trackMediaMetadata,
+        selectedTrackId,
+        playbackTime,
+        duration,
+        setTime,
+    } = useAudio();
     const { artwork } = trackMediaMetadata ?? {};
     const [position, setPosition] = useState(0);
     const [viewportWidth, setViewportWidth] = useState(
         typeof window !== 'undefined' ? window.innerWidth : 0
     );
     const dragStartPosition = useRef(0);
+    const [dragging, setDragging] = useState<boolean>(false);
+
+    const percentageCompleted = dragging
+        ? position / -viewportWidth
+        : playbackTime / duration;
 
     const { data: waveform, isLoading: isWaveformLoading } = useTauriQuery<
         GetTrackWaveformQuery,
@@ -128,16 +145,24 @@ const FullScreenPlayer = (props: FullScreenPlayerProps): React.ReactNode => {
 
     const handleDragStart = () => {
         dragStartPosition.current = position;
+        setDragging(true);
     };
 
     const handleDragMove = (event: DragMoveEvent) => {
         const nextPosition = dragStartPosition.current + event.delta.x;
         setPosition(Math.min(maxPosition, Math.max(minPosition, nextPosition)));
+        setDragging(true);
     };
 
     const handleDragEnd = (event: DragEndEvent) => {
         const nextPosition = dragStartPosition.current + event.delta.x;
-        setPosition(Math.min(maxPosition, Math.max(minPosition, nextPosition)));
+        const newPosition = Math.min(
+            maxPosition,
+            Math.max(minPosition, nextPosition)
+        );
+        setPosition(newPosition);
+        setTime((newPosition / -viewportWidth) * duration);
+        setDragging(false);
     };
 
     if (isWaveformLoading || waveform === undefined) {
@@ -157,8 +182,9 @@ const FullScreenPlayer = (props: FullScreenPlayerProps): React.ReactNode => {
                     <DraggableContainer
                         artwork={artwork}
                         onClose={onClose}
-                        position={position}
                         waveform={waveform}
+                        percentageCompleted={percentageCompleted}
+                        width={viewportWidth}
                     />
                 </DndContext>
             ) : null}

@@ -7,10 +7,7 @@ use std::sync::Mutex;
 use tauri::State;
 
 #[tauri::command]
-pub async fn get_track(
-    state: State<'_, Mutex<AppState>>,
-    id: i64,
-) -> Result<Track, String> {
+pub async fn get_track(state: State<'_, Mutex<AppState>>, id: i64) -> Result<Track, String> {
     check_offline_mode(&state)
         .map_err(|e| format_error_with_context("App is in offline mode", e))?;
 
@@ -19,12 +16,9 @@ pub async fn get_track(
         .as_ref()
         .as_ref()
         .ok_or("SoundCloud client is not available")?;
-    let track = client
-        .get_track(&Identifier::Id(id))
-        .await
-        .map_err(|e| {
-            let app_error = handle_error(&state, &e);
-            format_error_with_context("Failed to get track", app_error)
-        })?;
+    let track = client.get_track(&Identifier::Id(id)).await.map_err(|e| {
+        let app_error = handle_error(&state, &e);
+        format_error_with_context("Failed to get track", app_error)
+    })?;
     Ok(track)
 }

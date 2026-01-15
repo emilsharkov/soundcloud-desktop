@@ -8,9 +8,9 @@ pub mod search;
 pub mod utils;
 
 pub use download::*;
+pub use get_song_image::*;
+pub use get_track_media_metadata::*;
 pub use library::*;
 pub use media::*;
 pub use offline::*;
 pub use search::*;
-pub use get_song_image::*;
-pub use get_track_media_metadata::*;
