@@ -1,3 +1,4 @@
+import { useTrackWaveform } from '@/hooks/useTrackWaveform';
 import { useAudio } from '@/providers/AudioProvider';
 import {
     DndContext,
@@ -7,7 +8,6 @@ import {
 } from '@dnd-kit/core';
 import { FullscreenPlayerStage } from './FullscreenPlayerStage';
 import { useFullscreenDrag } from './hooks/useFullscreenDrag';
-import { useTrackWaveform } from './hooks/useTrackWaveform';
 import { useViewportWidth } from './hooks/useViewportWidth';
 
 interface FullscreenPlayerProps {

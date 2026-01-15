@@ -1,18 +1,18 @@
 import { useTauriQuery } from '@/hooks/useTauriQuery';
+import { Waveform, WaveformSchema } from '@/types/schemas';
 import {
     GetTrackWaveformQuery,
     GetTrackWaveformQuerySchema,
 } from '@/types/schemas/query';
-import { Waveform, WaveformSchema } from '@/types/schemas/response/local';
 
-const useTrackWaveform = (selectedTrackId: number | null) => {
+const useTrackWaveform = (trackId: number | null) => {
     return useTauriQuery<GetTrackWaveformQuery, Waveform>(
         'get_track_waveform',
-        { id: selectedTrackId! },
+        { id: trackId! },
         {
             querySchema: GetTrackWaveformQuerySchema,
             responseSchema: WaveformSchema,
-            enabled: selectedTrackId !== null,
+            enabled: trackId !== null,
         }
     );
 };

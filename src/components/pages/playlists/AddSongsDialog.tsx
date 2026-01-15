@@ -8,14 +8,8 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { useTauriQuery } from '@/hooks/useTauriQuery';
-import {
-    GetSongImageQuery,
-    GetSongImageQuerySchema,
-    GetSongImageResponse,
-    GetSongImageResponseSchema,
-    TrackRow,
-} from '@/types/schemas';
+import { useSongImage } from '@/hooks/useSongImage';
+import { TrackRow } from '@/types/schemas';
 import { Music, Plus, Search } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
@@ -30,17 +24,7 @@ interface AddSongsDialogProps {
 const TrackItem = (props: { track: TrackRow; onAdd: () => void }) => {
     const { track, onAdd } = props;
 
-    const { data: artwork } = useTauriQuery<
-        GetSongImageQuery,
-        GetSongImageResponse
-    >(
-        'get_song_image',
-        { id: track.id },
-        {
-            querySchema: GetSongImageQuerySchema,
-            responseSchema: GetSongImageResponseSchema,
-        }
-    );
+    const { data: artwork } = useSongImage(track.id);
 
     return (
         <button

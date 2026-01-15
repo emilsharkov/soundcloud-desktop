@@ -14,23 +14,19 @@ import {
     DropdownMenuSubTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
+import { usePlaylists } from '@/hooks/usePlaylists';
 import { useTauriMutation } from '@/hooks/useTauriMutation';
-import { useTauriQuery } from '@/hooks/useTauriQuery';
 import {
     AddSongToPlaylistResponse,
     AddSongToPlaylistResponseSchema,
     CreatePlaylistResponse,
     CreatePlaylistResponseSchema,
-    GetPlaylistsResponse,
-    GetPlaylistsResponseSchema,
 } from '@/types/schemas';
 import {
     AddSongToPlaylistQuery,
     AddSongToPlaylistQuerySchema,
     CreatePlaylistQuery,
     CreatePlaylistQuerySchema,
-    GetPlaylistsQuery,
-    GetPlaylistsQuerySchema,
 } from '@/types/schemas/query';
 import { useQueryClient } from '@tanstack/react-query';
 import { Music, Plus } from 'lucide-react';
@@ -48,13 +44,7 @@ const AddToPlaylist = (props: AddToPlaylistProps) => {
     const [newPlaylistName, setNewPlaylistName] = useState('');
     const queryClient = useQueryClient();
 
-    const { data: playlists } = useTauriQuery<
-        GetPlaylistsQuery,
-        GetPlaylistsResponse
-    >('get_playlists_command', undefined, {
-        querySchema: GetPlaylistsQuerySchema,
-        responseSchema: GetPlaylistsResponseSchema,
-    });
+    const { data: playlists } = usePlaylists();
 
     const { mutate: addSongToPlaylist } = useTauriMutation<
         AddSongToPlaylistQuery,

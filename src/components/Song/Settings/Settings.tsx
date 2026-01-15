@@ -1,10 +1,6 @@
 import { DropdownMenu } from '@/components/ui/dropdown-menu';
-import { useTauriQuery } from '@/hooks/useTauriQuery';
-import { Track, TrackSchema } from '@/types/schemas';
-import {
-    GetLocalTrackQuery,
-    GetLocalTrackQuerySchema,
-} from '@/types/schemas/query';
+import { useLocalTrackRow } from '@/hooks/useLocalTrackRow';
+import { TrackRow } from '@/types/schemas';
 import { createContext, ReactNode, useContext } from 'react';
 import { SettingsContent } from './SettingsContent';
 import { SettingsTrigger } from './SettingsTrigger';
@@ -13,7 +9,7 @@ interface SettingsContextValue {
     trackId: number;
     title: string;
     artist: string;
-    localTrack: Track | undefined;
+    localTrack: TrackRow | undefined;
 }
 
 const SettingsContext = createContext<SettingsContextValue | null>(null);
@@ -37,16 +33,7 @@ interface SettingsProps {
 
 const Settings = (props: SettingsProps) => {
     const { trackId, title, artist, children } = props;
-    const { data: localTrack } = useTauriQuery<GetLocalTrackQuery, Track>(
-        'get_local_track',
-        {
-            id: trackId,
-        },
-        {
-            querySchema: GetLocalTrackQuerySchema,
-            responseSchema: TrackSchema,
-        }
-    );
+    const { data: localTrack } = useLocalTrackRow(trackId);
 
     const contextValue: SettingsContextValue = {
         trackId,

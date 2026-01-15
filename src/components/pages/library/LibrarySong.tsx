@@ -9,16 +9,8 @@ import { Song } from '@/components/Song/Song';
 import { SongSkeleton } from '@/components/Song/SongSkeleton';
 import { SortableItem } from '@/components/ui/sortable-item';
 import { QueueContext } from '@/hooks/useQueueStrategy';
-import { useTauriQuery } from '@/hooks/useTauriQuery';
-import {
-    GetSongImageResponse,
-    GetSongImageResponseSchema,
-    TrackRow,
-} from '@/types/schemas';
-import {
-    GetSongImageQuery,
-    GetSongImageQuerySchema,
-} from '@/types/schemas/query';
+import { useSongImage } from '@/hooks/useSongImage';
+import { TrackRow } from '@/types/schemas';
 
 interface LibrarySongProps {
     trackRow: TrackRow;
@@ -29,17 +21,7 @@ const LibrarySong = (props: LibrarySongProps) => {
     const { trackRow, queueContext } = props;
     const { id, title, artist, waveform } = trackRow;
 
-    const { data: artwork, isLoading } = useTauriQuery<
-        GetSongImageQuery,
-        GetSongImageResponse
-    >(
-        'get_song_image',
-        { id },
-        {
-            querySchema: GetSongImageQuerySchema,
-            responseSchema: GetSongImageResponseSchema,
-        }
-    );
+    const { data: artwork, isLoading } = useSongImage(id);
 
     if (isLoading || !artwork) {
         return <SongSkeleton />;

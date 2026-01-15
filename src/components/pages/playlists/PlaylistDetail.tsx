@@ -1,18 +1,7 @@
 import { SortableList } from '@/components/ui/sortable-list';
-import { useTauriQuery } from '@/hooks/useTauriQuery';
-import {
-    GetLocalTracksResponse,
-    GetLocalTracksResponseSchema,
-    GetPlaylistSongsResponse,
-    GetPlaylistSongsResponseSchema,
-    PlaylistRow,
-} from '@/types/schemas';
-import {
-    GetLocalTracksQuery,
-    GetLocalTracksQuerySchema,
-    GetPlaylistSongsQuery,
-    GetPlaylistSongsQuerySchema,
-} from '@/types/schemas/query';
+import { useLocalTracks } from '@/hooks/useLocalTracks';
+import { usePlaylistSongs } from '@/hooks/usePlaylistSongs';
+import { PlaylistRow } from '@/types/schemas';
 import { useState } from 'react';
 import { AddSongsDialog } from './AddSongsDialog';
 import { usePlaylistMutations } from './hooks/usePlaylistMutations';
@@ -30,24 +19,9 @@ const PlaylistDetail = (props: PlaylistDetailProps) => {
     const { id, name } = playlist;
     const [addSongsDialogOpen, setAddSongsDialogOpen] = useState(false);
 
-    const { data: songs } = useTauriQuery<
-        GetPlaylistSongsQuery,
-        GetPlaylistSongsResponse
-    >(
-        'get_playlist_songs_command',
-        { id },
-        {
-            querySchema: GetPlaylistSongsQuerySchema,
-            responseSchema: GetPlaylistSongsResponseSchema,
-        }
-    );
+    const { data: songs } = usePlaylistSongs(id);
 
-    const { data: libraryTracks } = useTauriQuery<
-        GetLocalTracksQuery,
-        GetLocalTracksResponse
-    >('get_local_tracks', undefined, {
-        querySchema: GetLocalTracksQuerySchema,
-        responseSchema: GetLocalTracksResponseSchema,
+    const { data: libraryTracks } = useLocalTracks({
         enabled: addSongsDialogOpen,
     });
 

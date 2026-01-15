@@ -6,12 +6,11 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { SortableList } from '@/components/ui/sortable-list';
+import { useLocalTracks } from '@/hooks/useLocalTracks';
 import { useTauriMutation } from '@/hooks/useTauriMutation';
-import { useTauriQuery } from '@/hooks/useTauriQuery';
 import {
     ExportLibraryResponse,
     ExportLibraryResponseSchema,
-    GetLocalTracksResponseSchema,
     ReorderTracksResponse,
     ReorderTracksResponseSchema,
     TrackRow,
@@ -19,7 +18,6 @@ import {
 import {
     ExportLibraryQuery,
     ExportLibraryQuerySchema,
-    GetLocalTracksQuerySchema,
     ReorderTracksQuery,
     ReorderTracksQuerySchema,
 } from '@/types/schemas/query';
@@ -32,14 +30,7 @@ import { LibrarySong } from './LibrarySong';
 const Library = () => {
     const queryClient = useQueryClient();
 
-    const { data: tracks } = useTauriQuery<undefined, TrackRow[]>(
-        'get_local_tracks',
-        undefined,
-        {
-            querySchema: GetLocalTracksQuerySchema,
-            responseSchema: GetLocalTracksResponseSchema,
-        }
-    );
+    const { data: tracks } = useLocalTracks();
 
     const { mutate: reorderTracks } = useTauriMutation<
         ReorderTracksQuery,

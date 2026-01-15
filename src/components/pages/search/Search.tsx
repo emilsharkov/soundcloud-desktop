@@ -1,13 +1,8 @@
 import { Button } from '@/components/ui/button';
-import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
-import { useTauriInfiniteQuery } from '@/hooks/useTauriInfiniteQuery';
+import { useSearchTracks } from '@/hooks/useSearchTracks';
 import { useNav } from '@/providers/NavProvider';
 import { useOffline } from '@/providers/OfflineProvider';
-import { Track, Tracks, TracksSchema } from '@/types/schemas';
-import {
-    SearchTracksQuery,
-    SearchTracksQuerySchema,
-} from '@/types/schemas/query';
+import { Track } from '@/types/schemas';
 import { parseError } from '@/utils/parseError';
 import { Loader2, RefreshCw } from 'lucide-react';
 import { SearchSong } from './SearchSong';
@@ -16,32 +11,11 @@ const Search = () => {
     const { selectedSearch } = useNav();
     const { isOffline, retryConnection, isRetrying } = useOffline();
 
-    const {
-        data,
-        error,
-        isError,
-        refetch,
-        fetchNextPage,
-        hasNextPage,
-        isFetchingNextPage,
-    } = useTauriInfiniteQuery<SearchTracksQuery, Track, Tracks>(
-        'search_tracks',
-        {
-            q: selectedSearch ?? '',
-        },
-        {
+    const { data, error, isError, refetch, isFetchingNextPage, loadMoreRef } =
+        useSearchTracks(selectedSearch ?? '', {
             enabled: !isOffline && selectedSearch !== undefined,
             limit: 20,
-            querySchema: SearchTracksQuerySchema,
-            responseSchema: TracksSchema,
-        }
-    );
-
-    const { loadMoreRef } = useInfiniteScroll({
-        hasNextPage,
-        isFetchingNextPage,
-        fetchNextPage,
-    });
+        });
 
     // Flatten all pages into a single array of tracks
     const tracks = data?.pages.flatMap(page => page.collection) ?? [];

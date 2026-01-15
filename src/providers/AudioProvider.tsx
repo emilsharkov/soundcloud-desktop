@@ -1,15 +1,8 @@
 import { AudioEngine, EngineSnapshot } from '@/core/audio/AudioEngine';
 import { Repeat } from '@/core/audio/types';
 import { useMediaSession } from '@/hooks/useMediaSession';
-import { useTauriQuery } from '@/hooks/useTauriQuery';
-import {
-    GetTrackMediaMetadataQuery,
-    GetTrackMediaMetadataQuerySchema,
-} from '@/types/schemas/query';
-import {
-    TrackMediaMetadata,
-    TrackMediaMetadataSchema,
-} from '@/types/schemas/response';
+import { useTrackMediaMetadata } from '@/hooks/useTrackMediaMetadata';
+import { TrackMediaMetadata } from '@/types/schemas/response';
 import { isEqual } from 'lodash';
 import React, {
     createContext,
@@ -152,17 +145,8 @@ export const AudioProvider = (props: AudioProviderProps): React.ReactNode => {
     );
 
     // Fetch current track metadata for Media Session
-    const { data: trackMediaMetadata } = useTauriQuery<
-        GetTrackMediaMetadataQuery,
-        TrackMediaMetadata
-    >(
-        'get_track_media_metadata',
-        { id: snap.selectedTrackId! },
-        {
-            querySchema: GetTrackMediaMetadataQuerySchema,
-            responseSchema: TrackMediaMetadataSchema,
-            enabled: snap.selectedTrackId !== null,
-        }
+    const { data: trackMediaMetadata } = useTrackMediaMetadata(
+        snap.selectedTrackId
     );
 
     // Set up Media Session

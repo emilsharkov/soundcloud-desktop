@@ -8,21 +8,10 @@ import {
 import { Song } from '@/components/Song/Song';
 import { SongSkeleton } from '@/components/Song/SongSkeleton';
 import { SortableItem } from '@/components/ui/sortable-item';
+import { useLocalTrackRow } from '@/hooks/useLocalTrackRow';
 import { QueueContext } from '@/hooks/useQueueStrategy';
-import { useTauriQuery } from '@/hooks/useTauriQuery';
-import {
-    GetLocalTrackResponse,
-    GetLocalTrackResponseSchema,
-    GetSongImageResponse,
-    GetSongImageResponseSchema,
-    PlaylistSongRow,
-} from '@/types/schemas';
-import {
-    GetLocalTrackQuery,
-    GetLocalTrackQuerySchema,
-    GetSongImageQuery,
-    GetSongImageQuerySchema,
-} from '@/types/schemas/query';
+import { useSongImage } from '@/hooks/useSongImage';
+import { PlaylistSongRow } from '@/types/schemas';
 
 interface PlaylistSongProps {
     playlistSong: PlaylistSongRow;
@@ -33,27 +22,11 @@ const PlaylistSong = (props: PlaylistSongProps) => {
     const { playlistSong, queueContext } = props;
     const { track_id, title, artist, playlist_id } = playlistSong;
 
-    const { data: localTrack, isLoading: isLoadingTrack } = useTauriQuery<
-        GetLocalTrackQuery,
-        GetLocalTrackResponse
-    >(
-        'get_local_track',
-        { id: track_id },
+    const { data: localTrack, isLoading: isLoadingTrack } =
+        useLocalTrackRow(track_id);
+    const { data: artwork, isLoading: isLoadingArtwork } = useSongImage(
+        track_id,
         {
-            querySchema: GetLocalTrackQuerySchema,
-            responseSchema: GetLocalTrackResponseSchema,
-        }
-    );
-
-    const { data: artwork, isLoading: isLoadingArtwork } = useTauriQuery<
-        GetSongImageQuery,
-        GetSongImageResponse
-    >(
-        'get_song_image',
-        { id: track_id },
-        {
-            querySchema: GetSongImageQuerySchema,
-            responseSchema: GetSongImageResponseSchema,
             enabled: localTrack !== undefined,
         }
     );

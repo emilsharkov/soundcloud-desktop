@@ -1,14 +1,6 @@
-import { useTauriQuery } from '@/hooks/useTauriQuery';
+import { useSearchResults } from '@/hooks/useSearchResults';
 import { useNav } from '@/providers/NavProvider';
-import {
-    SearchResult,
-    SearchResultsResponse,
-    SearchResultsResponseSchema,
-} from '@/types/schemas';
-import {
-    SearchResultsQuery,
-    SearchResultsQuerySchema,
-} from '@/types/schemas/query';
+import { SearchResult } from '@/types/schemas';
 import { TABS } from '@/types/tabs';
 import { upperFirst } from 'lodash';
 import { Search } from 'lucide-react';
@@ -29,20 +21,7 @@ const Navbar = () => {
     const [debouncedSearch] = useDebounceValue(search, 500);
     const [popoverOpen, setPopoverOpen] = useState<boolean>(false);
 
-    const { data: searchResults } = useTauriQuery<
-        SearchResultsQuery,
-        SearchResultsResponse
-    >(
-        'search_results',
-        {
-            q: debouncedSearch,
-        },
-        {
-            enabled: debouncedSearch.trim() !== '',
-            querySchema: SearchResultsQuerySchema,
-            responseSchema: SearchResultsResponseSchema,
-        }
-    );
+    const { data: searchResults } = useSearchResults(debouncedSearch);
 
     const selectSearchResult = (searchResult: SearchResult) => {
         const { output } = searchResult;

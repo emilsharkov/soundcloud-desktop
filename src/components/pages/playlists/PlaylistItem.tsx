@@ -1,14 +1,6 @@
 import { SortableItem } from '@/components/ui/sortable-item';
-import { useTauriQuery } from '@/hooks/useTauriQuery';
-import {
-    GetPlaylistSongsResponse,
-    GetPlaylistSongsResponseSchema,
-    PlaylistRow,
-} from '@/types/schemas';
-import {
-    GetPlaylistSongsQuery,
-    GetPlaylistSongsQuerySchema,
-} from '@/types/schemas/query';
+import { usePlaylistSongs } from '@/hooks/usePlaylistSongs';
+import { PlaylistRow } from '@/types/schemas';
 import { Music } from 'lucide-react';
 import { PlaylistImageGrid } from './PlaylistImageGrid';
 
@@ -21,17 +13,7 @@ const PlaylistItem = (props: PlaylistItemProps) => {
     const { playlist, onClick } = props;
     const { name, id } = playlist;
 
-    const { data: songs } = useTauriQuery<
-        GetPlaylistSongsQuery,
-        GetPlaylistSongsResponse
-    >(
-        'get_playlist_songs_command',
-        { id },
-        {
-            querySchema: GetPlaylistSongsQuerySchema,
-            responseSchema: GetPlaylistSongsResponseSchema,
-        }
-    );
+    const { data: songs } = usePlaylistSongs(id);
 
     const firstFourTracks = songs?.slice(0, 4) ?? [];
 

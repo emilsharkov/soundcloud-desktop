@@ -1,16 +1,12 @@
+import { useLocalTrackRow } from '@/hooks/useLocalTrackRow';
 import { useTauriMutation } from '@/hooks/useTauriMutation';
-import { useTauriQuery } from '@/hooks/useTauriQuery';
 import {
     DownloadTrackResponse,
     DownloadTrackResponseSchema,
-    GetLocalTrackResponse,
-    GetLocalTrackResponseSchema,
 } from '@/types/schemas';
 import {
     DownloadTrackQuery,
     DownloadTrackQuerySchema,
-    GetLocalTrackQuery,
-    GetLocalTrackQuerySchema,
 } from '@/types/schemas/query';
 import { useQueryClient } from '@tanstack/react-query';
 import { Check, LoaderCircle, LucideDownload } from 'lucide-react';
@@ -27,18 +23,7 @@ const Download = (props: DownloadProps) => {
     const queryClient = useQueryClient();
     const [downloading, setDownloading] = useState<boolean>(false);
 
-    const {
-        data: localTrack,
-        isLoading,
-        isError,
-    } = useTauriQuery<GetLocalTrackQuery, GetLocalTrackResponse>(
-        'get_local_track',
-        { id: trackId },
-        {
-            querySchema: GetLocalTrackQuerySchema,
-            responseSchema: GetLocalTrackResponseSchema,
-        }
-    );
+    const { data: localTrack, isLoading, isError } = useLocalTrackRow(trackId);
 
     const { mutate: downloadTrack } = useTauriMutation<
         DownloadTrackQuery,

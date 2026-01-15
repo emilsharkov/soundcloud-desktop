@@ -1,14 +1,6 @@
 import { SortableList } from '@/components/ui/sortable-list';
-import { useTauriQuery } from '@/hooks/useTauriQuery';
-import {
-    GetPlaylistsResponse,
-    GetPlaylistsResponseSchema,
-    PlaylistRow,
-} from '@/types/schemas';
-import {
-    GetPlaylistsQuery,
-    GetPlaylistsQuerySchema,
-} from '@/types/schemas/query';
+import { usePlaylists } from '@/hooks/usePlaylists';
+import { PlaylistRow } from '@/types/schemas';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { CreatePlaylistDialog } from './CreatePlaylistDialog';
@@ -23,13 +15,7 @@ const Playlists = () => {
     const [createDialogOpen, setCreateDialogOpen] = useState(false);
     const [newPlaylistName, setNewPlaylistName] = useState('');
 
-    const { data: playlists } = useTauriQuery<
-        GetPlaylistsQuery,
-        GetPlaylistsResponse
-    >('get_playlists_command', undefined, {
-        querySchema: GetPlaylistsQuerySchema,
-        responseSchema: GetPlaylistsResponseSchema,
-    });
+    const { data: playlists } = usePlaylists();
 
     const { createPlaylist, deletePlaylist, reorderPlaylists } =
         usePlaylistsMutations(

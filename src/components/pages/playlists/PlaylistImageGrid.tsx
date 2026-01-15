@@ -1,30 +1,12 @@
-import { useTauriQuery } from '@/hooks/useTauriQuery';
-import {
-    GetSongImageResponse,
-    GetSongImageResponseSchema,
-    PlaylistSongRow,
-} from '@/types/schemas';
-import {
-    GetSongImageQuery,
-    GetSongImageQuerySchema,
-} from '@/types/schemas/query';
+import { useSongImage } from '@/hooks/useSongImage';
+import { PlaylistSongRow } from '@/types/schemas';
 
 interface PlaylistImageGridProps {
     tracks: PlaylistSongRow[];
 }
 
 const TrackImage = ({ trackId }: { trackId: number }) => {
-    const { data: image, isLoading } = useTauriQuery<
-        GetSongImageQuery,
-        GetSongImageResponse
-    >(
-        'get_song_image',
-        { id: trackId },
-        {
-            querySchema: GetSongImageQuerySchema,
-            responseSchema: GetSongImageResponseSchema,
-        }
-    );
+    const { data: image, isLoading } = useSongImage(trackId);
 
     if (isLoading || !image) {
         return <div className='w-full h-full bg-accent' />;
