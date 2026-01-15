@@ -1,6 +1,6 @@
 import { useAudio } from '@/providers/AudioProvider';
 import { useState } from 'react';
-import { FullScreenPlayer } from './FullScreenPlayer';
+import { FullscreenPlayer } from './FullScreenPlayer';
 import { Play } from './Play';
 import { Repeat } from './Repeat';
 import { Seeker } from './Seeker';
@@ -43,7 +43,7 @@ const MusicPlayer = (): React.ReactNode => {
                     </div>
                 </div>
             </div>
-            <FullScreenPlayer
+            <FullscreenPlayer
                 isOpen={isFullScreenOpen}
                 onClose={handleCloseFullScreen}
             />
