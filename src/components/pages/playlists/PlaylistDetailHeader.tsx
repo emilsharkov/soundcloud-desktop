@@ -54,12 +54,8 @@ export const PlaylistDetailHeader = (props: PlaylistDetailHeaderProps) => {
     });
 
     const handleDelete = () => {
-        // Close dialog first, then delete after a small delay to allow animation
         setDeleteDialogOpen(false);
-        // Use setTimeout to ensure dialog closes before component unmounts
-        setTimeout(() => {
-            onDelete();
-        }, 200);
+        onDelete();
     };
 
     const handleExportPlaylist = async () => {
@@ -93,7 +89,7 @@ export const PlaylistDetailHeader = (props: PlaylistDetailHeaderProps) => {
                     <Plus className='w-4 h-4 mr-2' />
                     Add Songs
                 </Button>
-                <DropdownMenu>
+                <DropdownMenu modal={false}>
                     <DropdownMenuTrigger asChild>
                         <Button size='icon' className='shrink-0'>
                             <MoreVertical className='w-5 h-5' />
@@ -115,7 +111,11 @@ export const PlaylistDetailHeader = (props: PlaylistDetailHeaderProps) => {
                     </DropdownMenuContent>
                 </DropdownMenu>
             </div>
-            <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+            <Dialog
+                modal={false}
+                open={deleteDialogOpen}
+                onOpenChange={setDeleteDialogOpen}
+            >
                 <DialogContent className='sm:max-w-md'>
                     <DialogHeader>
                         <DialogTitle>Delete Playlist</DialogTitle>

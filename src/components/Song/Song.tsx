@@ -7,7 +7,7 @@ export interface SongProps {
     trackId: number;
     title: string;
     artist: string;
-    artwork: string;
+    artwork: string | undefined;
     waveform: Waveform;
     buttonBar?: React.ReactNode;
     queueContext?: QueueContext;

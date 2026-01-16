@@ -49,6 +49,7 @@ export const GetPlaylistSongsResponseSchema = z.array(PlaylistSongRowSchema);
 export const CreatePlaylistResponseSchema = z.null();
 export const UpdatePlaylistResponseSchema = z.null();
 export const DeletePlaylistResponseSchema = z.null();
+export const DeleteLocalTrackResponseSchema = z.null();
 export const AddSongToPlaylistResponseSchema = z.null();
 export const RemoveSongFromPlaylistResponseSchema = z.null();
 export const ReorderPlaylistsResponseSchema = z.null();
@@ -86,6 +87,9 @@ export type UpdatePlaylistResponse = z.infer<
 >;
 export type DeletePlaylistResponse = z.infer<
     typeof DeletePlaylistResponseSchema
+>;
+export type DeleteLocalTrackResponse = z.infer<
+    typeof DeleteLocalTrackResponseSchema
 >;
 export type AddSongToPlaylistResponse = z.infer<
     typeof AddSongToPlaylistResponseSchema

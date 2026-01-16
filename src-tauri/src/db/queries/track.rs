@@ -94,8 +94,6 @@ pub async fn update_track(
         return Err("No fields to update".into());
     }
 
-    println!("Updating track: {:?}", (title, artist, id));
-
     sqlx::query("UPDATE tracks SET title = ?1, artist = ?2 WHERE id = ?3")
         .bind(title)
         .bind(artist)
@@ -107,7 +105,6 @@ pub async fn update_track(
     let track = get_track(pool, id)
         .await
         .map_err(|e| format!("Failed to get track: {e}"))?;
-    println!("Track updated: {track:?}");
     Ok(())
 }
 

@@ -37,6 +37,7 @@ const FullscreenPlayerStage = (props: FullscreenPlayerStageProps) => {
 
     const style = {
         backgroundImage: `url(${artwork})`,
+        backgroundColor: artwork ? 'transparent' : 'black',
         width: '200vw',
         transform: `translate3d(${position}px, 0, 0)`,
     };

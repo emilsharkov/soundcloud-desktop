@@ -83,7 +83,7 @@ export const AddSongsDialog = (props: AddSongsDialogProps) => {
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className='max-w-3xl max-h-[85vh] flex flex-col'>
+            <DialogContent className='max-w-3xl max-h-[85vh] flex flex-col bg-black text-white'>
                 <DialogHeader>
                     <DialogTitle>Add Songs to Playlist</DialogTitle>
                     <DialogDescription>
@@ -136,6 +136,7 @@ export const AddSongsDialog = (props: AddSongsDialogProps) => {
                 </div>
                 <DialogFooter>
                     <Button
+                        className='bg-white text-black'
                         variant='outline'
                         onClick={() => {
                             setSearchQuery('');

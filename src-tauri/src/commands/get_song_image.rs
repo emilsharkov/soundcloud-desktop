@@ -18,7 +18,7 @@ pub async fn get_song_image(state: State<'_, Mutex<AppState>>, id: i64) -> Resul
 
     if local_track.is_some() {
         let music_dir = state.lock().unwrap().app_data_dir.clone().join("music");
-        get_image_from_local_track(music_dir, id).await
+        return get_image_from_local_track(music_dir, id).await;
     } else {
         check_offline_mode(&state)
             .map_err(|e| format_error_with_context("App is in offline mode", e))?;
@@ -45,15 +45,16 @@ async fn get_image_from_local_track(music_dir: PathBuf, id: i64) -> Result<Strin
         let image = format!("data:{mime};base64,{b64}");
         Ok(image)
     } else {
-        Err("No image found in ID3 metadata".to_string())
+        Ok("".to_string())
     }
 }
 
 async fn get_image_from_online_track(track: &Track) -> Result<String, String> {
-    let artwork_url = track
-        .artwork_url
-        .as_ref()
-        .ok_or("Failed to get artwork url")?;
-    let artwork = get_artwork(artwork_url).await;
+    let artwork_url = track.artwork_url.clone();
+    if artwork_url.is_none() {
+        return Ok("".to_string());
+    }
+
+    let artwork = get_artwork(artwork_url.as_ref().ok_or("Failed to get artwork url")?).await;
     Ok(artwork)
 }

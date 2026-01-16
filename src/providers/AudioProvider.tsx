@@ -148,6 +148,7 @@ export const AudioProvider = (props: AudioProviderProps): React.ReactNode => {
     const { data: trackMediaMetadata } = useTrackMediaMetadata(
         snap.selectedTrackId
     );
+    console.log(trackMediaMetadata);
 
     // Set up Media Session
     useMediaSession({

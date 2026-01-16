@@ -20,12 +20,7 @@ const SearchSong = (props: SearchSongProps) => {
     const { data: waveform, isLoading: isWaveformLoading } =
         useTrackWaveform(id);
 
-    if (
-        isArtworkLoading ||
-        isWaveformLoading ||
-        waveform === undefined ||
-        artwork === undefined
-    ) {
+    if (isArtworkLoading || isWaveformLoading || waveform === undefined) {
         return <SongSkeleton />;
     }
 

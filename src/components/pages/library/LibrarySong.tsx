@@ -23,7 +23,7 @@ const LibrarySong = (props: LibrarySongProps) => {
 
     const { data: artwork, isLoading } = useSongImage(id);
 
-    if (isLoading || !artwork) {
+    if (isLoading) {
         return <SongSkeleton />;
     }
 

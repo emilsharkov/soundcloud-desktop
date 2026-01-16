@@ -1,10 +1,13 @@
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { useTauriMutation } from '@/hooks/useTauriMutation';
-import { Track, TrackSchema } from '@/types/schemas';
 import {
     DeleteLocalTrackQuery,
     DeleteLocalTrackQuerySchema,
 } from '@/types/schemas/query';
+import {
+    DeleteLocalTrackResponse,
+    DeleteLocalTrackResponseSchema,
+} from '@/types/schemas/response/local';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { useSettingsContext } from './Settings';
@@ -15,10 +18,10 @@ const SettingsDelete = () => {
 
     const { mutate: deleteTrack } = useTauriMutation<
         DeleteLocalTrackQuery,
-        Track
+        DeleteLocalTrackResponse
     >('delete_local_track', {
         querySchema: DeleteLocalTrackQuerySchema,
-        responseSchema: TrackSchema,
+        responseSchema: DeleteLocalTrackResponseSchema,
         onSuccess: async () => {
             await queryClient.invalidateQueries({
                 queryKey: ['get_local_tracks'],

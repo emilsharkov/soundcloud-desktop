@@ -31,7 +31,7 @@ const PlaylistSong = (props: PlaylistSongProps) => {
         }
     );
 
-    if (isLoadingTrack || isLoadingArtwork || !artwork || !localTrack) {
+    if (isLoadingTrack || isLoadingArtwork || !localTrack) {
         return <SongSkeleton />;
     }
 
