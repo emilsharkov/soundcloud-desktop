@@ -8,11 +8,17 @@ This is an unofficial desktop client for [Soundcloud](https://soundcloud.com/) w
 You need to have the following installed on your system:
 
 - `rustc/cargo/rustup`
-    - curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+
+    ```bash
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+    ```
 
 - `npm/node`
-    - curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
-    - nvm install node
+    ```bash
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+
+    nvm install node
+    ```
 
 ## Get App Set Up
 
