@@ -67,7 +67,8 @@ pub async fn download_track(state: State<'_, Mutex<AppState>>, id: i64) -> Resul
     let artwork_url = track.artwork_url.clone();
     let mut final_artwork = None;
     if artwork_url.is_some() {
-        final_artwork = Some(get_artwork(artwork_url.as_ref().ok_or("Failed to get artwork url")?).await);
+        final_artwork =
+            Some(get_artwork(artwork_url.as_ref().ok_or("Failed to get artwork url")?).await);
     }
 
     update_local_track_metadata(

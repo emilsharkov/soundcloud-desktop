@@ -51,9 +51,6 @@ const Download = (props: DownloadProps) => {
         downloadTrack({ id: trackId });
     };
 
-    if (trackId === 2110830129) {
-        console.log(localTrack, isLoading, isError);
-    }
     const isLocalTrack = localTrack !== undefined && !isLoading && !isError;
 
     return isLocalTrack ? (

@@ -18,7 +18,7 @@ pub async fn get_song_image(state: State<'_, Mutex<AppState>>, id: i64) -> Resul
 
     if local_track.is_some() {
         let music_dir = state.lock().unwrap().app_data_dir.clone().join("music");
-        return get_image_from_local_track(music_dir, id).await;
+        get_image_from_local_track(music_dir, id).await
     } else {
         check_offline_mode(&state)
             .map_err(|e| format_error_with_context("App is in offline mode", e))?;
