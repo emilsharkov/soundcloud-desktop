@@ -33,6 +33,9 @@ const Download = (props: DownloadProps) => {
         responseSchema: DownloadTrackResponseSchema,
         onSuccess: async () => {
             await queryClient.invalidateQueries({
+                queryKey: ['get_local_tracks'],
+            });
+            await queryClient.invalidateQueries({
                 queryKey: ['get_local_track', trackId],
             });
             toast.success('Downloaded successfully');

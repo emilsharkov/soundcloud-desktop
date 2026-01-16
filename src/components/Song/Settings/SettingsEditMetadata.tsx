@@ -51,6 +51,15 @@ const SettingsEditMetadata = () => {
             await queryClient.invalidateQueries({
                 queryKey: ['get_local_track', trackId],
             });
+            await queryClient.invalidateQueries({
+                queryKey: ['get_song_image', trackId],
+            });
+            await queryClient.invalidateQueries({
+                queryKey: ['get_track_media_metadata', trackId],
+            });
+            await queryClient.invalidateQueries({
+                queryKey: ['get_playlist_songs_command'],
+            });
             toast.success('Metadata updated successfully');
         },
         onError: () => {
@@ -174,8 +183,11 @@ const SettingsEditMetadata = () => {
                         <DialogTitle>Edit Metadata</DialogTitle>
                     </DialogHeader>
 
-                    <form onSubmit={handleSubmit} className='space-y-4'>
-                        <div className='space-y-2'>
+                    <form
+                        onSubmit={handleSubmit}
+                        className='space-y-4 max-w-full min-w-0'
+                    >
+                        <div className='space-y-2 max-w-full'>
                             <Label htmlFor='title'>Title</Label>
                             <Input
                                 id='title'
@@ -186,7 +198,7 @@ const SettingsEditMetadata = () => {
                             />
                         </div>
 
-                        <div className='space-y-2'>
+                        <div className='space-y-2 max-w-full'>
                             <Label htmlFor='artist'>Artist</Label>
                             <Input
                                 id='artist'
@@ -197,18 +209,19 @@ const SettingsEditMetadata = () => {
                             />
                         </div>
 
-                        <div className='space-y-2'>
+                        <div className='space-y-2 max-w-full min-w-0'>
                             <Label htmlFor='artwork'>Artwork URL</Label>
                             <Button
+                                className='w-full max-w-full min-w-0 justify-start overflow-hidden'
                                 type='button'
                                 variant='outline'
                                 onClick={handleSelectArtwork}
                             >
-                                <p className='text-sm text-ellipsis'>
+                                <span className='text-sm truncate w-full min-w-0 text-left'>
                                     {artwork !== undefined
                                         ? artwork
                                         : 'Select Artwork'}
-                                </p>
+                                </span>
                             </Button>
                         </div>
 

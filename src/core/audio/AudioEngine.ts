@@ -29,8 +29,17 @@ export class AudioEngine {
             if (q.repeat === 'song') {
                 this.transport.setTime(0);
                 void this.transport.setPaused(false);
-            } else {
-                this.queue.next();
+                return;
+            }
+            const currentId = q.selectedTrackId;
+            this.queue.next();
+            const after = this.queue.getSnapshot();
+            if (
+                after.repeat === 'songs' &&
+                after.selectedTrackId === currentId
+            ) {
+                this.transport.setTime(0);
+                void this.transport.setPaused(false);
             }
         });
 

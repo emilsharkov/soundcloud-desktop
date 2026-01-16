@@ -49,9 +49,12 @@ export const usePlaylistsMutations = (
     >('delete_playlist_command', {
         querySchema: DeletePlaylistQuerySchema,
         responseSchema: DeletePlaylistResponseSchema,
-        onSuccess: async () => {
+        onSuccess: async (_, variables) => {
             await queryClient.invalidateQueries({
                 queryKey: ['get_playlists_command'],
+            });
+            await queryClient.invalidateQueries({
+                queryKey: ['get_playlist_songs_command', variables.id],
             });
             onDeleteSuccess?.();
             toast.success('Playlist deleted successfully');

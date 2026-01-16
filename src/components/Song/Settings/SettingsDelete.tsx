@@ -32,6 +32,12 @@ const SettingsDelete = () => {
             await queryClient.invalidateQueries({
                 queryKey: ['get_song_image', trackId],
             });
+            await queryClient.invalidateQueries({
+                queryKey: ['get_track_media_metadata', trackId],
+            });
+            await queryClient.invalidateQueries({
+                queryKey: ['get_playlist_songs_command'],
+            });
             toast.success('Track deleted successfully');
         },
         onError: () => {
