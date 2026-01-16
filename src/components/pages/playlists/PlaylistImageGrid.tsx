@@ -36,7 +36,7 @@ const PlaylistImageGrid = (props: PlaylistImageGridProps) => {
 
     return (
         <div className={`grid ${getGridClass()} w-full h-full`}>
-            {firstFourTracks.map((track, index) => (
+            {firstFourTracks.map(track => (
                 <TrackImage key={track.track_id} trackId={track.track_id} />
             ))}
         </div>
