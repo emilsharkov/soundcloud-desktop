@@ -18,13 +18,12 @@ interface FullscreenPlayerProps {
 const FullscreenPlayer = (props: FullscreenPlayerProps): React.ReactNode => {
     const { isOpen, onClose } = props;
     const {
-        trackMediaMetadata,
         playbackTime,
         duration,
         setTime,
         selectedTrackId,
+        trackMediaMetadata,
     } = useAudio();
-    const { artwork } = trackMediaMetadata ?? {};
     const viewportWidth = useViewportWidth();
     const {
         position,
@@ -39,12 +38,6 @@ const FullscreenPlayer = (props: FullscreenPlayerProps): React.ReactNode => {
         selectedTrackId,
     });
 
-    const percentageCompleted = dragging
-        ? position / -viewportWidth
-        : duration > 0
-          ? playbackTime / duration
-          : 0;
-
     const { data: waveform, isLoading: isWaveformLoading } =
         useTrackWaveform(selectedTrackId);
 
@@ -55,6 +48,14 @@ const FullscreenPlayer = (props: FullscreenPlayerProps): React.ReactNode => {
             },
         })
     );
+
+    const percentageCompleted = dragging
+        ? position / -viewportWidth
+        : duration > 0
+          ? playbackTime / duration
+          : 0;
+
+    const { artwork, title, artist } = trackMediaMetadata ?? {};
 
     if (isWaveformLoading || waveform === undefined) {
         return null;
@@ -70,6 +71,8 @@ const FullscreenPlayer = (props: FullscreenPlayerProps): React.ReactNode => {
                     onDragEnd={handleDragEnd}
                 >
                     <FullscreenPlayerStage
+                        title={title}
+                        artist={artist}
                         artwork={artwork}
                         onClose={onClose}
                         waveform={waveform}
