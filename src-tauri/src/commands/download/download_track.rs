@@ -11,10 +11,7 @@ use soundcloud_rs::Identifier;
 use std::sync::Mutex;
 use tauri::State;
 
-pub async fn download_track_internal(
-    state: &Mutex<AppState>,
-    id: i64,
-) -> Result<(), String> {
+pub async fn download_track_internal(state: &Mutex<AppState>, id: i64) -> Result<(), String> {
     check_offline_mode(state)
         .map_err(|e| format_error_with_context("App is in offline mode", e))?;
 

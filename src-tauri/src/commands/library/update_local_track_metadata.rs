@@ -1,3 +1,7 @@
+use crate::{
+    models::app_state::AppState,
+    utils::classify_path::{classify_path, InputType},
+};
 use id3::{
     frame::{Picture, PictureType},
     Tag, TagLike, Version,
@@ -8,10 +12,6 @@ use std::{
     sync::Mutex,
 };
 use tauri::State;
-use crate::{
-    models::app_state::AppState,
-    utils::classify_path::{classify_path, InputType},
-};
 
 fn detect_mime_type_from_path(path: &Path) -> String {
     match path.extension().and_then(|ext| ext.to_str()) {

@@ -1,7 +1,7 @@
 use id3::{Tag, TagLike};
+use serde_json;
 use std::fs;
 use std::path::Path;
-use serde_json;
 
 /// Sanitizes a filename or folder name by replacing invalid filesystem characters with underscores.
 ///
