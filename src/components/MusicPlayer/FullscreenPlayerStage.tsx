@@ -13,27 +13,21 @@ interface FullscreenPlayerStageProps {
     artwork?: string;
     onClose: () => void;
     width: number;
-    percentageCompleted: number;
+    position: number;
     waveform: Waveform;
 }
 
 const FullscreenPlayerStage = (props: FullscreenPlayerStageProps) => {
-    const {
-        title,
-        artist,
-        artwork,
-        onClose,
-        percentageCompleted,
-        width,
-        waveform,
-    } = props;
-    const { paused, setPaused, playbackTime, duration } = useAudio();
+    const { title, artist, artwork, onClose, position, width, waveform } =
+        props;
+    const { paused, setPaused, playbackTime, duration, next, prev } =
+        useAudio();
     const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
         id: 'fullscreen-player',
     });
     const { ref, samples } = useWaveform(waveform);
+    const percentageCompleted = position / -width;
     const sampleIndex = Math.floor(percentageCompleted * (samples.length - 1));
-    const position = Math.floor(percentageCompleted * width * -1);
 
     const style = {
         backgroundImage: `url(${artwork})`,
@@ -47,6 +41,18 @@ const FullscreenPlayerStage = (props: FullscreenPlayerStageProps) => {
         setPaused(!paused);
     };
 
+    const handleSkipBack = (e: React.MouseEvent<HTMLButtonElement>) => {
+        e.stopPropagation();
+        if (isDragging) return;
+        prev();
+    };
+
+    const handleSkipForward = (e: React.MouseEvent<HTMLButtonElement>) => {
+        e.stopPropagation();
+        if (isDragging) return;
+        next();
+    };
+
     const formatTime = (time: number) => {
         if (!Number.isFinite(time) || time < 0) return '0:00';
         const minutes = Math.floor(time / 60);
@@ -56,20 +62,18 @@ const FullscreenPlayerStage = (props: FullscreenPlayerStageProps) => {
 
     return (
         <>
-            <div className='fixed w-fit h-fit z-60 inset-0 flex flex-col items-start justify-start p-4'>
-                <div className='flex flex-col items-start justify-start gap-0'>
-                    <h1 className='text-2xl font-bold bg-black px-2 pt-1'>
+            <div className='fixed top-0 left-0 right-0 z-60 flex items-start justify-between p-4 gap-4'>
+                <div className='flex min-w-0 flex-col items-start justify-start gap-0'>
+                    <h1 className='text-2xl font-bold bg-black px-2 pt-1 truncate max-w-full'>
                         {title}
                     </h1>
-                    <p className='text-xl text-gray-500 bg-black px-2 pb-1'>
+                    <p className='text-xl text-gray-500 bg-black px-2 pb-1 truncate max-w-full'>
                         {artist}
                     </p>
                 </div>
-            </div>
-            <div className='fixed w-fit h-fit z-60 right-10 top-0 p-4'>
                 <Button
                     onClick={onClose}
-                    className='bg-black rounded-full size-10 flex items-center justify-center'
+                    className='bg-black rounded-full size-10 flex items-center justify-center shrink-0'
                 >
                     <ChevronDown className='size-7 text-white' />
                 </Button>
@@ -81,42 +85,42 @@ const FullscreenPlayerStage = (props: FullscreenPlayerStageProps) => {
             </div>
             <div
                 className={cn(
-                    'fixed inset-0 z-60 flex items-center justify-center ml-[200px] transition-opacity duration-200 ease-out pointer-events-none',
-                    paused ? 'opacity-100' : 'opacity-0 '
+                    'fixed inset-0 z-70 flex items-center justify-center ml-[200px] transition-opacity duration-200 ease-out pointer-events-none',
+                    paused ? 'flex' : 'hidden'
                 )}
             >
                 <button
                     type='button'
-                    onClick={handleTogglePlayback}
-                    className='cursor-pointer bg-black rounded-full size-12 flex items-center justify-center'
+                    onClick={handleSkipForward}
+                    className='cursor-pointer bg-black rounded-full size-12 flex items-center justify-center pointer-events-auto'
                 >
                     <SkipForward className='size-6 text-white fill-white' />
                 </button>
             </div>
             <div
                 className={cn(
-                    'fixed inset-0 z-60 flex items-center justify-center transition-opacity duration-200 ease-out pointer-events-none',
-                    paused ? 'opacity-100' : 'opacity-0 '
+                    'fixed inset-0 z-70 flex items-center justify-center transition-opacity duration-200 ease-out pointer-events-none',
+                    paused ? 'flex' : 'hidden'
                 )}
             >
                 <button
                     type='button'
                     onClick={handleTogglePlayback}
-                    className='cursor-pointer bg-black rounded-full size-16 flex items-center justify-center'
+                    className='cursor-pointer bg-black rounded-full size-16 flex items-center justify-center pointer-events-auto'
                 >
                     <Play className='size-8 text-white fill-white' />
                 </button>
             </div>
             <div
                 className={cn(
-                    'fixed inset-0 z-60 flex items-center justify-center mr-[200px] transition-opacity duration-200 ease-out pointer-events-none',
-                    paused ? 'opacity-100' : 'opacity-0 '
+                    'fixed inset-0 z-70 flex items-center justify-center mr-[200px] transition-opacity duration-200 ease-out pointer-events-none',
+                    paused ? 'flex' : 'hidden'
                 )}
             >
                 <button
                     type='button'
-                    onClick={handleTogglePlayback}
-                    className='cursor-pointer bg-black rounded-full size-12 flex items-center justify-center'
+                    onClick={handleSkipBack}
+                    className='cursor-pointer bg-black rounded-full size-12 flex items-center justify-center pointer-events-auto'
                 >
                     <SkipBack className='size-6 text-white fill-white' />
                 </button>
@@ -132,7 +136,7 @@ const FullscreenPlayerStage = (props: FullscreenPlayerStageProps) => {
                 <div
                     className={cn(
                         'absolute inset-0 bg-black/40 z-0',
-                        paused && 'backdrop-blur-md'
+                        paused || isDragging ? 'backdrop-blur-md' : ''
                     )}
                 />
                 <div className='absolute left-[50vw] h-10 w-[100vw] top-3/5 z-10'>

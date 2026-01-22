@@ -1,5 +1,7 @@
+import { SearchInput } from '@/components/ui/search-input';
 import { SortableList } from '@/components/ui/sortable-list';
 import { usePlaylists } from '@/hooks/usePlaylists';
+import { useSearchFilter } from '@/hooks/useSearchFilter';
 import { PlaylistRow } from '@/types/schemas';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -52,6 +54,13 @@ const Playlists = () => {
         setNewPlaylistName('');
     };
 
+    const { query, setQuery, normalizedQuery, filteredItems } = useSearchFilter(
+        {
+            items: playlists,
+            getSearchText: playlist => playlist.name ?? '',
+        }
+    );
+
     if (selectedPlaylist) {
         return (
             <PlaylistDetail
@@ -65,23 +74,47 @@ const Playlists = () => {
     return (
         <div className='flex flex-col gap-4 p-4'>
             <PlaylistsHeader onCreateClick={() => setCreateDialogOpen(true)} />
+            <SearchInput
+                value={query}
+                onChange={event => setQuery(event.target.value)}
+                placeholder='Search playlists'
+                aria-label='Search playlists'
+            />
 
-            <SortableList
-                items={playlists}
-                getId={playlist => playlist.id}
-                onReorder={positions => {
-                    reorderPlaylists({ positions });
-                }}
-                emptyMessage='No playlists yet. Create one to get started!'
-            >
-                {playlists?.map(playlist => (
-                    <PlaylistItem
-                        key={playlist.id}
-                        playlist={playlist}
-                        onClick={() => setSelectedPlaylist(playlist)}
-                    />
-                ))}
-            </SortableList>
+            {normalizedQuery ? (
+                filteredItems.length > 0 ? (
+                    <div className='flex flex-col gap-2'>
+                        {filteredItems.map(playlist => (
+                            <PlaylistItem
+                                key={playlist.id}
+                                playlist={playlist}
+                                onClick={() => setSelectedPlaylist(playlist)}
+                            />
+                        ))}
+                    </div>
+                ) : (
+                    <div className='flex flex-col items-center justify-center py-12 text-tertiary'>
+                        <p>No matching playlists</p>
+                    </div>
+                )
+            ) : (
+                <SortableList
+                    items={playlists}
+                    getId={playlist => playlist.id}
+                    onReorder={positions => {
+                        reorderPlaylists({ positions });
+                    }}
+                    emptyMessage='No playlists yet. Create one to get started!'
+                >
+                    {playlists?.map(playlist => (
+                        <PlaylistItem
+                            key={playlist.id}
+                            playlist={playlist}
+                            onClick={() => setSelectedPlaylist(playlist)}
+                        />
+                    ))}
+                </SortableList>
+            )}
 
             <CreatePlaylistDialog
                 open={createDialogOpen}

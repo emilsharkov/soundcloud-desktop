@@ -18,7 +18,7 @@ const WaveformBar = (props: WaveformBarProps) => {
                 return (
                     <div
                         key={index}
-                        className='w-[2px] transition-all duration-200'
+                        className='w-[2px] transition-all duration-100'
                         style={{
                             height: !paused ? `${sample * 2}px` : '4px',
                             backgroundColor:

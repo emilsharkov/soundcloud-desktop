@@ -27,16 +27,17 @@ const FullscreenPlayer = (props: FullscreenPlayerProps): React.ReactNode => {
     const viewportWidth = useViewportWidth();
     const {
         position,
-        dragging,
         handleDragStart,
         handleDragMove,
         handleDragEnd,
-    } = useFullscreenDrag({
+        handleDragCancel,
+    } = useFullscreenDrag(
         viewportWidth,
+        playbackTime,
         duration,
         setTime,
-        selectedTrackId,
-    });
+        selectedTrackId
+    );
 
     const { data: waveform, isLoading: isWaveformLoading } =
         useTrackWaveform(selectedTrackId);
@@ -48,12 +49,6 @@ const FullscreenPlayer = (props: FullscreenPlayerProps): React.ReactNode => {
             },
         })
     );
-
-    const percentageCompleted = dragging
-        ? position / -viewportWidth
-        : duration > 0
-          ? playbackTime / duration
-          : 0;
 
     const { artwork, title, artist } = trackMediaMetadata ?? {};
 
@@ -69,6 +64,7 @@ const FullscreenPlayer = (props: FullscreenPlayerProps): React.ReactNode => {
                     onDragStart={handleDragStart}
                     onDragMove={handleDragMove}
                     onDragEnd={handleDragEnd}
+                    onDragCancel={handleDragCancel}
                 >
                     <FullscreenPlayerStage
                         title={title}
@@ -76,7 +72,7 @@ const FullscreenPlayer = (props: FullscreenPlayerProps): React.ReactNode => {
                         artwork={artwork}
                         onClose={onClose}
                         waveform={waveform}
-                        percentageCompleted={percentageCompleted}
+                        position={position}
                         width={viewportWidth}
                     />
                 </DndContext>

@@ -1,21 +1,17 @@
-import { DragEndEvent, DragMoveEvent } from '@dnd-kit/core';
+import { DragCancelEvent, DragEndEvent, DragMoveEvent } from '@dnd-kit/core';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 const clampPosition = (value: number, min: number, max: number) => {
     return Math.min(max, Math.max(min, value));
 };
 
-const useFullscreenDrag = ({
-    viewportWidth,
-    duration,
-    setTime,
-    selectedTrackId,
-}: {
-    viewportWidth: number;
-    duration: number;
-    setTime: (time: number) => void;
-    selectedTrackId: number | null;
-}) => {
+const useFullscreenDrag = (
+    viewportWidth: number,
+    playbackTime: number,
+    duration: number,
+    setTime: (time: number) => void,
+    selectedTrackId: number | null
+) => {
     const [position, setPosition] = useState(0);
     const [dragging, setDragging] = useState<boolean>(false);
     const dragStartPosition = useRef(0);
@@ -32,6 +28,11 @@ const useFullscreenDrag = ({
     useEffect(() => {
         setPosition(0);
     }, [selectedTrackId]);
+
+    useEffect(() => {
+        if (dragging) return;
+        setPosition((playbackTime / duration) * -viewportWidth);
+    }, [playbackTime, duration, viewportWidth, dragging]);
 
     const handleDragStart = useCallback(() => {
         dragStartPosition.current = position;
@@ -64,6 +65,26 @@ const useFullscreenDrag = ({
         [duration, maxPosition, minPosition, setTime, viewportWidth]
     );
 
+    const handleDragCancel = useCallback((_: DragCancelEvent) => {
+        setDragging(false);
+    }, []);
+
+    useEffect(() => {
+        const handlePointerUp = () => {
+            setDragging(false);
+        };
+        window.addEventListener('pointerup', handlePointerUp);
+        window.addEventListener('pointercancel', handlePointerUp);
+        window.addEventListener('mouseup', handlePointerUp);
+        window.addEventListener('touchend', handlePointerUp);
+        return () => {
+            window.removeEventListener('pointerup', handlePointerUp);
+            window.removeEventListener('pointercancel', handlePointerUp);
+            window.removeEventListener('mouseup', handlePointerUp);
+            window.removeEventListener('touchend', handlePointerUp);
+        };
+    }, []);
+
     return {
         position,
         dragging,
@@ -72,6 +93,7 @@ const useFullscreenDrag = ({
         handleDragStart,
         handleDragMove,
         handleDragEnd,
+        handleDragCancel,
     };
 };
 
