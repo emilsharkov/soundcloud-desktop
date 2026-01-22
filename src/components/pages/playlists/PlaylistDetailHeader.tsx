@@ -13,19 +13,10 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useTauriMutation } from '@/hooks/useTauriMutation';
-import {
-    ExportPlaylistQuery,
-    ExportPlaylistQuerySchema,
-} from '@/types/schemas/query';
-import {
-    ExportPlaylistResponse,
-    ExportPlaylistResponseSchema,
-} from '@/types/schemas/response';
+import { useExportPlaylistMutation } from '@/hooks/useExportPlaylistMutation';
 import { open as openDialog } from '@tauri-apps/plugin-dialog';
 import { ArrowLeft, MoreVertical, Plus } from 'lucide-react';
 import { useState } from 'react';
-import { toast } from 'sonner';
 
 interface PlaylistDetailHeaderProps {
     playlistId: number;
@@ -39,19 +30,7 @@ export const PlaylistDetailHeader = (props: PlaylistDetailHeaderProps) => {
     const { playlistId, name, onBack, onAddSongs, onDelete } = props;
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
-    const { mutate: exportPlaylist, isPending: isExporting } = useTauriMutation<
-        ExportPlaylistQuery,
-        ExportPlaylistResponse
-    >('export_playlist', {
-        querySchema: ExportPlaylistQuerySchema,
-        responseSchema: ExportPlaylistResponseSchema,
-        onSuccess: () => {
-            toast.success('Playlist exported successfully');
-        },
-        onError: error => {
-            toast.error(`Failed to export playlist: ${error.message}`);
-        },
-    });
+    const { exportPlaylist, isExporting } = useExportPlaylistMutation();
 
     const handleDelete = () => {
         setDeleteDialogOpen(false);

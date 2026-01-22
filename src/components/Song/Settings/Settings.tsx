@@ -48,7 +48,7 @@ const Settings = (props: SettingsProps) => {
 
     return (
         <SettingsContext.Provider value={contextValue}>
-            <DropdownMenu>
+            <DropdownMenu modal={false}>
                 <SettingsTrigger />
                 <SettingsContent>{children}</SettingsContent>
             </DropdownMenu>

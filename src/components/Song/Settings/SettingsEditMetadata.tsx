@@ -9,19 +9,10 @@ import {
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useTauriMutation } from '@/hooks/useTauriMutation';
-import {
-    UpdateLocalTrackResponse,
-    UpdateLocalTrackResponseSchema,
-} from '@/types/schemas';
-import {
-    UpdateLocalTrackQuery,
-    UpdateLocalTrackQuerySchema,
-} from '@/types/schemas/query';
-import { useQueryClient } from '@tanstack/react-query';
+import { useUpdateTrackMetadataMutation } from '@/hooks/useUpdateTrackMetadataMutation';
+import { UpdateLocalTrackQuery } from '@/types/schemas/query';
 import { open as openDialog } from '@tauri-apps/plugin-dialog';
 import { useEffect, useState } from 'react';
-import { toast } from 'sonner';
 import { useSettingsContext } from './Settings';
 
 const SettingsEditMetadata = () => {
@@ -36,35 +27,8 @@ const SettingsEditMetadata = () => {
     const [artist, setArtist] = useState<string>(initialArtist);
     const [artwork, setArtwork] = useState<string | undefined>(undefined);
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-    const queryClient = useQueryClient();
 
-    const { mutate: updateTrack } = useTauriMutation<
-        UpdateLocalTrackQuery,
-        UpdateLocalTrackResponse
-    >('update_local_track', {
-        querySchema: UpdateLocalTrackQuerySchema,
-        responseSchema: UpdateLocalTrackResponseSchema,
-        onSuccess: async () => {
-            await queryClient.invalidateQueries({
-                queryKey: ['get_local_tracks'],
-            });
-            await queryClient.invalidateQueries({
-                queryKey: ['get_local_track', trackId],
-            });
-            await queryClient.invalidateQueries({
-                queryKey: ['get_song_image', trackId],
-            });
-            await queryClient.invalidateQueries({
-                queryKey: ['get_track_media_metadata', trackId],
-            });
-            await queryClient.invalidateQueries({
-                queryKey: ['get_playlist_songs_command'],
-            });
-            toast.success('Metadata updated successfully');
-        },
-        onError: () => {
-            toast.error('Failed to update metadata');
-        },
+    const { updateTrack } = useUpdateTrackMetadataMutation(trackId, {
         onSettled: () => {
             setIsSubmitting(false);
             setEditMetadataModalOpen(false);
@@ -174,9 +138,9 @@ const SettingsEditMetadata = () => {
                 Edit metadata
             </DropdownMenuItem>
             <Dialog
+                modal={false}
                 open={editMetadataModalOpen}
                 onOpenChange={handleOpenChange}
-                modal={true}
             >
                 <DialogContent className='sm:max-w-md'>
                     <DialogHeader>
