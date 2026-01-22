@@ -17,6 +17,10 @@ const useWaveform = (waveform: Waveform): UseWaveformReturn => {
     // container width = 3x - 1 px
     const numSamples = Math.floor((containerWidth + 1) / 3);
     const resizedSamples = resizeSamples(samples, numSamples, 60);
+    useEffect(
+        () => console.log(resizedSamples.length, samples.length),
+        [resizedSamples, samples.length]
+    );
 
     useLayoutEffect(() => {
         if (ref.current) {

@@ -74,6 +74,8 @@ const Search = () => {
         );
     }
 
+    if (data === undefined) return null;
+
     // Create queue context for search
     const queueContext = {
         tab: 'search' as const,
@@ -83,13 +85,22 @@ const Search = () => {
 
     return (
         <div className='flex flex-col gap-4 p-4'>
-            {tracks.map((track: Track) => (
-                <SearchSong
-                    key={track.id}
-                    track={track}
-                    queueContext={queueContext}
-                />
-            ))}
+            {tracks.length === 0 ? (
+                <div className='flex flex-col items-center justify-center py-12 text-center'>
+                    <p className='text-tertiary font-medium'>No songs found</p>
+                    <p className='text-tertiary text-sm mt-1'>
+                        Try a different search term
+                    </p>
+                </div>
+            ) : (
+                tracks.map((track: Track) => (
+                    <SearchSong
+                        key={track.id}
+                        track={track}
+                        queueContext={queueContext}
+                    />
+                ))
+            )}
 
             {/* Load more trigger */}
             <div ref={loadMoreRef} className='flex justify-center py-4'>

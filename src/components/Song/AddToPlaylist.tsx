@@ -61,7 +61,14 @@ const AddToPlaylist = (props: AddToPlaylistProps) => {
     return (
         <>
             <DropdownMenuSub>
-                <DropdownMenuSubTrigger>Add to playlist</DropdownMenuSubTrigger>
+                <DropdownMenuSubTrigger
+                    onClick={e => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }}
+                >
+                    Add to playlist
+                </DropdownMenuSubTrigger>
                 <DropdownMenuSubContent>
                     {playlists && playlists.length > 0 ? (
                         playlists.map(playlist => (
@@ -78,7 +85,10 @@ const AddToPlaylist = (props: AddToPlaylistProps) => {
                         </DropdownMenuItem>
                     )}
                     <DropdownMenuItem
-                        onClick={() => setCreateDialogOpen(true)}
+                        onClick={e => {
+                            e.preventDefault();
+                            setCreateDialogOpen(true);
+                        }}
                         className='text-primary'
                     >
                         <Plus className='w-4 h-4 mr-2' />
