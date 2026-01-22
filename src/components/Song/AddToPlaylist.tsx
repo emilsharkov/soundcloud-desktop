@@ -96,11 +96,7 @@ const AddToPlaylist = (props: AddToPlaylistProps) => {
                     </DropdownMenuItem>
                 </DropdownMenuSubContent>
             </DropdownMenuSub>
-            <Dialog
-                modal={false}
-                open={createDialogOpen}
-                onOpenChange={setCreateDialogOpen}
-            >
+            <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
                 <DialogContent>
                     <DialogHeader>
                         <DialogTitle>Create New Playlist</DialogTitle>

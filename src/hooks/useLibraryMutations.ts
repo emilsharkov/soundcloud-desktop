@@ -2,12 +2,16 @@ import { useTauriMutation } from '@/hooks/useTauriMutation';
 import {
     ExportLibraryResponse,
     ExportLibraryResponseSchema,
+    ImportTracksResponse,
+    ImportTracksResponseSchema,
     ReorderTracksResponse,
     ReorderTracksResponseSchema,
 } from '@/types/schemas';
 import {
     ExportLibraryQuery,
     ExportLibraryQuerySchema,
+    ImportTracksQuery,
+    ImportTracksQuerySchema,
     ReorderTracksQuery,
     ReorderTracksQuerySchema,
 } from '@/types/schemas/query';
@@ -48,9 +52,34 @@ export const useLibraryMutations = () => {
         },
     });
 
+    const { mutate: importTracks, isPending: isImporting } = useTauriMutation<
+        ImportTracksQuery,
+        ImportTracksResponse
+    >('import_tracks', {
+        querySchema: ImportTracksQuerySchema,
+        responseSchema: ImportTracksResponseSchema,
+        onSuccess: async result => {
+            await queryClient.invalidateQueries({
+                queryKey: ['get_local_tracks'],
+            });
+            if (result.failed_count > 0) {
+                toast.success(
+                    `Imported ${result.imported} tracks, skipped ${result.failed_count}`
+                );
+            } else {
+                toast.success(`Imported ${result.imported} tracks`);
+            }
+        },
+        onError: error => {
+            toast.error(`Failed to import tracks: ${error.message}`);
+        },
+    });
+
     return {
         exportLibrary,
         isExporting,
+        importTracks,
+        isImporting,
         reorderTracks,
     };
 };

@@ -138,7 +138,6 @@ const SettingsEditMetadata = () => {
                 Edit metadata
             </DropdownMenuItem>
             <Dialog
-                modal={false}
                 open={editMetadataModalOpen}
                 onOpenChange={handleOpenChange}
             >

@@ -1,6 +1,7 @@
 use id3::{Tag, TagLike};
 use std::fs;
 use std::path::Path;
+use serde_json;
 
 /// Sanitizes a filename or folder name by replacing invalid filesystem characters with underscores.
 ///
@@ -76,6 +77,8 @@ pub fn export_tracks(
     fs::create_dir_all(&export_folder)
         .map_err(|e| format!("Failed to create export folder: {e}"))?;
 
+    let mut exported_ids: Vec<u64> = Vec::new();
+
     // Copy all track files
     for &track_id in track_ids {
         let source_path = music_dir.join(track_id.to_string()).with_extension("mp3");
@@ -86,8 +89,14 @@ pub fn export_tracks(
 
             fs::copy(&source_path, export_folder.join(&file_name))
                 .map_err(|e| format!("Failed to copy file {}: {e}", source_path.display()))?;
+            exported_ids.push(track_id);
         }
     }
+
+    let import_manifest = serde_json::to_string_pretty(&exported_ids)
+        .map_err(|e| format!("Failed to serialize import manifest: {e}"))?;
+    fs::write(export_folder.join("import.json"), import_manifest)
+        .map_err(|e| format!("Failed to write import.json: {e}"))?;
 
     Ok(())
 }

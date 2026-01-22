@@ -69,6 +69,7 @@ pub fn run() {
             // Download
             download_playlist,
             download_track,
+            import_tracks,
             // Local
             update_local_track,
             update_local_track_metadata,

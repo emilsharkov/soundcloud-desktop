@@ -90,11 +90,7 @@ export const PlaylistDetailHeader = (props: PlaylistDetailHeaderProps) => {
                     </DropdownMenuContent>
                 </DropdownMenu>
             </div>
-            <Dialog
-                modal={false}
-                open={deleteDialogOpen}
-                onOpenChange={setDeleteDialogOpen}
-            >
+            <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
                 <DialogContent className='sm:max-w-md'>
                     <DialogHeader>
                         <DialogTitle>Delete Playlist</DialogTitle>

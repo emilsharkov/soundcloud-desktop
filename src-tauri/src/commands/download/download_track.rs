@@ -1,6 +1,6 @@
 use crate::{
     commands::{
-        update_local_track_metadata,
+        update_local_track_metadata_internal,
         utils::{check_offline_mode, format_error_with_context, handle_error},
     },
     db::queries::create_track,
@@ -11,9 +11,11 @@ use soundcloud_rs::Identifier;
 use std::sync::Mutex;
 use tauri::State;
 
-#[tauri::command]
-pub async fn download_track(state: State<'_, Mutex<AppState>>, id: i64) -> Result<(), String> {
-    check_offline_mode(&state)
+pub async fn download_track_internal(
+    state: &Mutex<AppState>,
+    id: i64,
+) -> Result<(), String> {
+    check_offline_mode(state)
         .map_err(|e| format_error_with_context("App is in offline mode", e))?;
 
     let soundcloud_client = state.lock().unwrap().soundcloud_client.clone();
@@ -24,7 +26,7 @@ pub async fn download_track(state: State<'_, Mutex<AppState>>, id: i64) -> Resul
         .as_ref()
         .ok_or("SoundCloud client is not available")?;
     let track = client.get_track(&Identifier::Id(id)).await.map_err(|e| {
-        let app_error = handle_error(&state, &e);
+        let app_error = handle_error(state, &e);
         format_error_with_context("Failed to get track", app_error)
     })?;
     let track_title = track.title.as_ref().ok_or("Failed to get title")?;
@@ -40,7 +42,7 @@ pub async fn download_track(state: State<'_, Mutex<AppState>>, id: i64) -> Resul
         .get_track_waveform(&Identifier::Id(id))
         .await
         .map_err(|e| {
-            let app_error = handle_error(&state, &e);
+            let app_error = handle_error(state, &e);
             format_error_with_context("Failed to get track waveform", app_error)
         })?;
 
@@ -60,7 +62,7 @@ pub async fn download_track(state: State<'_, Mutex<AppState>>, id: i64) -> Resul
         )
         .await
         .map_err(|e| {
-            let app_error = handle_error(&state, &e);
+            let app_error = handle_error(state, &e);
             format_error_with_context("Failed to download track", app_error)
         })?;
 
@@ -71,8 +73,8 @@ pub async fn download_track(state: State<'_, Mutex<AppState>>, id: i64) -> Resul
             Some(get_artwork(artwork_url.as_ref().ok_or("Failed to get artwork url")?).await);
     }
 
-    update_local_track_metadata(
-        state.clone(),
+    update_local_track_metadata_internal(
+        state,
         id,
         Some(track_title.to_string()),
         Some(track_username.to_string()),
@@ -88,4 +90,9 @@ pub async fn download_track(state: State<'_, Mutex<AppState>>, id: i64) -> Resul
         .map_err(|e| format!("Failed to create track: {e}"))?;
 
     Ok(())
+}
+
+#[tauri::command]
+pub async fn download_track(state: State<'_, Mutex<AppState>>, id: i64) -> Result<(), String> {
+    download_track_internal(state.inner(), id).await
 }

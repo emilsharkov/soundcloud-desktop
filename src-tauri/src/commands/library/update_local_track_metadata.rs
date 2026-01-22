@@ -8,7 +8,6 @@ use std::{
     sync::Mutex,
 };
 use tauri::State;
-
 use crate::{
     models::app_state::AppState,
     utils::classify_path::{classify_path, InputType},
@@ -52,6 +51,16 @@ fn detect_mime_type_from_url(url_str: &str) -> String {
 #[tauri::command]
 pub async fn update_local_track_metadata(
     state: State<'_, Mutex<AppState>>,
+    id: i64,
+    title: Option<String>,
+    artist: Option<String>,
+    artwork: Option<String>,
+) -> Result<(), String> {
+    update_local_track_metadata_internal(state.inner(), id, title, artist, artwork).await
+}
+
+pub async fn update_local_track_metadata_internal(
+    state: &Mutex<AppState>,
     id: i64,
     title: Option<String>,
     artist: Option<String>,

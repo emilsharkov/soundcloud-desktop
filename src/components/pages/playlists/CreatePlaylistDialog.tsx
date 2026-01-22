@@ -29,7 +29,7 @@ export const CreatePlaylistDialog = (props: CreatePlaylistDialogProps) => {
     } = props;
 
     return (
-        <Dialog modal={false} open={open} onOpenChange={onOpenChange}>
+        <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>Create New Playlist</DialogTitle>

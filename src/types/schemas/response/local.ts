@@ -40,6 +40,10 @@ export const GetLocalTrackResponseSchema = TrackRowSchema;
 export const GetLocalTracksResponseSchema = z.array(TrackRowSchema);
 
 export const DownloadTrackResponseSchema = z.null();
+export const ImportTracksResponseSchema = z.object({
+    imported: z.number(),
+    failed_count: z.number(),
+});
 
 export const UpdateLocalTrackResponseSchema = z.null();
 
@@ -71,6 +75,7 @@ export type GetLocalTracksResponse = z.infer<
     typeof GetLocalTracksResponseSchema
 >;
 export type DownloadTrackResponse = z.infer<typeof DownloadTrackResponseSchema>;
+export type ImportTracksResponse = z.infer<typeof ImportTracksResponseSchema>;
 export type UpdateLocalTrackResponse = z.infer<
     typeof UpdateLocalTrackResponseSchema
 >;
